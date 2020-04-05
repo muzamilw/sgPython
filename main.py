@@ -30,9 +30,6 @@ import botLogic
 
 #global vars
 
-API_BaseURL = "https://socialgrowthlabs.com/API"
-
-
 
 
 class GlobalVars:
@@ -114,14 +111,20 @@ except IOError:
     gVars.GlobalTodo = None
     gVars.Todo = None
     gVars.DailyStatsSent = False
+    gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
 
     with open('glob.Vars', 'wb') as gVarFile:
         pickle.dump(gVars, gVarFile)
 
 print(api.username_id)
-print(gVars.BotVer)
 
 botLogic.RunBot(gVars,api)
+
+print(gVars.SocialProfileId)
+
+with open('glob.Vars', 'wb') as gVarFile:
+    print('Updating gVars at end')
+    pickle.dump(gVars, gVarFile)
 
 
 

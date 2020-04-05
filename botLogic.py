@@ -3,6 +3,7 @@ import customFunctions as cf
 import apiWrappers as apiW
 
 from enum import Enum
+import datetime, pytz
 
 class Actions(Enum):
     Follow = 60
@@ -27,11 +28,11 @@ def RunBot(gVars,api):
     
     if gVars.loginResult is None:
         print('performing app login')
-        gVars.loginResult = cf.AppLogin('nevillekmiec','103381','123')
+        gVars.loginResult = cf.AppLogin('nevillekmiec','103381','123',gVars)
 
     if gVars.loginResult is not None:
         gVars.SocialProfileId = gVars.loginResult["SocialProfileId"]
-        gVars.manifest = cf.GetManifest(gVars.loginResult["SocialProfileId"])
+        gVars.manifest = cf.GetManifest(gVars.loginResult["SocialProfileId"],gVars)
 
         if api.username_id is not None:
             if (gVars.loginResult["InitialStatsReceived"] != True):
@@ -39,7 +40,7 @@ def RunBot(gVars,api):
                 InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
                 InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
 
-                cf.UpdateInitialStatsToServer(gVars.SocialProfileId,InitFollowers,InitFollowing,InitPosts)
+                cf.UpdateInitialStatsToServer(gVars.SocialProfileId,InitFollowers,InitFollowing,InitPosts,gVars)
 
                 print('int followers' + str(InitFollowers))
                 print('InitFollowing' +str(InitFollowers))
@@ -54,7 +55,7 @@ def RunBot(gVars,api):
                 InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
                 InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
                 print('Sending Daily Stats')
-                cf.SendAction(gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(InitFollowing)+'\",\"InitialFollowers\":\"'+ str(InitFollowers) +'\",\"InitialPosts\":\"'+str(InitPosts)+'\",\"SocialProfileId\":'+str(SocialProfileId)+'}')
+                cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(InitFollowing)+'\",\"InitialFollowers\":\"'+ str(InitFollowers) +'\",\"InitialPosts\":\"'+str(InitPosts)+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
                 gVars.DailyStatsSent = True
             else:
                 print('Daily Stats already sent')
@@ -64,11 +65,13 @@ def RunBot(gVars,api):
 
             if gVars.manifestJson is None:
                 print('getting manifest')
-                gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId)
+                gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
             if gVars.manifestObj is None:
                 print('loading manifest')
                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
+
+            return gVars
 
             # if Todo is None:
             #     Todo = SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)

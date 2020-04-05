@@ -1,3 +1,8 @@
+import datetime, pytz
+import dateutil.tz
+import json
+import requests 
+
 def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
     msg= ''
     
@@ -28,8 +33,8 @@ def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
     session.quit()
     print('Mail Sent')
 
-def AppLogin(socialUsername,pin,IMEI):
-    API_Login = API_BaseURL + "/Mobile/Login"
+def AppLogin(socialUsername,pin,IMEI,gVars):
+    API_Login = gVars.API_BaseURL + "/Mobile/Login"
     
     localtz = dateutil.tz.tzlocal()
     localoffset = localtz.utcoffset(datetime.datetime.now(localtz))
@@ -47,9 +52,9 @@ def AppLogin(socialUsername,pin,IMEI):
     else:
         None
 
-def SendAction(SocialProfileId, Action, TargetSocialUserName,Message):
+def SendAction(gVars,SocialProfileId, Action, TargetSocialUserName,Message):
     
-    API_Login = API_BaseURL + "/Mobile/AppActionBulk"
+    API_Login = gVars.API_BaseURL + "/Mobile/AppActionBulk"
     data = [{'SocialProfileId':SocialProfileId,    #1101
             'ActionId':Action.value,
             'TargetSocialUserName':TargetSocialUserName,
@@ -61,8 +66,8 @@ def SendAction(SocialProfileId, Action, TargetSocialUserName,Message):
     else:
         return False
     
-def UpdateInitialStatsToServer(SocialProfileId, InitFollowers, InitFollowing,InitPosts):
-    API_Login = API_BaseURL + "/Mobile/InitialStats"
+def UpdateInitialStatsToServer(SocialProfileId, InitFollowers, InitFollowing,InitPosts,gVars):
+    API_Login = gVars.API_BaseURL + "/Mobile/InitialStats"
     data = {'SocialProfileId':SocialProfileId,    #1101
             'InitialFollowings':InitFollowing,
             'InitialFollowers':InitFollowers,
@@ -75,8 +80,8 @@ def UpdateInitialStatsToServer(SocialProfileId, InitFollowers, InitFollowing,Ini
         return False
 
 
-def GetManifest(SocialProfileId):
-    API_Manifest = API_BaseURL + "/Mobile/GetManifest"
+def GetManifest(SocialProfileId,gVars):
+    API_Manifest = gVars.API_BaseURL + "/Mobile/GetManifest"
     data = {'SocialProfileId':SocialProfileId,    #1101
             'SocialPassword':'1'} 
     r = requests.post(url = API_Manifest, data = data) 
