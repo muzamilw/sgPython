@@ -1,16 +1,21 @@
+from itertools import islice
+from time import sleep
+import datetime
+import time
+
 #api Wrappers
 def getSelfTimeline(api):
     return api.getTimeline()
 
 
 def getTotalFollowers(api, user_id):
-    return api.getTotalFollowers(user_id);
+    return api.getTotalFollowers(user_id)
 
 def getTotalFollowings(api, user_id):
-    return api.getTotalFollowings(user_id);
+    return api.getTotalFollowings(user_id)
 
 def getTotalUserFeed(api, user_id):
-    return api.getTotalUserFeed(user_id);
+    return api.getTotalUserFeed(user_id)
 
 
 def GetSelfFeed(api, userId):
@@ -52,6 +57,8 @@ def GetTagFeed(api, hashTag,maxCountToGet):
         if itemCount >= maxCountToGet:
             next_max_id = False
 
+        time.sleep(2)
+
     return items
         
 
@@ -79,6 +86,8 @@ def GetLocationFeed(api, locationTag,maxCountToGet):
             
             if itemCount >= maxCountToGet:
                 next_max_id = False
+
+            time.sleep(3)
                 
         return items
         #res = api.getLocationFeed(locastionSearchResult[0]["location"]["pk"])

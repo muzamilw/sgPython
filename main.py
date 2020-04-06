@@ -1,10 +1,10 @@
 from InstagramAPI import InstagramAPI
-from itertools import islice
+
 import requests 
-import pandas as pd
+
 import datetime
 #import numpy
-from random import choices
+
 #from collections import Counter
 from time import sleep
 from random import randint
@@ -12,24 +12,19 @@ import json
 import logging
 import time
 import random
-from random import randrange
+
 
 import datetime, pytz
 import dateutil.tz
 #import sys
-import smtplib
-from email.message import EmailMessage
-from email.mime.multipart import MIMEMultipart
+
+
 import pickle
 #from v import MIMETextnpm
 
 import customFunctions
 import apiWrappers
 import botLogic
-
-
-#global vars
-
 
 
 class GlobalVars:

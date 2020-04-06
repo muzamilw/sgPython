@@ -2,6 +2,17 @@ import datetime, pytz
 import dateutil.tz
 import json
 import requests 
+from random import choices
+from random import randrange
+import pandas as pd
+from itertools import islice
+import datetime
+from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+
+import apiWrappers as apiW
 
 def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
     msg= ''
@@ -156,11 +167,12 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights):
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = GetTagFeed(api,tag,manifestObj.totalActionsHashTag) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
-                tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
+                if photo["user"]["friendship_status"]["following"] == False:                
+                    tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
 
 #         for photo in  islice(api.LastJson["items"], 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
 #             if (photo["has_liked"] == False):
@@ -200,7 +212,7 @@ def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos):
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerLocation)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -240,7 +252,7 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos):
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,1): #20
-        lItems = GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(manifestObj.totalActionsDirectCompetitor)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -286,6 +298,8 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
 
         if resUser == True and api.LastJson['user'] is not None:
             locMediaUsers.append([str(api.LastJson['user']['username']),'',str(api.LastJson['user']['pk']),str(api.LastJson['user']['username']),str(api.LastJson["user"]["full_name"]), '' ])
+        else:
+            locMediaUsers.append(['delete_not_found','','',foll['FollowedSocialUsername'],'', '' ])
   
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
