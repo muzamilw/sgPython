@@ -3,15 +3,17 @@ from time import sleep
 import datetime
 import time
 
+#user_info(user_id)
+
 #api Wrappers
-def getSelfTimeline(api):
+def getSelfTimeline(api): #feed_timeline(**kwargs)
     return api.getTimeline()
 
 
-def getTotalFollowers(api, user_id):
+def getTotalFollowers(api, user_id):   #user_followers(user_id, rank_token, **kwargs)
     return api.getTotalFollowers(user_id)
 
-def getTotalFollowings(api, user_id):
+def getTotalFollowings(api, user_id):   #user_following(user_id, rank_token, **kwargs)
     return api.getTotalFollowings(user_id)
 
 def getTotalUserFeed(api, user_id):
@@ -28,13 +30,13 @@ def FollowUser(api, userId):
 def UnFollowUser(api, userId):
     api.unfollow(userId)
     
-def CommentOnMedia(api, mediaId,commentText):
+def CommentOnMedia(api, mediaId,commentText):  #post_comment(media_id, comment_text)
     api.comment(mediaId, commentText)
 
-def LikeMedia(api, mediaId):
-    return api.like(mediaId)
+def LikeMedia(api, mediaId):  #post_like(media_id, module_name='feed_timeline')
+    return api.like(mediaId)   #
 
-def GetTagFeed(api, hashTag,maxCountToGet):
+def GetTagFeed(api, hashTag,maxCountToGet):   #feed_tag(tag, rank_token, **kwargs)
     
     res = api.getHashtagFeed(hashTag)
 
@@ -103,7 +105,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet):
 
     if follUserRes == True and api.LastJson['user'] is not None:
         
-        api.getUserFollowers(api.LastJson['user']['pk'])
+        api.getUserFollowers(api.LastJson['user']['pk'])   #user_followers(user_id, rank_token, **kwargs)
 
         if len(api.LastJson["users"]) > 0:
         
@@ -112,7 +114,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet):
             for user in islice(userFollowers, 0, int(maxCountToGet)): 
                 if (user["is_private"] == False):
                     time.sleep(3)
-                    feedres = api.getUserFeed(user['pk'])
+                    feedres = api.getUserFeed(user['pk'])   #user_feed(user_id, **kwargs)
                     if feedres == True and api.LastJson['items'] is not None:
                         if len(api.LastJson['items']) > 0:
                             #items.extend([{**api.LastJson['items'][0],**user} ])
