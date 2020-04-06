@@ -85,7 +85,7 @@ def RunBot(gVars,api):
                 print('Creating Empty Global todo')
             
 
-            if gVars.hashtagActions is not None:
+            if gVars.hashtagActions is None:
                 print('Getting Feeds of Hashtags and creating action list')
                 gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33])
                 print('Hashtag Feed Done')
@@ -115,7 +115,7 @@ def RunBot(gVars,api):
             frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions,gVars.UnFollowActions]
             actions = pd.concat(frames)
 
-            if gVars.GlobalTodo is None:
+            if gVars.GlobalTodo is not None:
                 gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
                 print('GlobalTodo merged')
             #GlobalTodo[GlobalTodo['Action'] == 'Like']
@@ -123,7 +123,7 @@ def RunBot(gVars,api):
             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
 
             print("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
-            dump(gVars.manifestObj)
+            #dump(gVars.manifestObj)
             
             
            
@@ -200,6 +200,7 @@ def RunBot(gVars,api):
                 
             except:# ClientError:
                 #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                print("exception occurred")
                 print(sys.exc_info())
 
             return gVars
