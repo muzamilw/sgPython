@@ -9,6 +9,7 @@ import time
 def getSelfTimeline(api): #feed_timeline(**kwargs)
     return api.getTimeline()
 
+#username_feed(user_name, **kwargs)
 
 def getTotalFollowers(api, user_id):   #user_followers(user_id, rank_token, **kwargs)
     return api.getTotalFollowers(user_id)
@@ -16,7 +17,7 @@ def getTotalFollowers(api, user_id):   #user_followers(user_id, rank_token, **kw
 def getTotalFollowings(api, user_id):   #user_following(user_id, rank_token, **kwargs)
     return api.getTotalFollowings(user_id)
 
-def getTotalUserFeed(api, user_id):
+def getTotalUserFeed(api, user_id):   #user_feed(user_id, **kwargs)
     return api.getTotalUserFeed(user_id)
 
 
@@ -24,10 +25,10 @@ def GetSelfFeed(api, userId):
     api.getSelfUserFeed()
     return api.LastJson["items"]
 
-def FollowUser(api, userId):
+def FollowUser(api, userId):  #friendships_create(user_id)
     api.follow(userId)
     
-def UnFollowUser(api, userId):
+def UnFollowUser(api, userId):  #friendships_destroy(user_id, **kwargs)
     api.unfollow(userId)
     
 def CommentOnMedia(api, mediaId,commentText):  #post_comment(media_id, comment_text)
@@ -38,7 +39,8 @@ def LikeMedia(api, mediaId):  #post_like(media_id, module_name='feed_timeline')
 
 def GetTagFeed(api, hashTag,maxCountToGet):   #feed_tag(tag, rank_token, **kwargs)
     
-    res = api.getHashtagFeed(hashTag)
+    res = api.getHashtagFeed(hashTag)    #usertag_feed(user_id, **kwargs)
+
 
     items = []
 
@@ -101,7 +103,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet):
     
     items = []
     
-    follUserRes = api.searchUsername(userName)
+    follUserRes = api.searchUsername(userName)   #check_username(username)
 
     if follUserRes == True and api.LastJson['user'] is not None:
         

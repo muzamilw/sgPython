@@ -34,10 +34,6 @@ def RunBot(gVars,api):
         
     gVars.RunStartTime = datetime.datetime.now()
     
-    if gVars.loginResult is None:
-        print('performing app login')
-        gVars.loginResult = cf.AppLogin('nevillekmiec','103381','123',gVars)
-
     if gVars.loginResult is not None:
         gVars.SocialProfileId = gVars.loginResult["SocialProfileId"]
         gVars.manifest = cf.GetManifest(gVars.loginResult["SocialProfileId"],gVars)
