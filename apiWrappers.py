@@ -2,6 +2,7 @@ from itertools import islice
 from time import sleep
 import datetime
 import time
+import json
 
 #user_info(user_id)
 
@@ -11,11 +12,33 @@ def getSelfTimeline(api): #feed_timeline(**kwargs)
 
 #username_feed(user_name, **kwargs)
 
-def getTotalFollowers(api, user_id):   #user_followers(user_id, rank_token, **kwargs)
-    return api.getTotalFollowers(user_id)
+def getFollowers(api, user_id, Client, maxlen):   #user_followers(user_id, rank_token, **kwargs)
+    #return api.getTotalFollowers(user_id)
+    
+    rank_token = Client.generate_uuid()
+    has_more = True
+    user_results = []
+    while has_more and rank_token and len(user_results) < maxlen:
+        results = api.user_followers(
+            user_id, rank_token)
+        user_results.extend(results.get('users', []))
+        has_more = results.get('has_more')
+        rank_token = results.get('rank_token')
+    return user_results
+    #print(json.dumps([t['name'] for t in tag_results], indent=2))
 
-def getTotalFollowings(api, user_id):   #user_following(user_id, rank_token, **kwargs)
-    return api.getTotalFollowings(user_id)
+def getFollowings(api, user_id,Client, maxlen):   #user_following(user_id, rank_token, **kwargs)
+    #return api.getTotalFollowings(user_id)
+    rank_token = Client.generate_uuid()
+    has_more = True
+    user_results = []
+    while has_more and rank_token and len(user_results) < maxlen:
+        results = api.user_following(
+            user_id, rank_token)
+        user_results.extend(results.get('users', []))
+        has_more = results.get('has_more')
+        rank_token = results.get('rank_token')
+    return user_results
 
 def getTotalUserFeed(api, user_id):   #user_feed(user_id, **kwargs)
     return api.getTotalUserFeed(user_id)

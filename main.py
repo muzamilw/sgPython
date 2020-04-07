@@ -207,9 +207,22 @@ api = IGLogin('nevillekmiec','!_LKvXc1')
 
 print(api.authenticated_user_id)
 
-botLogic.RunBot(gVars,api)
+botLogic.RunBot(gVars,api,Client)
 
-print(gVars.loginResult)
+
+########################################################
+#user = api.current_user()
+
+#print(gVars.loginResult)
+
+#user_dtail_info = api.user_detail_info(api.authenticated_user_id)
+#user_info = api.user_info(api.authenticated_user_id)
+#username_info = api.username_info(api.authenticated_user_id)
+#print(json.dumps(user, indent=2))
+#print(json.dumps(user_info, indent=2))
+
+#print(user_info['user']['media_count'])
+########################################################
 
 with open('glob.Vars', 'wb') as gVarFile:
     print('Updating gVars at end')
