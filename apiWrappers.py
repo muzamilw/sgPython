@@ -60,33 +60,30 @@ def CommentOnMedia(api, mediaId,commentText):  #post_comment(media_id, comment_t
 def LikeMedia(api, mediaId):  #post_like(media_id, module_name='feed_timeline')
     return api.like(mediaId)   #
 
-def GetTagFeed(api, hashTag,maxCountToGet):   #feed_tag(tag, rank_token, **kwargs)
+def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, **kwargs)
     
-    res = api.getHashtagFeed(hashTag)    #usertag_feed(user_id, **kwargs)
-
-
-    items = []
-
-    items.extend(api.LastJson.get('ranked_items', []))
-
-    itemCount = len(items)
+    rank_token = Client.generate_uuid()
+    has_more = True
+    tag_results = []
     next_max_id = True
-    while next_max_id:
-        # first iteration hack
+    # results = api.feed_tag(
+    #         hashTag, rank_token)
+    # tag_results.extend(results.get('ranked_items', []))
+    # tag_results.extend(results.get('items', []))
+    
+    while has_more and rank_token and next_max_id and len(tag_results) < maxCountToGet:
         if next_max_id is True:
-            next_max_id = ''
+             next_max_id = ''
 
-        _ = api.getHashtagFeed(hashTag,maxid=next_max_id) #api.getUserFollowers(user_id, maxid=next_max_id)
-        itemCount = itemCount + len(api.LastJson["items"])
-        items.extend(api.LastJson.get('items', []))
-        next_max_id = api.LastJson.get('next_max_id', '')
+        results = api.feed_tag(
+            hashTag, rank_token, max_id=next_max_id)
+        tag_results.extend(results.get('ranked_items', []))
+        tag_results.extend(results.get('items', []))
+        has_more = results.get('more_available')
+        next_max_id = results.get('next_max_id')
+        time.sleep(1)
 
-        if itemCount >= maxCountToGet:
-            next_max_id = False
-
-        time.sleep(2)
-
-    return items
+    return tag_results
         
 
 def GetLocationFeed(api, locationTag,maxCountToGet):

@@ -67,24 +67,24 @@ def RunBot(gVars,api,Client):
                 
             
 
-            # if gVars.manifestJson is None:
-            #     print('getting manifest')
-            #     gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
+            if gVars.manifestJson is None:
+                print('getting manifest')
+                gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
-            # if gVars.manifestObj is None:
-            #     print('loading manifest')
-            #     gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
+            if gVars.manifestObj is None:
+                print('loading manifest')
+                gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
             
 
-            # if gVars.Todo is None:
-            #     gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
-            #     print('Creating Empty Global todo')
+            if gVars.Todo is None:
+                gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
+                print('Creating Empty Global todo')
             
 
-            # if gVars.hashtagActions is None:
-            #     print('Getting Feeds of Hashtags and creating action list')
-            #     gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33])
-            #     print('Hashtag Feed Done')
+            if gVars.hashtagActions is None:
+                print('Getting Feeds of Hashtags and creating action list')
+                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33])
+                print('Hashtag Feed Done')
             
             
                 

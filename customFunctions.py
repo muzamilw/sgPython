@@ -162,16 +162,16 @@ def LoadManifest(manifest):
     return manifestObj
 
     
-def LoadHashtagsTodo(api, manifestObj, SubActionWeights):
+def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500,Client) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
-                if photo["user"]["friendship_status"]["following"] == False:                
+                if photo["user"]["is_private"] == False and photo["user"]["friendship_status"]["following"] == False:                
                     tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
 
 #         for photo in  islice(api.LastJson["items"], 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
