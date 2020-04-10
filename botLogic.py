@@ -81,9 +81,9 @@ def RunBot(gVars,api,Client):
                 print('Creating Empty Global todo')
             
 
-            if gVars.hashtagActions is None:
+            if gVars.hashtagActions is not None:
                 print('Getting Feeds of Hashtags and creating action list')
-                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33])
+                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
                 print('Hashtag Feed Done')
             
             
@@ -108,13 +108,13 @@ def RunBot(gVars,api,Client):
             #     print('UnFollow Feed Done')
 
 
-            # frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions,gVars.UnFollowActions]
-            # actions = pd.concat(frames)
+            frames = [gVars.hashtagActions] #, gVars.locationActions, gVars.DCActions,gVars.UnFollowActions]
+            actions = pd.concat(frames)
 
-            # if gVars.GlobalTodo is not None:
-            #     gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
-            #     print('GlobalTodo merged')
-            # #GlobalTodo[GlobalTodo['Action'] == 'Like']
+            if gVars.GlobalTodo is not None:
+                gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
+                print('GlobalTodo merged')
+            #GlobalTodo[GlobalTodo['Action'] == 'Like']
             
             # LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
 

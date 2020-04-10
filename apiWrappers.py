@@ -77,8 +77,13 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
 
         results = api.feed_tag(
             hashTag, rank_token, max_id=next_max_id)
-        tag_results.extend(results.get('ranked_items', []))
-        tag_results.extend(results.get('items', []))
+
+
+        #tag_results.extend(results.get('ranked_items', []))
+        #tag_results.extend(results.get('items', []))
+        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
         time.sleep(1)
@@ -86,34 +91,36 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
     return tag_results
         
 
-def GetLocationFeed(api, locationTag,maxCountToGet):
-    res = api.searchLocation(locationTag)
-    locastionSearchResult = api.LastJson["items"]
+def GetLocationFeed(api, locationTag,maxCountToGet,Client):
+    rank_token = Client.generate_uuid()
+    has_more = True
+    location_results = []
+    next_max_id = True
+
+    
+    locastionSearchResult =  api.location_fb_search(locationTag, rank_token)
 
     if len(locastionSearchResult) > 0:
+
         
-        items = []
         
-        items.extend(api.LastJson.get('ranked_items', []))
-        
-        itemCount = len(items)
-        next_max_id = True
-        while next_max_id:
-            # first iteration hack
+        while has_more and rank_token and next_max_id and len(location_results) < maxCountToGet:
             if next_max_id is True:
                 next_max_id = ''
 
-            _ = api.getLocationFeed(locastionSearchResult[0]["location"]["pk"],maxid=next_max_id) #api.getUserFollowers(user_id, maxid=next_max_id)
-            itemCount = itemCount + len(api.LastJson["items"])
-            items.extend(api.LastJson.get('items', []))
-            next_max_id = api.LastJson.get('next_max_id', '')
-            
-            if itemCount >= maxCountToGet:
-                next_max_id = False
+            results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
+            #location_section(location_id, rank_token, tab='ranked', **kwargs)
 
-            time.sleep(3)
-                
-        return items
+            #tag_results.extend(results.get('ranked_items', []))
+            #tag_results.extend(results.get('items', []))
+            location_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+            location_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+
+            has_more = results.get('more_available')
+            next_max_id = results.get('next_max_id')
+            time.sleep(1)
+
+        return tag_results
         #res = api.getLocationFeed(locastionSearchResult[0]["location"]["pk"])
         #return api.LastJson["items"],api.LastJson["ranked_items"]
     else:

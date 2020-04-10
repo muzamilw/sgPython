@@ -212,11 +212,26 @@ print(api.authenticated_user_id)
 
 ########################################################
 rank_token = Client.generate_uuid()
-results = apiW.GetTagFeed(api, 'musically',300,Client)
 
-#user = api.current_user()
+locres = api.location_fb_search('london', rank_token)
 
-print(len(results))
+results = api.location_section(locres['items'][0]['location']['pk'], rank_token,tab='ranked')
+
+json_object = json.dumps(results, indent=4)
+
+with open("loc.data", "w") as outfile: 
+    outfile.write(json_object) 
+# #results = apiW.GetTagFeed(api, 'musically',300,Client)
+# tag_results = []
+# results = api.feed_tag(
+#             'musically', rank_token)
+
+
+# print(len(tag_results))
+
+# print(len(results['items']))
+
+# print(tag_results)
 
 #user_dtail_info = api.user_detail_info(api.authenticated_user_id)
 #user_info = api.user_info(api.authenticated_user_id)
