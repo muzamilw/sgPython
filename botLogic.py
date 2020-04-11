@@ -100,6 +100,11 @@ def RunBot(gVars,api,Client):
                 gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
                 print('Competitors Feed Done')
 
+            if gVars.SuggestFollowers is None:
+                print('Getting Feeds of Competitors and creating action list')
+                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client)
+                print('Competitors Feed Done')
+
               
                 
             if gVars.UnFollowActions is not None:
@@ -107,8 +112,14 @@ def RunBot(gVars,api,Client):
                 gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
                 print('UnFollow Feed Done')
 
+            if gVars.StoryViewActions is not None:
+                print('Getting Feeds of UnFollow and creating action list')
+                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1])
+                print('UnFollow Feed Done')
 
-            frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions]
+            #media_seen(reels)
+
+            frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
             actions = pd.concat(frames)
 
             if gVars.GlobalTodo is not None:

@@ -190,6 +190,8 @@ except IOError:
     gVars.locationActions = None
     gVars.UnFollowActions = None
     gVars.DCActions = None
+    gVars.SuggestFollowers = None
+    gVars.StoryViewActions = None
     gVars.GlobalTodo = None
     gVars.Todo = None
     gVars.DailyStatsSent = False

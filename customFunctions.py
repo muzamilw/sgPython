@@ -11,6 +11,9 @@ from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+import time
+import calendar;
+
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -292,13 +295,21 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
             
     return usersdf
 
-def LoadSuggestions(api, manifestObj, SubActionWeights,SeqNos,Client):
+def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client):
     
     locMediaUsers = []
 
-    for user in api.discover_chaining(api.authenticated_user_id)['users']: #20
-        locMediaUsers.append(['suggested ' + user['username'],str(user["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), '' ])
-  
+    suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
+    if suggUsers is not None and len(suggUsers) > 0:
+                for user in suggUsers:
+                    if user["is_private"] == False:
+                        ufeed = api.user_feed(user['pk'])
+                        if ufeed is not None and len(ufeed['items']) > 0 :
+                            if ufeed['items'][0]['has_liked'] == False:
+                                # follFeed_results.extend([ufeed['items'][0]])
+                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), '' ])
+                        time.sleep(1)
+
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
     usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
@@ -352,6 +363,41 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
     usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
     usersdf.insert(0, 'Seq',0)
     actions = ['UnFollow' ]
+    
+    Samples = choices(actions, SubActionWeights, k=len(usersdf))
+
+    usersdf['Action'] = Samples
+
+    uf = 1
+
+    for i, row in usersdf.iterrows():
+        
+            usersdf.loc[i,'Seq']  = uf
+            uf = uf + 1
+        
+            
+    return usersdf
+
+def LoadStoryTodo(api, manifestObj, SubActionWeights):
+    
+    reelMediaUsers = []
+
+    reel_tray = api.reels_tray()
+    if reel_tray is not None and len(reel_tray['tray']) > 0:
+        for reel_user in reel_tray['tray']:
+            #reel_tray_users = [(x['user']['pk'],x['user']['username'],x['seen'],x['media_count']) for x in reel_tray()['tray']]
+            if reel_user['seen'] == 0 :
+                user_reel_media = api.user_reel_media(reel_user['user']['pk']) #getting the reel media for the user
+                if user_reel_media is not None and len(user_reel_media['items']) > 0:
+                    reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [x['taken_at']+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
+                    time.sleep(1)
+        
+  
+    hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
+   
+    usersdf = pd.DataFrame(reelMediaUsers,columns = hcols)
+    usersdf.insert(0, 'Seq',0)
+    actions = ['StoryView' ]
     
     Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
