@@ -119,7 +119,7 @@ def IGLogin(username,password):
 
             # login new
             api = Client(
-                username, password,
+                username, password,auto_patch=True,
                 on_login=lambda x: onlogin_callback(x, settings_file))
         else:
             with open(settings_file) as file_data:
@@ -129,7 +129,7 @@ def IGLogin(username,password):
             device_id = cached_settings.get('device_id')
             # reuse auth settings
             api = Client(
-                username, password,
+                username, password,auto_patch=True,
                 settings=cached_settings)
 
     except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
@@ -138,7 +138,7 @@ def IGLogin(username,password):
         # Login expired
         # Do relogin but use default ua, keys and such
         api = Client(
-            username, password,
+            username, password,auto_patch=True,
             device_id=device_id,
             on_login=lambda x: onlogin_callback(x, settings_file))
 
@@ -207,20 +207,22 @@ api = IGLogin('nevillekmiec','!_LKvXc1')
 
 print(api.authenticated_user_id)
 
-#botLogic.RunBot(gVars,api,Client)
+botLogic.RunBot(gVars,api,Client)
 
 
 ########################################################
-rank_token = Client.generate_uuid()
+# rank_token = Client.generate_uuid()
 
-locres = api.location_fb_search('london', rank_token)
+#follfeed = apiW.GetUserFollowingFeed(api, 'muzamilw',10,Client)
+#print(len(follfeed))
+#print(follfeed)
 
-results = api.location_section(locres['items'][0]['location']['pk'], rank_token,tab='ranked')
+# location_results = apiW.GetLocationFeed(api, 'london',300,Client)
 
-json_object = json.dumps(results, indent=4)
+# print(len(location_results))
 
-with open("loc.data", "w") as outfile: 
-    outfile.write(json_object) 
+# with open("loc.json", "w") as outfile: 
+#     outfile.write(json.dumps(location_results))
 # #results = apiW.GetTagFeed(api, 'musically',300,Client)
 # tag_results = []
 # results = api.feed_tag(

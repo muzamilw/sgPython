@@ -11,6 +11,10 @@ from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+from instagram_private_api import (
+        Client, ClientError, ClientLoginError,
+        ClientCookieExpiredError, ClientLoginRequiredError,
+        __version__ as client_version)
 
 import apiWrappers as apiW
 
@@ -207,12 +211,12 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos):
+def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerLocation)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -247,17 +251,53 @@ def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos):
+def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
     
     locMediaUsers = []
 
-    for compe in islice(manifestObj.DirectCompetitors,0,1): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor) 
+    for compe in islice(manifestObj.DirectCompetitors,0,20): #20
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor,Client) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(manifestObj.totalActionsDirectCompetitor)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
                 if (photo["has_liked"] == False):
                     locMediaUsers.append([compe,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), '' ])
+  
+    hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
+   
+    usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
+    usersdf.insert(0, 'Seq',0)
+    actions = ['Follow', 'Like', 'Comment' ]
+    
+    Samples = choices(actions, SubActionWeights, k=len(usersdf))
+
+    usersdf['Action'] = Samples
+
+    fc = SeqNos[1]+1
+    lc = SeqNos[2]+1
+    cc = SeqNos[0]+1
+
+    for i, row in usersdf.iterrows():
+        if row["Action"] == 'Follow':
+            usersdf.loc[i,'Seq']  = fc
+            fc = fc + 1
+
+        if row["Action"] == 'Like':
+            usersdf.loc[i,'Seq']  = lc
+            lc = lc + 1
+
+        if row["Action"] == 'Comment':
+            usersdf.loc[i,'Seq']  = cc
+            cc = cc + 1
+            
+    return usersdf
+
+def LoadSuggestions(api, manifestObj, SubActionWeights,SeqNos,Client):
+    
+    locMediaUsers = []
+
+    for user in api.discover_chaining(api.authenticated_user_id)['users']: #20
+        locMediaUsers.append(['suggested ' + user['username'],str(user["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), '' ])
   
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
@@ -294,10 +334,16 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
 
     for foll in manifestObj.FollowersToUnFollow:
         
-        resUser = api.searchUsername(foll['FollowedSocialUsername'])
+        # resUser = api.searchUsername(foll['FollowedSocialUsername'])
 
-        if resUser == True and api.LastJson['user'] is not None:
-            locMediaUsers.append([str(api.LastJson['user']['username']),'',str(api.LastJson['user']['pk']),str(api.LastJson['user']['username']),str(api.LastJson["user"]["full_name"]), '' ])
+        try:
+            follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            follUserRes = None
+
+        if follUserRes is not None:
+            locMediaUsers.append([str(follUserRes['user']['username']),'',str(follUserRes['user']['pk']),str(follUserRes['user']['username']),str(follUserRes["user"]["full_name"]), '' ])
         else:
             locMediaUsers.append(['delete_not_found','','',foll['FollowedSocialUsername'],'', '' ])
   

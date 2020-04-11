@@ -81,34 +81,34 @@ def RunBot(gVars,api,Client):
                 print('Creating Empty Global todo')
             
 
-            if gVars.hashtagActions is not None:
+            if gVars.hashtagActions is None:
                 print('Getting Feeds of Hashtags and creating action list')
                 gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
                 print('Hashtag Feed Done')
             
             
                 
-            # if gVars.locationActions is None:
-            #     print('Getting Feeds of Location and creating action list')
-            #     gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count())
-            #     print('Location Feed Done')
+            if gVars.locationActions is None:
+                print('Getting Feeds of Location and creating action list')
+                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client)
+                print('Location Feed Done')
 
             
                 
-            # if gVars.DCActions is None:
-            #     print('Getting Feeds of Competitors and creating action list')
-            #     gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count())
-            #     print('Competitors Feed Done')
+            if gVars.DCActions is None:
+                print('Getting Feeds of Competitors and creating action list')
+                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
+                print('Competitors Feed Done')
 
               
                 
-            # if gVars.UnFollowActions is None:
-            #     print('Getting Feeds of UnFollow and creating action list')
-            #     gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
-            #     print('UnFollow Feed Done')
+            if gVars.UnFollowActions is not None:
+                print('Getting Feeds of UnFollow and creating action list')
+                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
+                print('UnFollow Feed Done')
 
 
-            frames = [gVars.hashtagActions] #, gVars.locationActions, gVars.DCActions,gVars.UnFollowActions]
+            frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions]
             actions = pd.concat(frames)
 
             if gVars.GlobalTodo is not None:
