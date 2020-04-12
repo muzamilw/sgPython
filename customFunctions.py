@@ -12,7 +12,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
 import time
-import calendar;
+import calendar
+import sys
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -183,10 +184,7 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client):
                 if photo["user"]["is_private"] == False and photo["user"]["friendship_status"]["following"] == False:                
                     tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
 
-#         for photo in  islice(api.LastJson["items"], 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
-#             if (photo["has_liked"] == False):
-#                 tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
-  
+         
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
     usersdf = pd.DataFrame(tagMediaUsers,columns = hcols)
@@ -298,12 +296,37 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
     return usersdf
 
 def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client):
-    
-    locMediaUsers = []
+    try:
+        locMediaUsers = []
 
-    suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
-    if suggUsers is not None and len(suggUsers) > 0:
-                for user in suggUsers:
+        try:
+            suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
+            if suggUsers is not None and len(suggUsers) > 0:
+                        for user in suggUsers:
+                            if user["is_private"] == False:
+                                ufeed = api.user_feed(user['pk'])
+                                if ufeed is not None and len(ufeed['items']) > 0 :
+                                    if ufeed['items'][0]['has_liked'] == False:
+                                        # follFeed_results.extend([ufeed['items'][0]])
+                                        locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
+                                time.sleep(1)
+        except:
+            print('exception in chaining')
+            raise
+
+        folluser = ''
+        try:
+            #server follow list
+            for foll in manifestObj.FollowList:
+                folluser = foll['FollowedSocialUsername'].strip()
+                try:
+                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                except ClientError as e:
+                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                    user = None
+
+                if user is not None:
+                    user = user['user']
                     if user["is_private"] == False:
                         ufeed = api.user_feed(user['pk'])
                         if ufeed is not None and len(ufeed['items']) > 0 :
@@ -311,83 +334,101 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                                 # follFeed_results.extend([ufeed['items'][0]])
                                 locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                         time.sleep(1)
+        except Exception as e:
+            print('exception in FollowList for user' + folluser)
+            raise
 
-    #server follow list
-    for foll in manifestObj.FollowList:
+        #server Like list
         try:
-            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-        except ClientError as e:
-            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-            user = None
+            for foll in manifestObj.LikeList:
+                try:
+                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                except ClientError as e:
+                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                    user = None
 
-        if user["is_private"] == False:
-            ufeed = api.user_feed(user['pk'])
-            if ufeed is not None and len(ufeed['items']) > 0 :
-                if ufeed['items'][0]['has_liked'] == False:
-                    # follFeed_results.extend([ufeed['items'][0]])
-                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-            time.sleep(1)
+                if user is not None:
+                    user = user['user']
+                    if user["is_private"] == False:
+                        ufeed = api.user_feed(user['pk'])
+                        if ufeed is not None and len(ufeed['items']) > 0 :
+                            if ufeed['items'][0]['has_liked'] == False:
+                                # follFeed_results.extend([ufeed['items'][0]])
+                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
+                        time.sleep(1)
+        except:
+            print('exception in LikeList')
+            raise
 
-    #server Like list
-    for foll in manifestObj.LikeList:
+        #server Comment list
         try:
-            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-        except ClientError as e:
-            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-            user = None
 
-        if user["is_private"] == False:
-            ufeed = api.user_feed(user['pk'])
-            if ufeed is not None and len(ufeed['items']) > 0 :
-                if ufeed['items'][0]['has_liked'] == False:
-                    # follFeed_results.extend([ufeed['items'][0]])
-                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
-            time.sleep(1)
+            for foll in manifestObj.FollowersToComment:
+                try:
+                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                except ClientError as e:
+                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                    user = None
+
+                if user is not None:
+                    user = user['user']
+                    if user["is_private"] == False:
+                        ufeed = api.user_feed(user['pk'])
+                        if ufeed is not None and len(ufeed['items']) > 0 :
+                            if ufeed['items'][0]['has_liked'] == False:
+                                # follFeed_results.extend([ufeed['items'][0]])
+                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
+                        time.sleep(1)
+        except:
+            print('exception in FollowersToComment')
+            raise
+
+        hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
     
-    #server Comment list
-    for foll in manifestObj.FollowersToComment:
-        try:
-            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-        except ClientError as e:
-            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-            user = None
+        usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
+        usersdf.insert(0, 'Seq',0)
+        actions = ['Follow', 'Like', 'Comment' ]
+        
+        Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
-        if user["is_private"] == False:
-            ufeed = api.user_feed(user['pk'])
-            if ufeed is not None and len(ufeed['items']) > 0 :
-                if ufeed['items'][0]['has_liked'] == False:
-                    # follFeed_results.extend([ufeed['items'][0]])
-                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
-            time.sleep(1)
+        usersdf['Action'] = Samples
 
-    hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
-   
-    usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
-    usersdf.insert(0, 'Seq',0)
-    actions = ['Follow', 'Like', 'Comment' ]
-    
-    Samples = choices(actions, SubActionWeights, k=len(usersdf))
+        fc = SeqNos[1]+1
+        lc = SeqNos[2]+1
+        cc = SeqNos[0]+1
 
-    usersdf['Action'] = Samples
+        for i, row in usersdf.iterrows():
+            if row["FriendShipStatus"] == 'MustFollow':
+                usersdf.loc[i,'Action']  = 'Follow'
 
-    fc = SeqNos[1]+1
-    lc = SeqNos[2]+1
-    cc = SeqNos[0]+1
+            if row["FriendShipStatus"] == 'MustLike':
+                usersdf.loc[i,'Action']  = 'Like'
 
-    for i, row in usersdf.iterrows():
-        if row["Action"] == 'Follow':
-            usersdf.loc[i,'Seq']  = fc
-            fc = fc + 1
+            if row["FriendShipStatus"] == 'MustComment':
+                usersdf.loc[i,'Action']  = 'Comment'
 
-        if row["Action"] == 'Like':
-            usersdf.loc[i,'Seq']  = lc
-            lc = lc + 1
 
-        if row["Action"] == 'Comment':
-            usersdf.loc[i,'Seq']  = cc
-            cc = cc + 1
+        for i, row in usersdf.iterrows():
+            if row["Action"] == 'Follow':
+                usersdf.loc[i,'Seq']  = fc
+                fc = fc + 1
+
+            if row["Action"] == 'Like':
+                usersdf.loc[i,'Seq']  = lc
+                lc = lc + 1
+
+            if row["Action"] == 'Comment':
+                usersdf.loc[i,'Seq']  = cc
+                cc = cc + 1
             
-    return usersdf
+            
+        
+                
+        return usersdf
+    except Exception as e:
+        print('Unexpected Exception LoadSuggestedUsersForFollow: {0!s} '.format(e))
+        print(print(sys.exc_info()))
+        return None
 
 def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
     

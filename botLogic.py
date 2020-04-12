@@ -2,12 +2,22 @@
 import customFunctions as cf
 import apiWrappers as apiW
 import datetime
+import time
+from time import sleep
 from enum import Enum
 import datetime, pytz
 import pandas as pd
 from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
+from itertools import islice
+from random import randrange
+from random import choices
+import random
 import sys
+from instagram_private_api import (
+        Client, ClientError, ClientLoginError,
+        ClientCookieExpiredError, ClientLoginRequiredError,
+        __version__ as client_version)
 
 class Actions(Enum):
     Follow = 60
@@ -25,6 +35,8 @@ class Actions(Enum):
     InitStatsReceived = 72
     FollowExchange=73
     LikeExchange = 74
+    BotError = 80
+    BadHashtag = 86
 
 def dump(obj):
   for attr in dir(obj):
@@ -137,8 +149,11 @@ def RunBot(gVars,api,Client):
 
                 if gVars.GlobalTodo is None:
                     gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
+                    gVars.GlobalTodo.to_csv('GlobData.csv')
                     print('GlobalTodo merged')
                 #GlobalTodo[GlobalTodo['Action'] == 'Like']
+
+                
                 
                 LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
                 print("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
@@ -146,7 +161,7 @@ def RunBot(gVars,api,Client):
             except Exception as e: ## try catch block for the 
                 print('Unexpected Exception in initial feed loads : {0!s}'.format(e))
             
-           
+            
 
             # #iterList = (GlobalTodo[GlobalTodo['Status'] == '1']).iterrows()
             # #print(iterList) 
@@ -160,50 +175,78 @@ def RunBot(gVars,api,Client):
             curRow = None
 
             try:
-                # for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
-                #     if row['Status'] == 1 and not pd.isnull(row['MediaId']):
+                for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
+                    if row['Status'] == 1 and not pd.isnull(row['MediaId']):
                         
-                #         waitTime = randrange(20,30)
+                        waitTime = randrange(20,30)
                         
                         
-                #         if row['Action'] == 'Like' :
-                #             apiW.LikeMedia(api,row['MediaId'])
-                #             cf.SendAction(gVars.SocialProfileId,Actions.Like,row['Username'],row['MediaId'])
-                #             print('like action : ' + row['MediaId'])
-                #             gVars.GlobalTodo.loc[i,'Status'] = 2
-                #             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                #             print('sleeping for : ' + str(waitTime))
-                #             time.sleep(waitTime) 
+                        if row['Action'] == 'Like':
+                            try:
+                                print('like action : ' + row['MediaId'])
+                                apiW.LikeMedia(api,row['MediaId'])
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.Like,row['Username'],row['MediaId'])
+                               
+                            except ClientError as e:
+                                print('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while liking : ' + str(row['MediaId']))
+                                gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while liking'
+                                return None
 
-                        # if row['Action'] == 'Follow':
-                        #     apiW.FollowUser(api,row['UserId'])
-                        #     cf.SendAction(SocialProfileId,Actions.Follow,row['Username'],'')
-                        #     print('Follow action : ' + row['Username'])
-                        #     gVars.GlobalTodo.loc[i,'Status'] = 2
-                        #     gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                        #     print('sleeping for : ' + str(waitTime))
-                        #     time.sleep(waitTime) 
-
-                #         if row['Action'] == 'Comment':
-                #             comm = random.choice(Comments)
-                #             apiW.CommentOnMedia(api,row['MediaId'],comm)
-                #             cf.SendAction(SocialProfileId,Actions.Comment,row['Username'],row['Username'] + 'Comment added : ' + comm)
-                #             print('Comment action : ' + row['MediaId'])
-                #             gVars.GlobalTodo.loc[i,'Status'] = 2
-                #             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                #             gVars.GlobalTodo.loc[i,'Data'] = 'Comment added : ' + comm
-                #             print('sleeping for : ' + str(waitTime))
-                #             time.sleep(waitTime) 
+                            gVars.GlobalTodo.loc[i,'Status'] = 2
+                            gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            print('sleeping for : ' + str(waitTime))
+                            time.sleep(waitTime) 
                             
-                # if row['Action'] == 'UnFollow':
-                #     if row['Tag'] != 'delete_not_found':  ##ignore the IG action and send it anyways
-                #         apiW.UnFollowUser(api,row['UserId'])
-                # cf.SendAction(SocialProfileId,Actions.UnFollow,row['Username'],'delete_not_found')
-                # print('UnFollow action : ' + row['Username'])
-                # gVars.GlobalTodo.loc[i,'Status'] = 2
-                # gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                # print('sleeping for : ' + str(waitTime))
-                # time.sleep(waitTime) 
+
+                        if row['Action'] == 'Follow':
+                            apiW.FollowUser(api,row['UserId'])
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
+                            print('Follow action : ' + row['Username'])
+                            gVars.GlobalTodo.loc[i,'Status'] = 2
+                            gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            print('sleeping for : ' + str(waitTime))
+                            time.sleep(waitTime) 
+
+                        if row['Action'] == 'Comment':
+                            comm = random.choice(Comments)
+                            try:
+                                print('Comment action : ' + row['MediaId'])
+                                apiW.CommentOnMedia(api,row['MediaId'],comm)
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.Comment,row['Username'],row['Username'] + 'Comment added : ' + comm)
+                                gVars.GlobalTodo.loc[i,'Data'] = 'Comment added : ' + comm
+                            except ClientError as e:
+                                print('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while Commenting : ' + str(row['MediaId']))
+                                gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while Commenting'
+                                return None
+
+                            gVars.GlobalTodo.loc[i,'Status'] = 2
+                            gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            
+                            print('sleeping for : ' + str(waitTime))
+                            time.sleep(waitTime) 
+                                    
+                        if row['Action'] == 'UnFollow':
+                            if row['Tag'] == 'delete_not_found':  ##ignore the IG action and send it anyways
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'delete_not_found')
+                            else:
+                                apiW.UnFollowUser(api,row['UserId'])
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'')
+                            print('UnFollow action : ' + row['Username'])
+                            gVars.GlobalTodo.loc[i,'Status'] = 2
+                            gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            print('sleeping for : ' + str(waitTime))
+                            time.sleep(waitTime) 
+
+                        if row['Action'] == 'StoryView':
+                            apiW.ViewStory(api,row['UserId'],row['FriendShipStatus'])
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'')
+                            print('UnFollow action : ' + row['Username'])
+                            gVars.GlobalTodo.loc[i,'Status'] = 2
+                            gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            print('sleeping for : ' + str(waitTime))
+                            time.sleep(waitTime) 
 
                 #Run Ending
                 gVars.RunEndTime = datetime.datetime.now()
@@ -214,14 +257,16 @@ def RunBot(gVars,api,Client):
                     file.writelines('<meta charset="UTF-8">\n')
                     file.write(gVars.GlobalTodo.to_html())
                 
-                gVars.GlobalTodo.to_csv('GlobData.csv')
+                
                 
                 #cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2020','dataframe_GlobalTodo.html','','')
                 
             except:# ClientError:
                 #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                print("exception occurred")
+                print("exception occurred in main bot action loop")
                 print(sys.exc_info())
+
+            gVars.GlobalTodo.to_csv('GlobData.csv')
 
             return gVars
         else:

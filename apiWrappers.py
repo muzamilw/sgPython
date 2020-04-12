@@ -53,16 +53,29 @@ def GetSelfFeed(api, userId):
     return api.LastJson["items"]
 
 def FollowUser(api, userId):  #friendships_create(user_id)
-    api.follow(userId)
+    api.friendships_create(userId)
+    #api.follow(userId)
     
 def UnFollowUser(api, userId):  #friendships_destroy(user_id, **kwargs)
-    api.unfollow(userId)
+    api.friendships_destroy(userId)
+    #api.unfollow(userId)
     
 def CommentOnMedia(api, mediaId,commentText):  #post_comment(media_id, comment_text)
-    api.comment(mediaId, commentText)
+    api.post_comment(mediaId, commentText)
+    #api.comment(mediaId, commentText)
 
 def LikeMedia(api, mediaId):  #post_like(media_id, module_name='feed_timeline')
-    return api.like(mediaId)   #
+    api.post_like(mediaId, module_name='feed_timeline')
+    #return api.like(mediaId) #
+
+
+def ViewStory(api, itemids, timestamps):  #post_like(media_id, module_name='feed_timeline')
+    iIndex = 0
+    for i in itemids:
+        api.media_seen({i: [timestamps[iIndex]]})
+        #api.media_seen({"2284544142979976553_145316263_145316263": ['1586558904_'+str(calendar.timegm(time.gmtime()))]})
+    
+   
 
 def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, **kwargs)
     
@@ -77,7 +90,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
     
     while has_more and rank_token and next_max_id and len(tag_results) < maxCountToGet:
         if next_max_id is True:
-             next_max_id = ''
+            next_max_id = ''
 
         results = api.feed_tag(
             hashTag, rank_token, max_id=next_max_id)
@@ -90,7 +103,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
-        time.sleep(1)
+        time.sleep(3)
 
     return tag_results
         
@@ -145,63 +158,69 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client):
         return None
     
 def GetUserFollowingFeed(api, userName,maxCountToGet,Client):
-    
-    
-    follUserRes = None
     try:
-        follUserRes = api.username_info(userName.strip())   #check_username(username)
-    except ClientError as e:
-        print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-        return None
+    
+        follUserRes = None
+        try:
+            follUserRes = api.username_info(userName.strip())   #check_username(username)
+        except ClientError as e:
+            print('General exception for username {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, userName.strip()))
+            return None
+        except Exception as e:
+            print('Unexpected Exception api.username_info: {0!s} username {1!s}'.format(e,userName.strip()))
+            return None
 
-    if follUserRes is not None and follUserRes['user']['is_private'] == False:
-        
-        rank_token = Client.generate_uuid()
-        has_more = True
-        follFeed_results = []
-        next_max_id = True
-
-        while has_more and rank_token and next_max_id and len(follFeed_results) < maxCountToGet:
-                if next_max_id is True:
-                    next_max_id = ''
-
-                results = api.user_followers(follUserRes['user']['pk'], rank_token, max_id=next_max_id)
-
-                if results is not None and len(results) > 0:
-                    for user in results['users']:
-                        if user["is_private"] == False and len(follFeed_results) <= maxCountToGet:
-                            ufeed = api.user_feed(user['pk'])
-                            if ufeed is not None and len(ufeed['items']) > 0 :
-                                if ufeed['items'][0]['has_liked'] == False:
-                                    follFeed_results.extend([ufeed['items'][0]])
-
-                #tag_results.extend(results.get('ranked_items', []))
-                #tag_results.extend(results.get('items', []))
-                #tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
-                #tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
-
-                has_more = results.get('more_available')
-                next_max_id = results.get('next_max_id')
-                time.sleep(1)
-
-
-        # api.getUserFollowers(follUserRes['user']['pk'])   #user_followers(user_id, rank_token, **kwargs)
-
-        # if len(api.LastJson["users"]) > 0:
-        
-        #     userFollowers = api.LastJson["users"]
+        if follUserRes is not None and follUserRes['user']['is_private'] == False:
             
-        #     for user in islice(userFollowers, 0, int(maxCountToGet)): 
-        #         if (user["is_private"] == False):
-        #             time.sleep(3)
-        #             feedres = api.getUserFeed(user['pk'])   #user_feed(user_id, **kwargs)
-        #             if feedres == True and api.LastJson['items'] is not None:
-        #                 if len(api.LastJson['items']) > 0:
-        #                     #items.extend([{**api.LastJson['items'][0],**user} ])
-        #                     items.extend([api.LastJson['items'][0]])
-        
-        return follFeed_results
+            rank_token = Client.generate_uuid()
+            has_more = True
+            follFeed_results = []
+            next_max_id = True
+
+            while has_more and rank_token and next_max_id and len(follFeed_results) < maxCountToGet:
+                    if next_max_id is True:
+                        next_max_id = ''
+
+                    results = api.user_followers(follUserRes['user']['pk'], rank_token, max_id=next_max_id)
+
+                    if results is not None and len(results) > 0:
+                        for user in results['users']:
+                            if user["is_private"] == False and len(follFeed_results) <= maxCountToGet:
+                                ufeed = api.user_feed(user['pk'])
+                                if ufeed is not None and len(ufeed['items']) > 0 :
+                                    if ufeed['items'][0]['has_liked'] == False:
+                                        follFeed_results.extend([ufeed['items'][0]])
+
+                    #tag_results.extend(results.get('ranked_items', []))
+                    #tag_results.extend(results.get('items', []))
+                    #tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+                    #tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+
+                    has_more = results.get('more_available')
+                    next_max_id = results.get('next_max_id')
+                    time.sleep(1)
+
+
+            # api.getUserFollowers(follUserRes['user']['pk'])   #user_followers(user_id, rank_token, **kwargs)
+
+            # if len(api.LastJson["users"]) > 0:
             
-    else:  # followers list is empty
+            #     userFollowers = api.LastJson["users"]
+                
+            #     for user in islice(userFollowers, 0, int(maxCountToGet)): 
+            #         if (user["is_private"] == False):
+            #             time.sleep(3)
+            #             feedres = api.getUserFeed(user['pk'])   #user_feed(user_id, **kwargs)
+            #             if feedres == True and api.LastJson['items'] is not None:
+            #                 if len(api.LastJson['items']) > 0:
+            #                     #items.extend([{**api.LastJson['items'][0],**user} ])
+            #                     items.extend([api.LastJson['items'][0]])
+            
+            return follFeed_results
+                
+        else:  # followers list is empty
+            return None
+    
+    except Exception as e:
+        print('Unexpected Exception GetUserFollowingFeed: {0!s} username {1!s}'.format(e,userName.strip()))
         return None
-   
