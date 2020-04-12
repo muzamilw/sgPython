@@ -119,7 +119,7 @@ def IGLogin(username,password):
 
             # login new
             api = Client(
-                username, password,auto_patch=True,
+                username, password,#auto_patch=True,
                 on_login=lambda x: onlogin_callback(x, settings_file))
         else:
             with open(settings_file) as file_data:
@@ -129,7 +129,7 @@ def IGLogin(username,password):
             device_id = cached_settings.get('device_id')
             # reuse auth settings
             api = Client(
-                username, password,auto_patch=True,
+                username, password,#auto_patch=True,
                 settings=cached_settings)
 
     except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
@@ -138,7 +138,7 @@ def IGLogin(username,password):
         # Login expired
         # Do relogin but use default ua, keys and such
         api = Client(
-            username, password,auto_patch=True,
+            username, password,#auto_patch=True,
             device_id=device_id,
             on_login=lambda x: onlogin_callback(x, settings_file))
 
@@ -213,6 +213,8 @@ botLogic.RunBot(gVars,api,Client)
 
 
 ########################################################
+
+#cf.LoadStoryTodo(api,gVars.manifestObj,[1])
 # rank_token = Client.generate_uuid()
 
 #follfeed = apiW.GetUserFollowingFeed(api, 'muzamilw',10,Client)

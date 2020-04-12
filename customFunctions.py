@@ -389,7 +389,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights):
             if reel_user['seen'] == 0 :
                 user_reel_media = api.user_reel_media(reel_user['user']['pk']) #getting the reel media for the user
                 if user_reel_media is not None and len(user_reel_media['items']) > 0:
-                    reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [x['taken_at']+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
+                    reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
                     time.sleep(1)
         
   

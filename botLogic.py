@@ -39,99 +39,112 @@ def RunBot(gVars,api,Client):
         gVars.manifest = cf.GetManifest(gVars.loginResult["SocialProfileId"],gVars)
 
         if api.authenticated_user_id is not None:
-            if (gVars.loginResult["InitialStatsReceived"] != True):
 
-                user_info = api.user_info(api.authenticated_user_id)
+            try:
+                if (gVars.loginResult["InitialStatsReceived"] != True):
 
-                cf.UpdateInitialStatsToServer(gVars.SocialProfileId,user_info['user']['follower_count'],user_info['user']['following_count'],user_info['user']['media_count'],gVars)
+                    user_info = api.user_info(api.authenticated_user_id)
 
-                print('int followers' + str(user_info['user']['follower_count']))
-                print('Init Following' +str(user_info['user']['following_count']))
-                print('InitPosts' + str(user_info['user']['media_count']))
-            else:
-                print('initial stats already sent')
+                    cf.UpdateInitialStatsToServer(gVars.SocialProfileId,user_info['user']['follower_count'],user_info['user']['following_count'],user_info['user']['media_count'],gVars)
+
+                    print('int followers' + str(user_info['user']['follower_count']))
+                    print('Init Following' +str(user_info['user']['following_count']))
+                    print('InitPosts' + str(user_info['user']['media_count']))
+                else:
+                    print('initial stats already sent')
+
+                    
+                #sending daily stats
+                if gVars.DailyStatsSent == False:
+                    # InitFollowers = len(apiW.getTotalFollowers(api,api.username_id))
+                    # InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
+                    # InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
+                    user_info = api.user_info(api.authenticated_user_id)
+                    print('Sending Daily Stats')
+                    cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(user_info['user']['following_count'])+'\",\"InitialFollowers\":\"'+ str(user_info['user']['follower_count']) +'\",\"InitialPosts\":\"'+str(user_info['user']['media_count'])+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
+                    gVars.DailyStatsSent = True
+                else:
+                    print('Daily Stats already sent')
+                #"Message":"{\"InitialFollowings\":\"400\",\"InitialFollowers\":\"1200\",\"InitialPosts\":\"6\",\"SocialProfileId\":28}"
+                    
+                
+
+                if gVars.manifestJson is None:
+                    print('getting manifest')
+                    gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
+
+                if gVars.manifestObj is None:
+                    print('loading manifest')
+                    gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
+                
+
+                if gVars.Todo is None:
+                    gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
+                    print('Creating Empty Global todo')
+                
+
+                if gVars.hashtagActions is None:
+                    print('Getting Feeds of Hashtags and creating action list')
+                    hashstart = datetime.datetime.now()
+                    gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
+                    LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
+                    print('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
+                
+                
+                    
+                if gVars.locationActions is None:
+                    print('Getting Feeds of Location and creating action list')
+                    locationtart = datetime.datetime.now()
+                    gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client)
+                    LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
+                    print('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
 
                 
-            #sending daily stats
-            if gVars.DailyStatsSent == False:
-                # InitFollowers = len(apiW.getTotalFollowers(api,api.username_id))
-                # InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
-                # InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
-                user_info = api.user_info(api.authenticated_user_id)
-                print('Sending Daily Stats')
-                cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(user_info['user']['following_count'])+'\",\"InitialFollowers\":\"'+ str(user_info['user']['follower_count']) +'\",\"InitialPosts\":\"'+str(user_info['user']['media_count'])+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
-                gVars.DailyStatsSent = True
-            else:
-                print('Daily Stats already sent')
-            #"Message":"{\"InitialFollowings\":\"400\",\"InitialFollowers\":\"1200\",\"InitialPosts\":\"6\",\"SocialProfileId\":28}"
+                    
+                if gVars.DCActions is None:
+                    print('Getting Feeds of Competitors and creating action list')
+                    DCstart = datetime.datetime.now()
+                    gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
+                    LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
+                    print('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
+
+                if gVars.SuggestFollowers is None:
+                    print('Getting Feeds of Suggested Users and creating action list')
+                    Suggestedstart = datetime.datetime.now()
+                    gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client)
+                    LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
+                    print('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
+
+                    
+                if gVars.UnFollowActions is None:
+                    print('Getting Feeds of UnFollow and creating action list')
+                    UnFollstart = datetime.datetime.now()
+                    gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
+                    LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
+                    print('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
+
+                if gVars.StoryViewActions is None:
+                    print('Getting Feeds of StoryViews and creating action list')
+                    Storystart = datetime.datetime.now()
+                    gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1])
+                    LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
+                    print('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
+
+                #media_seen(reels)
+
+                frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
+                actions = pd.concat(frames)
+
+                if gVars.GlobalTodo is None:
+                    gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
+                    print('GlobalTodo merged')
+                #GlobalTodo[GlobalTodo['Action'] == 'Like']
                 
-            
-
-            if gVars.manifestJson is None:
-                print('getting manifest')
-                gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
-
-            if gVars.manifestObj is None:
-                print('loading manifest')
-                gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
-            
-
-            if gVars.Todo is None:
-                gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
-                print('Creating Empty Global todo')
-            
-
-            if gVars.hashtagActions is None:
-                print('Getting Feeds of Hashtags and creating action list')
-                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
-                print('Hashtag Feed Done')
-            
-            
-                
-            if gVars.locationActions is None:
-                print('Getting Feeds of Location and creating action list')
-                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client)
-                print('Location Feed Done')
-
-            
-                
-            if gVars.DCActions is None:
-                print('Getting Feeds of Competitors and creating action list')
-                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
-                print('Competitors Feed Done')
-
-            if gVars.SuggestFollowers is None:
-                print('Getting Feeds of Competitors and creating action list')
-                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client)
-                print('Competitors Feed Done')
-
-              
-                
-            if gVars.UnFollowActions is not None:
-                print('Getting Feeds of UnFollow and creating action list')
-                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
-                print('UnFollow Feed Done')
-
-            if gVars.StoryViewActions is not None:
-                print('Getting Feeds of UnFollow and creating action list')
-                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1])
-                print('UnFollow Feed Done')
-
-            #media_seen(reels)
-
-            frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
-            actions = pd.concat(frames)
-
-            if gVars.GlobalTodo is not None:
-                gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
-                print('GlobalTodo merged')
-            #GlobalTodo[GlobalTodo['Action'] == 'Like']
-            
-            # LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
-
-            # print("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
-            # #dump(gVars.manifestObj)
-            
+                LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
+                print("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
+                # #dump(gVars.manifestObj)
+            except Exception as e: ## try catch block for the 
+                print('Unexpected Exception in initial feed loads : {0!s}'.format(e))
             
            
 
