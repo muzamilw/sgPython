@@ -143,6 +143,8 @@ def LoadManifest(manifest):
     intervals = json.loads(manifest["MobileJsonRootObject"]["TargetInformation"]["ExecutionIntervals"])
     
     manifestObj.FollowersToUnFollow = manifest["MobileJsonRootObject"]["FollowersToUnFollow"]
+    manifestObj.FollowersToComment = manifest["MobileJsonRootObject"]["FollowersToComment"]
+    
     manifestObj.FollowList = manifest["MobileJsonRootObject"]["FollowList"]
     manifestObj.LikeList = manifest["MobileJsonRootObject"]["LikeList"]
     
@@ -307,8 +309,56 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                         if ufeed is not None and len(ufeed['items']) > 0 :
                             if ufeed['items'][0]['has_liked'] == False:
                                 # follFeed_results.extend([ufeed['items'][0]])
-                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), '' ])
+                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                         time.sleep(1)
+
+    #server follow list
+    for foll in manifestObj.FollowList:
+        try:
+            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            user = None
+
+        if user["is_private"] == False:
+            ufeed = api.user_feed(user['pk'])
+            if ufeed is not None and len(ufeed['items']) > 0 :
+                if ufeed['items'][0]['has_liked'] == False:
+                    # follFeed_results.extend([ufeed['items'][0]])
+                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
+            time.sleep(1)
+
+    #server Like list
+    for foll in manifestObj.LikeList:
+        try:
+            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            user = None
+
+        if user["is_private"] == False:
+            ufeed = api.user_feed(user['pk'])
+            if ufeed is not None and len(ufeed['items']) > 0 :
+                if ufeed['items'][0]['has_liked'] == False:
+                    # follFeed_results.extend([ufeed['items'][0]])
+                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
+            time.sleep(1)
+    
+    #server Comment list
+    for foll in manifestObj.FollowersToComment:
+        try:
+            user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            user = None
+
+        if user["is_private"] == False:
+            ufeed = api.user_feed(user['pk'])
+            if ufeed is not None and len(ufeed['items']) > 0 :
+                if ufeed['items'][0]['has_liked'] == False:
+                    # follFeed_results.extend([ufeed['items'][0]])
+                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
+            time.sleep(1)
 
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
