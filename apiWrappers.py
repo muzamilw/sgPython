@@ -72,7 +72,7 @@ def LikeMedia(api, mediaId):  #post_like(media_id, module_name='feed_timeline')
 def ViewStory(api, itemids, timestamps):  #post_like(media_id, module_name='feed_timeline')
     iIndex = 0
     for i in itemids:
-        api.media_seen({i: [timestamps[iIndex]]})
+        api.media_seen({str(i): [str(timestamps[iIndex])]})
         #api.media_seen({"2284544142979976553_145316263_145316263": ['1586558904_'+str(calendar.timegm(time.gmtime()))]})
     
    

@@ -14,6 +14,7 @@ from random import randrange
 from random import choices
 import random
 import sys
+import pickle
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -176,7 +177,7 @@ def RunBot(gVars,api,Client):
 
             try:
                 for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
-                    if row['Status'] == 1 and not pd.isnull(row['MediaId']):
+                    if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])):
                         
                         waitTime = randrange(20,30)
                         
@@ -191,7 +192,6 @@ def RunBot(gVars,api,Client):
                                 print('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while liking : ' + str(row['MediaId']))
                                 gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while liking'
-                                return None
 
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
@@ -219,7 +219,6 @@ def RunBot(gVars,api,Client):
                                 print('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while Commenting : ' + str(row['MediaId']))
                                 gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while Commenting'
-                                return None
 
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
@@ -240,13 +239,18 @@ def RunBot(gVars,api,Client):
                             time.sleep(waitTime) 
 
                         if row['Action'] == 'StoryView':
-                            apiW.ViewStory(api,row['UserId'],row['FriendShipStatus'])
-                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'')
-                            print('UnFollow action : ' + row['Username'])
+                            print('StoryView action : ' + row['Username'])
+                            apiW.ViewStory(api,row['MediaId'],row['FriendShipStatus'])
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'story pages : ' + str(len(row['MediaId'])))
+                            
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
+                            gVars.GlobalTodo.loc[i,'Data'] = 'story pages : ' + str(len(row['MediaId']))
                             print('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
+
+                        with open('glob.Vars', 'wb') as gVarFile:
+                            pickle.dump(gVars, gVarFile)
 
                 #Run Ending
                 gVars.RunEndTime = datetime.datetime.now()
