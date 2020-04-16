@@ -1,6 +1,6 @@
-#:include ready.kv
+#:include connected.kv
 
-<Login>:
+<IGLogin>:
     BoxLayout
         id: login_layout
         orientation: 'vertical'
@@ -8,14 +8,14 @@
         spacing: 50
 
         Label:
-            text: 'Welcome to Intelligent Learning'
+            text: 'Please enter Instagram username and password to continue.'
             font_size: 32
 
         BoxLayout:
             orientation: 'vertical'
 
             Label:
-                text: 'Enter your username'
+                text: 'Enter your instagram username'
                 font_size: 18
                 halign: 'left'
                 text_size: root.width-20, 20
@@ -29,7 +29,7 @@
         BoxLayout:
             orientation: 'vertical'
             Label:
-                text: 'pin'
+                text: 'password'
                 halign: 'left'
                 font_size: 18
                 text_size: root.width-20, 20
@@ -45,4 +45,4 @@
             text: 'Connexion'
             font_size: 24
 
-            on_press: root.do_login(login.text, password.text)
+            on_press: root.do_IGlogin(login.text, password.text)

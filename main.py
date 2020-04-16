@@ -34,8 +34,15 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.app import App
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 import os
-from connected import Connected
+from ready import Ready
+
 
 
 class GlobalVars:
@@ -99,75 +106,6 @@ except ImportError:
         __version__ as client_version)
 
 
-def to_json(python_object):
-    if isinstance(python_object, bytes):
-        return {'__class__': 'bytes',
-                '__value__': codecs.encode(python_object, 'base64').decode()}
-    raise TypeError(repr(python_object) + ' is not JSON serializable')
-
-
-def from_json(json_object):
-    if '__class__' in json_object and json_object['__class__'] == 'bytes':
-        return codecs.decode(json_object['__value__'].encode(), 'base64')
-    return json_object
-
-
-def onlogin_callback(api, new_settings_file):
-    cache_settings = api.settings
-    with open(new_settings_file, 'w') as outfile:
-        json.dump(cache_settings, outfile, default=to_json)
-        print('SAVED: {0!s}'.format(new_settings_file))
-
-def IGLogin(username,password):
-    device_id = None
-    try:
-
-        settings_file = 'login.json'
-        if not os.path.isfile(settings_file):
-            # settings file does not exist
-            print('Unable to find file: {0!s}'.format(settings_file))
-
-            # login new
-            api = Client(
-                username, password,#auto_patch=True,
-                on_login=lambda x: onlogin_callback(x, settings_file))
-        else:
-            with open(settings_file) as file_data:
-                cached_settings = json.load(file_data, object_hook=from_json)
-            print('Reusing settings: {0!s}'.format(settings_file))
-
-            device_id = cached_settings.get('device_id')
-            # reuse auth settings
-            api = Client(
-                username, password,#auto_patch=True,
-                settings=cached_settings)
-
-    except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
-        print('ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e))
-
-        # Login expired
-        # Do relogin but use default ua, keys and such
-        api = Client(
-            username, password,#auto_patch=True,
-            device_id=device_id,
-            on_login=lambda x: onlogin_callback(x, settings_file))
-
-    except ClientLoginError as e:
-        print('ClientLoginError {0!s}'.format(e))
-        exit(9)
-    except ClientError as e:
-        print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-        exit(9)
-    except Exception as e:
-        print('Unexpected Exception: {0!s}'.format(e))
-        exit(99)
-
-    # Show when login expires
-    cookie_expiry = api.cookie_jar.auth_expires
-    print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
-
-    return api
-
 
 
 
@@ -183,41 +121,10 @@ def IGLogin(username,password):
 #         pickle.dump(api, api_login_file)
 
 
-try:
-    with open('glob.Vars', 'rb') as gVarFile:
-        print('Vars file found, loading')
-        gVars = pickle.load(gVarFile)
-except IOError:
-    print('Vars file does not exist, InitBlank')
-    gVars = GlobalVars()
-    gVars.BotVer = 'py.1.6'
-    gVars.RunStartTime = None
-    gVars.RunEndTime = None
-    gVars.manifestJson = None
-    gVars.manifestObj = None
-    gVars.loginResult = None
-    gVars.hashtagActions = None
-    gVars.locationActions = None
-    gVars.UnFollowActions = None
-    gVars.DCActions = None
-    gVars.SuggestFollowers = None
-    gVars.StoryViewActions = None
-    gVars.GlobalTodo = None
-    gVars.Todo = None
-    gVars.DailyStatsSent = False
-    gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
-
-    with open('glob.Vars', 'wb') as gVarFile:
-        pickle.dump(gVars, gVarFile)
 
 
-if gVars.loginResult is None:
-        print('performing app login')
-        gVars.loginResult = cf.AppLogin('nevillekmiec','103381','123',gVars)
 
-api = IGLogin('nevillekmiec','!_LKvXc1')
 
-print(api.authenticated_user_id)
 
 #botLogic.RunBot(gVars,api,Client)
 
@@ -258,11 +165,28 @@ print(api.authenticated_user_id)
 #print(user_info['user']['media_count'])
 ########################################################
 
-with open('glob.Vars', 'wb') as gVarFile:
-    print('Updating gVars at end')
-    pickle.dump(gVars, gVarFile)
 
 
+class Alert(Popup):
+
+    def __init__(self, title, text):
+        super(Alert, self).__init__()
+        content = BoxLayout (orientation= 'vertical')#AnchorLayout(anchor_x='center', anchor_y='bottom')
+        content.add_widget(
+            Label(text=text, halign='left', valign='top')
+        )
+        ok_button = Button(text='Ok', size_hint=(None, None))
+        content.add_widget(ok_button)
+
+        popup = Popup(
+            title=title,
+            content=content,
+            size_hint=(None, None),
+            size=(Window.width / 3, Window.height / 3),
+            auto_dismiss=False,
+        )
+        ok_button.bind(on_press=popup.dismiss)
+        popup.open()
 
 
 class Login(Screen):
@@ -272,12 +196,39 @@ class Login(Screen):
         app.username = loginText
         app.password = passwordText
 
-        gVars.loginResult = cf.AppLogin(loginText,passwordText,'123',gVars)
+        loginResult = cf.AppLogin(loginText,passwordText,'123',app.gVars)
+        if loginResult[0] == False:
+            Alert(title='Error', text=loginResult[1])
+        else:
+            app.gVars.loginResult = loginResult[1]
 
-        print(gVars.loginResult)
+            self.manager.transition = SlideTransition(direction="left")
+            app.api = app.checkIGLogin()
+            if app.api is None:
+                self.manager.current = 'IGlogin'
+            else:
+                self.manager.current = 'ready'
+
+
+            app.config.read(app.get_application_config())
+            app.config.write()
+
+    def resetForm(self):
+        self.ids['login'].text = ""
+        self.ids['password'].text = ""
+
+class IGLogin(Screen):
+    def do_IGlogin(self, loginText, passwordText):
+        app = App.get_running_app()
+
+        app.username = loginText
+        app.password = passwordText
+
+        #loginResult = cf.AppLogin(loginText,passwordText,'123',app.gVars)
+        #app.gVars.loginResult = loginResult
 
         self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'connected'
+        self.manager.current = 'ready'
 
         app.config.read(app.get_application_config())
         app.config.write()
@@ -287,16 +238,39 @@ class Login(Screen):
         self.ids['password'].text = ""
 
 class LoginApp(App):
+    gVars = None
+    api = None
     username = StringProperty(None)
     password = StringProperty(None)
 
     def build(self):
+        self.loadGlobalConfig()
         manager = ScreenManager()
-
         manager.add_widget(Login(name='login'))
-        manager.add_widget(Connected(name='connected'))
+        manager.add_widget(IGLogin(name='IGlogin'))
+        manager.add_widget(Ready(name='ready'))
+
+        if self.gVars.loginResult is not None:
+            self.api = self.checkIGLogin()
+            if self.api is None:
+                manager.current = 'IGlogin'
+            else:
+                manager.current = 'ready'
+        else:
+            manager.current = 'login'
+
 
         return manager
+
+    def on_stop(self):
+        with open('glob.Vars', 'wb') as gVarFile:
+            print('Updating gVars at end')
+            pickle.dump(self.gVars, gVarFile)
+
+    def on_pause(self):
+        with open('glob.Vars', 'wb') as gVarFile:
+            print('Updating gVars at pause')
+            pickle.dump(self.gVars, gVarFile)
 
     def get_application_config(self):
         if(not self.username):
@@ -310,6 +284,162 @@ class LoginApp(App):
         return super(LoginApp, self).get_application_config(
             '%s/config.cfg' % (conf_directory)
         )
+
+    def loadGlobalConfig(self):
+        try:
+            with open('glob.Vars', 'rb') as gVarFile:
+                print('Vars file found, loading')
+                globvars = pickle.load(gVarFile)
+                self.gVars = globvars
+        except IOError:
+            print('Vars file does not exist, InitBlank')
+            gVars = GlobalVars()
+            gVars.BotVer = 'py.1.6'
+            gVars.RunStartTime = None
+            gVars.RunEndTime = None
+            gVars.manifestJson = None
+            gVars.manifestObj = None
+            gVars.loginResult = None
+            gVars.hashtagActions = None
+            gVars.locationActions = None
+            gVars.UnFollowActions = None
+            gVars.DCActions = None
+            gVars.SuggestFollowers = None
+            gVars.StoryViewActions = None
+            gVars.GlobalTodo = None
+            gVars.Todo = None
+            gVars.DailyStatsSent = False
+            gVars.IGusername = None
+            gVars.IGpassword = None
+            gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
+
+            self.gVars = gVars
+
+            with open('glob.Vars', 'wb') as gVarFile:
+                pickle.dump(gVars, gVarFile)
+        
+    def to_json(self,python_object):
+        if isinstance(python_object, bytes):
+            return {'__class__': 'bytes',
+                    '__value__': codecs.encode(python_object, 'base64').decode()}
+        raise TypeError(repr(python_object) + ' is not JSON serializable')
+
+    def from_json(self,json_object):
+        if '__class__' in json_object and json_object['__class__'] == 'bytes':
+            return codecs.decode(json_object['__value__'].encode(), 'base64')
+        return json_object
+
+    def onlogin_callback(self,api, new_settings_file):
+        cache_settings = api.settings
+        with open(new_settings_file, 'w') as outfile:
+            json.dump(cache_settings, outfile, default=to_json)
+            print('SAVED: {0!s}'.format(new_settings_file))
+
+    def checkIGLogin(self):
+        device_id = None
+        try:
+
+            settings_file = 'login.json'
+            if not os.path.isfile(settings_file):
+                # settings file does not exist
+                print('Unable to find file: {0!s}'.format(settings_file))
+                api = None
+               
+            else:
+                with open(settings_file) as file_data:
+                    cached_settings = json.load(file_data, object_hook=self.from_json)
+                    print('Reusing settings: {0!s}'.format(settings_file))
+
+                device_id = cached_settings.get('device_id')
+                # reuse auth settings
+                api = Client(
+                    self.gVars.IGusername, self.gVars.IGpassword,#auto_patch=True,
+                    settings=cached_settings)
+
+        except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
+            print('ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e))
+
+            return None
+
+        except ClientLoginError as e:
+            print('ClientLoginError {0!s}'.format(e))
+            return None
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            return None
+        except Exception as e:
+            print('Unexpected Exception: {0!s}'.format(e))
+            return None
+
+        # Show when login expires
+        cookie_expiry = api.cookie_jar.auth_expires
+        print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+
+        return api
+
+    def PerformIGLogin(self):
+        device_id = None
+        try:
+
+            settings_file = 'login.json'
+            if not os.path.isfile(settings_file):
+                # settings file does not exist
+                print('Unable to find file: {0!s}'.format(settings_file))
+                return false
+                # login new
+                api = Client(
+                    username, password,#auto_patch=True,
+                    on_login=lambda x: onlogin_callback(x, settings_file))
+            else:
+                with open(settings_file) as file_data:
+                    cached_settings = json.load(file_data, object_hook=from_json)
+                print('Reusing settings: {0!s}'.format(settings_file))
+
+                device_id = cached_settings.get('device_id')
+                # reuse auth settings
+                api = Client(
+                    username, password,#auto_patch=True,
+                    settings=cached_settings)
+
+        except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
+            print('ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e))
+
+            # Login expired
+            # Do relogin but use default ua, keys and such
+            api = Client(
+                username, password,#auto_patch=True,
+                device_id=device_id,
+                on_login=lambda x: onlogin_callback(x, settings_file))
+
+        except ClientLoginError as e:
+            print('ClientLoginError {0!s}'.format(e))
+            exit(9)
+        except ClientError as e:
+            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+            exit(9)
+        except Exception as e:
+            print('Unexpected Exception: {0!s}'.format(e))
+            exit(99)
+
+        # Show when login expires
+        cookie_expiry = api.cookie_jar.auth_expires
+        print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+
+        return api
+
+    def AppLogout(self):
+        app = App.get_running_app()
+        app.gVars.loginResult = None
+        with open('glob.Vars', 'wb') as gVarFile:
+            print('Updating gVars at pause')
+            pickle.dump(self.gVars, gVarFile)
+
+    def show_popup(self):
+        show = P()
+
+        popupWindow = Popup(title="Popup Window", content=show, size_hint=(None,None),size=(400,400))
+
+        popupWindow.open()
 
 if __name__ == '__main__':
     LoginApp().run()

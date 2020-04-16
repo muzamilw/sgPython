@@ -67,9 +67,9 @@ def AppLogin(socialUsername,pin,IMEI,gVars):
            } 
     r = json.loads(requests.post(url = API_Login, data = data).text) 
     if r["MobileLoginJsonRootObject"]["StatusCode"] == 1:
-        return r["MobileLoginJsonRootObject"]
+        return (True, r["MobileLoginJsonRootObject"])
     else:
-        None
+        return (False, r["MobileLoginJsonRootObject"]["StatusMessage"])
 
 def SendAction(gVars,SocialProfileId, Action, TargetSocialUserName,Message):
     

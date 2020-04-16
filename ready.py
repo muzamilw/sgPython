@@ -1,0 +1,64 @@
+from kivy.app import App
+from kivy.uix.screenmanager import Screen, SlideTransition
+from kivy.uix.floatlayout import FloatLayout
+from kivy.properties import ObjectProperty, StringProperty
+from kivy.uix.screenmanager import ScreenManager, Screen, SlideTransition
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.button import Button
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
+from kivy.clock import Clock
+import os
+import logging
+import threading
+import time
+import botLogic as bot
+
+class Ready(Screen):
+
+    def on_enter(self):
+        app = App.get_running_app()
+        lblusername = self.ids['lblusername'] #Label(text="showing the log here")
+        lblusername.text = app.api.authenticated_user_id
+
+    t = None
+
+    def startBot(self):
+        label = self.ids['logLabel'] #Label(text="showing the log here")
+
+        log = logging.getLogger("my.logger")
+        log.level = logging.DEBUG
+        log.addHandler(MyLabelHandler(label, logging.DEBUG))
+
+        t = threading.Thread(target=self.my_thread, args=(log,))
+        #thread.start_new(self.my_thread, (log,))
+        t.start()
+
+    def my_thread(self,log):
+
+        for i in range(2**20):
+            time.sleep(1)
+            log.info("WOO %s", i)
+
+    def disconnect(self):
+        self.t.join()
+        self.manager.transition = SlideTransition(direction="right")
+        app = App.get_running_app()
+        app.AppLogout()
+        self.manager.current = 'login'
+        self.manager.get_screen('login').resetForm()
+
+class MyLabelHandler(logging.Handler):
+
+    def __init__(self, label, level=logging.NOTSET):
+        logging.Handler.__init__(self, level=level)
+        self.label = label
+
+    def emit(self, record):
+        "using the Clock module for thread safety with kivy's main loop"
+        def f(dt=None):
+            self.label.text += self.format(record) #"use += to append..."
+        Clock.schedule_once(f)
+       

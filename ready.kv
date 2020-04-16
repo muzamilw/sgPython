@@ -1,0 +1,69 @@
+<Ready>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: "Ready to start social growth"
+            font_size: 20
+            size_hint: 1, .2
+        Label:
+            text: "nev"
+            font_size: 20
+            size_hint: 1, .2
+            id: lblusername
+
+        Button:
+            text: "Start the Bot"
+            font_size: 15
+            on_press: root.startBot()
+            size_hint: 1, .2
+
+        GridLayout:
+            cols: 5
+            orientation: 'horizontal'
+            padding: 20
+            spacing: 10
+            Label:
+                id: lblFollowCount
+                text: "0"
+               
+            Label:
+                id: lblUnFollowCount
+                text: "0"
+               
+            Label:
+                id: lblUnLikeCount
+                text: "0"
+            Label:
+                id: lblStoryViewCount
+                text: "0"
+            Label:
+                id: lblTotalTime
+                text: "0:00"
+            Label:
+                size_hint_x: None
+                text: "Follow Count"
+                size_hint: 1, None
+            Label:
+                text: "UnFollow Count"
+                size_hint: 1, None
+            Label:
+                text: "Like Count"
+                size_hint: 1, None
+            Label:
+                text: "StoryView Count"
+                size_hint: 1, None
+            Label:
+                text: "Bot Run Time"
+                size_hint: 1, None
+            
+        TextInput:
+            id:logLabel
+            text: "Bot Log here"
+            font_size: 12
+            multiline:True
+        Button:
+            text: "Stop & Log Off"
+            font_size: 15
+            on_press: root.disconnect()
+            size_hint: 1, .1
