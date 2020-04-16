@@ -1,0 +1,48 @@
+#:include connected.kv
+
+<Login>:
+    BoxLayout
+        id: login_layout
+        orientation: 'vertical'
+        padding: [10,50,10,50]
+        spacing: 50
+
+        Label:
+            text: 'Welcome to Intelligent Learning'
+            font_size: 32
+
+        BoxLayout:
+            orientation: 'vertical'
+
+            Label:
+                text: 'Enter your username'
+                font_size: 18
+                halign: 'left'
+                text_size: root.width-20, 20
+
+            TextInput:
+                id: login
+                multiline:False
+                font_size: 28
+                text: 'nevillekmiec'
+
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'pin'
+                halign: 'left'
+                font_size: 18
+                text_size: root.width-20, 20
+
+            TextInput:
+                id: password
+                multiline:False
+                password:True
+                font_size: 28
+                text:'103381'
+
+        Button:
+            text: 'Connexion'
+            font_size: 24
+
+            on_press: root.do_login(login.text, password.text)
