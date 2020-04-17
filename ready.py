@@ -14,27 +14,47 @@ import os
 import logging
 import threading
 import time
+from instagram_private_api import (
+        Client, ClientError, ClientLoginError,
+        ClientCookieExpiredError, ClientLoginRequiredError,
+        __version__ as client_version)
 import botLogic as bot
 
 class Ready(Screen):
+
+    t = None
 
     def on_enter(self):
         app = App.get_running_app()
         lblusername = self.ids['lblusername'] #Label(text="showing the log here")
         lblusername.text = app.api.authenticated_user_id
+        # try:
+        #     from instagram_private_api import (
+        #         Client, ClientError, ClientLoginError,
+        #         ClientCookieExpiredError, ClientLoginRequiredError,
+        #         __version__ as client_version)
+        # except ImportError:
+        #     import sys
+        #     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+        #     from instagram_private_api import (
+        #         Client, ClientError, ClientLoginError,
+        #         ClientCookieExpiredError, ClientLoginRequiredError,
+        #         __version__ as client_version)
 
-    t = None
+   
 
     def startBot(self):
+        app = App.get_running_app()
         label = self.ids['logLabel'] #Label(text="showing the log here")
 
         log = logging.getLogger("my.logger")
         log.level = logging.DEBUG
         log.addHandler(MyLabelHandler(label, logging.DEBUG))
 
-        t = threading.Thread(target=self.my_thread, args=(log,))
+        bot.RunBot(app.gVars,app.api,Client,log)
+        # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
-        t.start()
+        # t.start()
 
     def my_thread(self,log):
 
@@ -59,6 +79,6 @@ class MyLabelHandler(logging.Handler):
     def emit(self, record):
         "using the Clock module for thread safety with kivy's main loop"
         def f(dt=None):
-            self.label.text += self.format(record) #"use += to append..."
+            self.label.text += "\n" + self.format(record) #"use += to append..."
         Clock.schedule_once(f)
        

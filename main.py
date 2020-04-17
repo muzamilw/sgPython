@@ -42,6 +42,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 import os
 from ready import Ready
+from instagram import Instagram
 
 
 
@@ -205,7 +206,7 @@ class Login(Screen):
             self.manager.transition = SlideTransition(direction="left")
             app.api = app.checkIGLogin()
             if app.api is None:
-                self.manager.current = 'IGlogin'
+                self.manager.current = 'ig'
             else:
                 self.manager.current = 'ready'
 
@@ -217,25 +218,7 @@ class Login(Screen):
         self.ids['login'].text = ""
         self.ids['password'].text = ""
 
-class IGLogin(Screen):
-    def do_IGlogin(self, loginText, passwordText):
-        app = App.get_running_app()
 
-        app.username = loginText
-        app.password = passwordText
-
-        #loginResult = cf.AppLogin(loginText,passwordText,'123',app.gVars)
-        #app.gVars.loginResult = loginResult
-
-        self.manager.transition = SlideTransition(direction="left")
-        self.manager.current = 'ready'
-
-        app.config.read(app.get_application_config())
-        app.config.write()
-
-    def resetForm(self):
-        self.ids['login'].text = ""
-        self.ids['password'].text = ""
 
 class LoginApp(App):
     gVars = None
@@ -247,13 +230,13 @@ class LoginApp(App):
         self.loadGlobalConfig()
         manager = ScreenManager()
         manager.add_widget(Login(name='login'))
-        manager.add_widget(IGLogin(name='IGlogin'))
+        manager.add_widget(Instagram(name='ig'))
         manager.add_widget(Ready(name='ready'))
 
         if self.gVars.loginResult is not None:
             self.api = self.checkIGLogin()
             if self.api is None:
-                manager.current = 'IGlogin'
+                manager.current = 'ig'
             else:
                 manager.current = 'ready'
         else:
@@ -344,7 +327,10 @@ class LoginApp(App):
                 # settings file does not exist
                 print('Unable to find file: {0!s}'.format(settings_file))
                 api = None
-               
+
+            elif self.gVars.IGusername is None or self.gVars.IGpassword is None:   
+                 print('stored username or pwd are empty, relogin required')
+                 api = None
             else:
                 with open(settings_file) as file_data:
                     cached_settings = json.load(file_data, object_hook=self.from_json)
@@ -371,9 +357,10 @@ class LoginApp(App):
             print('Unexpected Exception: {0!s}'.format(e))
             return None
 
+        if api is not None:
         # Show when login expires
-        cookie_expiry = api.cookie_jar.auth_expires
-        print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+            cookie_expiry = api.cookie_jar.auth_expires
+            print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
         return api
 

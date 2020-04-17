@@ -15,6 +15,7 @@ from random import choices
 import random
 import sys
 import pickle
+import logging
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -43,7 +44,7 @@ def dump(obj):
   for attr in dir(obj):
     print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
-def RunBot(gVars,api,Client):
+def RunBot(gVars,api,Client,log):
         
     gVars.RunStartTime = datetime.datetime.now()
     
@@ -60,11 +61,11 @@ def RunBot(gVars,api,Client):
 
                     cf.UpdateInitialStatsToServer(gVars.SocialProfileId,user_info['user']['follower_count'],user_info['user']['following_count'],user_info['user']['media_count'],gVars)
 
-                    print('int followers' + str(user_info['user']['follower_count']))
-                    print('Init Following' +str(user_info['user']['following_count']))
-                    print('InitPosts' + str(user_info['user']['media_count']))
+                    log.info('int followers' + str(user_info['user']['follower_count']))
+                    log.info('Init Following' +str(user_info['user']['following_count']))
+                    log.info('InitPosts' + str(user_info['user']['media_count']))
                 else:
-                    print('initial stats already sent')
+                    log.info('initial stats already sent')
 
                     
                 #sending daily stats
@@ -73,14 +74,14 @@ def RunBot(gVars,api,Client):
                     # InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
                     # InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
                     user_info = api.user_info(api.authenticated_user_id)
-                    print('Sending Daily Stats')
+                    log.info('Sending Daily Stats')
                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(user_info['user']['following_count'])+'\",\"InitialFollowers\":\"'+ str(user_info['user']['follower_count']) +'\",\"InitialPosts\":\"'+str(user_info['user']['media_count'])+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
                     gVars.DailyStatsSent = True
                 else:
-                    print('Daily Stats already sent')
+                    log.info('Daily Stats already sent')
                 #"Message":"{\"InitialFollowings\":\"400\",\"InitialFollowers\":\"1200\",\"InitialPosts\":\"6\",\"SocialProfileId\":28}"
                     
-                
+                return
 
                 if gVars.manifestJson is None:
                     print('getting manifest')
@@ -270,7 +271,7 @@ def RunBot(gVars,api,Client):
                 print("exception occurred in main bot action loop")
                 print(sys.exc_info())
 
-            gVars.GlobalTodo.to_csv('GlobData.csv')
+            #gVars.GlobalTodo.to_csv('GlobData.csv')
 
             return gVars
         else:
