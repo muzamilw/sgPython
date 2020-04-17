@@ -14,7 +14,7 @@ import logging
 import time
 import random
 import codecs
-
+from urllib.parse import urlparse
 import datetime, pytz
 import dateutil.tz
 #import sys
@@ -42,7 +42,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 import os
 from ready import Ready
-from instagram import Instagram
+from iglogin import IGLogin
 
 
 
@@ -206,7 +206,7 @@ class Login(Screen):
             self.manager.transition = SlideTransition(direction="left")
             app.api = app.checkIGLogin()
             if app.api is None:
-                self.manager.current = 'ig'
+                self.manager.current = 'iglogin'
             else:
                 self.manager.current = 'ready'
 
@@ -230,13 +230,14 @@ class LoginApp(App):
         self.loadGlobalConfig()
         manager = ScreenManager()
         manager.add_widget(Login(name='login'))
-        manager.add_widget(Instagram(name='ig'))
+        
         manager.add_widget(Ready(name='ready'))
+        manager.add_widget(IGLogin(name='iglogin'))
 
         if self.gVars.loginResult is not None:
             self.api = self.checkIGLogin()
             if self.api is None:
-                manager.current = 'ig'
+                manager.current = 'iglogin'
             else:
                 manager.current = 'ready'
         else:
@@ -364,55 +365,8 @@ class LoginApp(App):
 
         return api
 
-    def PerformIGLogin(self):
-        device_id = None
-        try:
-
-            settings_file = 'login.json'
-            if not os.path.isfile(settings_file):
-                # settings file does not exist
-                print('Unable to find file: {0!s}'.format(settings_file))
-                return false
-                # login new
-                api = Client(
-                    username, password,#auto_patch=True,
-                    on_login=lambda x: onlogin_callback(x, settings_file))
-            else:
-                with open(settings_file) as file_data:
-                    cached_settings = json.load(file_data, object_hook=from_json)
-                print('Reusing settings: {0!s}'.format(settings_file))
-
-                device_id = cached_settings.get('device_id')
-                # reuse auth settings
-                api = Client(
-                    username, password,#auto_patch=True,
-                    settings=cached_settings)
-
-        except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
-            print('ClientCookieExpiredError/ClientLoginRequiredError: {0!s}'.format(e))
-
-            # Login expired
-            # Do relogin but use default ua, keys and such
-            api = Client(
-                username, password,#auto_patch=True,
-                device_id=device_id,
-                on_login=lambda x: onlogin_callback(x, settings_file))
-
-        except ClientLoginError as e:
-            print('ClientLoginError {0!s}'.format(e))
-            exit(9)
-        except ClientError as e:
-            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-            exit(9)
-        except Exception as e:
-            print('Unexpected Exception: {0!s}'.format(e))
-            exit(99)
-
-        # Show when login expires
-        cookie_expiry = api.cookie_jar.auth_expires
-        print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
-
-        return api
+   
+        
 
     def AppLogout(self):
         app = App.get_running_app()
@@ -429,4 +383,37 @@ class LoginApp(App):
         popupWindow.open()
 
 if __name__ == '__main__':
-    LoginApp().run()
+    #LoginApp().run()
+
+    checkpoint_url = 'https://i.instagram.com/challenge/16677879671/5sdpr89Gtn/'
+
+    checkpoint_url = urlparse(checkpoint_url).path
+    headers = {}
+    authenticated = False
+    logged_in = False
+
+    BASE_URL = 'https://www.instagram.com/'
+    headers.update({'Referer': BASE_URL})
+    req = requests.get(BASE_URL[:-1] + checkpoint_url)
+    headers.update({'X-CSRFToken': req.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
+    headers.update({'Referer': BASE_URL[:-1] + checkpoint_url})
+    mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
+    challenge_data = {'choice': mode}
+    challenge = requests.post(BASE_URL[:-1] + checkpoint_url, data=challenge_data, allow_redirects=True)
+    headers.update({'X-CSRFToken': challenge.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
+
+    code = input('Enter code received: ').strip()
+    code_data = {'security_code': code}
+    code = requests.post(BASE_URL[:-1] + checkpoint_url, data=code_data, allow_redirects=True)
+    headers.update({'X-CSRFToken': code.cookies['csrftoken']})
+    cookies = code.cookies
+    code_text = json.loads(code.text)
+    if code_text.get('status') == 'ok':
+        authenticated = True
+        logged_in = True
+    elif 'errors' in code.text:
+        for count, error in enumerate(code_text['challenge']['errors']):
+            count += 1
+            logging.error('Session error %(count)s: "%(error)s"' % locals())
+    else:
+        logging.error(json.dumps(code_text))
