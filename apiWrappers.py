@@ -103,7 +103,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
-        time.sleep(3)
+        time.sleep(2)
 
     return tag_results
         

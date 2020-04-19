@@ -11,6 +11,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.clock import Clock
 import os
+from threading import Thread
 import logging
 import threading
 import time
@@ -18,7 +19,7 @@ from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
         __version__ as client_version)
-import botLogic as bot
+from botLogic import Bot
 
 class Ready(Screen):
 
@@ -47,11 +48,15 @@ class Ready(Screen):
         app = App.get_running_app()
         label = self.ids['logLabel'] #Label(text="showing the log here")
 
+        self.lblFollowCount =  self.ids['lblFollowCount']
+
         log = logging.getLogger("my.logger")
         log.level = logging.DEBUG
         log.addHandler(MyLabelHandler(label, logging.DEBUG))
 
-        bot.RunBot(app.api,Client,log)
+        oBot = Bot(Client,log,self)
+        Thread(target=oBot.RunBot).start()
+        
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
         # t.start()

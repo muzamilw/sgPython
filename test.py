@@ -1,53 +1,62 @@
 from kivy.app import App
-from kivy.clock import Clock
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.clock import Clock, _default_time as time  # ok, no better way to use the same clock as kivy, hmm
+from kivy.lang import Builder
+from kivy.factory import Factory
+from kivy.uix.button import Button
+from kivy.properties import ListProperty
+
+from threading import Thread
+from time import sleep
+
+MAX_TIME = 1/60.
+
+kv = '''
+BoxLayout:
+    ScrollView:
+        GridLayout:
+            cols: 1
+            id: target
+            size_hint: 1, None
+            height: self.minimum_height
+
+    MyButton:
+        text: 'run'
+
+<MyLabel@Label>:
+    size_hint_y: None
+    height: self.texture_size[1]
+'''
+
+class MyButton(Button):
+    def on_press(self, *args):
+        w = Myworkder(55)
+        Thread(target=w.worker).start()
+
+class Myworkder():
+
+    def __init__(self, initCount):
+        self.inic = initCount
 
 
-class FirstScreen(Screen):
-    pass
+    def worker(self, *args):
+        counter = self.inic
+        while  (counter < 100):
+            sleep(5) # blocking operation
+            App.get_running_app().consommables.append("count " + str(counter))
+            counter = counter + 1
 
-
-class SecondScreen(Screen):
-    pass
-
-
-class ThirdScreen(Screen):
-    pass
-
-
-class FourthScreen(Screen):
-    pass
-
-
-class MyScreenManager(ScreenManager):
-
-    def __init__(self, **kwargs):
-        super(MyScreenManager, self).__init__(**kwargs)
-        Clock.schedule_once(self.screen_switch_one, 2)
-
-    def screen_switch_one(self, dt):
-        self.current = '_first_screen_'
-        Clock.schedule_once(self.screen_switch_two, 2)
-
-    def screen_switch_two(self, dt):
-        self.current = '_second_screen_'
-        self.ids.first_screen.ids.first_screen_label.text = "Hi I'm The Fifth Screen"
-        Clock.schedule_once(self.screen_switch_three, 2)
-
-    def screen_switch_three(self, dt):
-        self.current = '_third_screen_'
-        Clock.schedule_once(self.screen_switch_four, 2)
-
-    def screen_switch_four(self, dt):
-        self.current = '_fourth_screen_'
-        Clock.schedule_once(self.screen_switch_one, 2)
-
-
-class SwitchingScreenApp(App):
+class PubConApp(App):
+    consommables = ListProperty([])
 
     def build(self):
-        return MyScreenManager()
+        Clock.schedule_interval(self.consume, 0)
+        return Builder.load_string(kv)
 
+    def consume(self, *args):
+        while self.consommables and time() < (Clock.get_time() + MAX_TIME):
+            item = self.consommables.pop(0)  # i want the first one
+            label = Factory.MyLabel(text=item)
+            self.root.ids.target.add_widget(label)
 
-if __name__ == "__main__":
-    SwitchingScreenApp().run()
+if __name__ == '__main__':
+    PubConApp().run()

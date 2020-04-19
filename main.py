@@ -1,5 +1,5 @@
 #from InstagramAPI import InstagramAPI
-from instagram_private_api import Client, ClientCompatPatch
+
 
 import requests 
 import os.path
@@ -44,6 +44,7 @@ import os
 from ready import Ready
 from iglogin import IGLogin
 from alert import Alert
+from instagram_private_api import Client, ClientCompatPatch
 
 
 class GlobalVars:
