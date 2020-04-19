@@ -240,6 +240,7 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 log.info('sleeping for : ' + str(waitTime))
+                                gVars.CurrentLikeDone = gVars.CurrentLikeDone + 1
                                 time.sleep(waitTime) 
                                 
 
@@ -250,6 +251,7 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 log.info('sleeping for : ' + str(waitTime))
+                                gVars.CurrentFollowDone = gVars.CurrentFollowDone + 1
                                 time.sleep(waitTime) 
 
                             if row['Action'] == 'Comment':
@@ -268,6 +270,7 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 
                                 log.info('sleeping for : ' + str(waitTime))
+                                gVars.CurrentCommentsDone = gVars.CurrentCommentsDone + 1
                                 time.sleep(waitTime) 
                                         
                             if row['Action'] == 'UnFollow':
@@ -280,6 +283,7 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 log.info('sleeping for : ' + str(waitTime))
+                                gVars.CurrentUnFollowDone = gVars.CurrentUnFollowDone + 1
                                 time.sleep(waitTime) 
 
                             if row['Action'] == 'StoryView':
@@ -291,6 +295,7 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 gVars.GlobalTodo.loc[i,'Data'] = 'story pages : ' + str(len(row['MediaId']))
                                 log.info('sleeping for : ' + str(waitTime))
+                                gVars.CurrentStoryViewDone = gVars.CurrentStoryViewDone + 1
                                 time.sleep(waitTime) 
 
                             with open('glob.Vars', 'wb') as gVarFile:
