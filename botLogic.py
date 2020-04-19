@@ -21,6 +21,8 @@ from instagram_private_api import (
         ClientCookieExpiredError, ClientLoginRequiredError,
         __version__ as client_version)
 
+from kivy.app import App
+
 class Actions(Enum):
     Follow = 60
     UnFollow = 61
@@ -42,10 +44,11 @@ class Actions(Enum):
 
 def dump(obj):
   for attr in dir(obj):
-    print("obj.%s = %r" % (attr, getattr(obj, attr)))
+    log.info("obj.%s = %r" % (attr, getattr(obj, attr)))
 
-def RunBot(gVars,api,Client,log):
-        
+def RunBot(api,Client,log):
+    app = App.get_running_app()
+    gVars = app.gVars
     gVars.RunStartTime = datetime.datetime.now()
     
     if gVars.loginResult is not None:
@@ -81,68 +84,76 @@ def RunBot(gVars,api,Client,log):
                     log.info('Daily Stats already sent')
                 #"Message":"{\"InitialFollowings\":\"400\",\"InitialFollowers\":\"1200\",\"InitialPosts\":\"6\",\"SocialProfileId\":28}"
                     
-                return
+                
 
                 if gVars.manifestJson is None:
-                    print('getting manifest')
+                    log.info('getting manifest from SGServer')
                     gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
+                
+
                 if gVars.manifestObj is None:
-                    print('loading manifest')
+                    log.info('loading manifest')
                     gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
+                    gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
+                    gVars.ReqUnFollow = gVars.manifestObj.UnFoll16DaysEngage
+                    gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
+                    gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
+                    gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
+                
                 
 
                 if gVars.Todo is None:
                     gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
-                    print('Creating Empty Global todo')
+                    log.info('Creating Empty Global todo')
                 
 
                 if gVars.hashtagActions is None:
-                    print('Getting Feeds of Hashtags and creating action list')
+                    log.info('Getting Feeds of Hashtags and creating action list')
                     hashstart = datetime.datetime.now()
                     gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
                     LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
-                    print('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
+                    log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                 
                 
                     
                 if gVars.locationActions is None:
-                    print('Getting Feeds of Location and creating action list')
+                    log.info('Getting Feeds of Location and creating action list')
                     locationtart = datetime.datetime.now()
                     gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client)
                     LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
-                    print('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
+                    log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
 
                 
                     
                 if gVars.DCActions is None:
-                    print('Getting Feeds of Competitors and creating action list')
+                    log.info('Getting Feeds of Competitors and creating action list')
                     DCstart = datetime.datetime.now()
                     gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
                     LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
-                    print('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
+                    log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
 
                 if gVars.SuggestFollowers is None:
-                    print('Getting Feeds of Suggested Users and creating action list')
+                    log.info('Getting Feeds of Suggested Users and creating action list')
                     Suggestedstart = datetime.datetime.now()
                     gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client)
                     LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
-                    print('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
+                    log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
 
                     
                 if gVars.UnFollowActions is None:
-                    print('Getting Feeds of UnFollow and creating action list')
+                    log.info('Getting Feeds of UnFollow and creating action list')
                     UnFollstart = datetime.datetime.now()
                     gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
                     LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
-                    print('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
+                    log.info('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
 
                 if gVars.StoryViewActions is None:
-                    print('Getting Feeds of StoryViews and creating action list')
+                    log.info('Getting Feeds of StoryViews and creating action list')
                     Storystart = datetime.datetime.now()
                     gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1])
                     LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
-                    print('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
+                    log.info('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
 
                 #media_seen(reels)
 
@@ -152,24 +163,25 @@ def RunBot(gVars,api,Client,log):
                 if gVars.GlobalTodo is None:
                     gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
                     gVars.GlobalTodo.to_csv('GlobData.csv')
-                    print('GlobalTodo merged')
+                    log.info('GlobalTodo merged')
                 #GlobalTodo[GlobalTodo['Action'] == 'Like']
 
                 
                 
                 LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
-                print("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
+                log.info("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
                 # #dump(gVars.manifestObj)
             except Exception as e: ## try catch block for the 
-                print('Unexpected Exception in initial feed loads : {0!s}'.format(e))
+                log.info('Unexpected Exception in initial feed loads : {0!s}'.format(e))
             
-            
+                
+            return
 
             # #iterList = (GlobalTodo[GlobalTodo['Status'] == '1']).iterrows()
-            # #print(iterList) 
+            # #log.info(iterList) 
             # #for i, row in islice(GlobalTodo.iterrows(),0,10):
             # #    if row['Status'] == 1:
-            # #        print(row)
+            # #        log.info(row)
             
             
             
@@ -185,46 +197,46 @@ def RunBot(gVars,api,Client,log):
                         
                         if row['Action'] == 'Like':
                             try:
-                                print('like action : ' + row['MediaId'])
+                                log.info('like action : ' + row['MediaId'])
                                 apiW.LikeMedia(api,row['MediaId'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.Like,row['Username'],row['MediaId'])
                                
                             except ClientError as e:
-                                print('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                log.info('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while liking : ' + str(row['MediaId']))
                                 gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while liking'
 
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                            print('sleeping for : ' + str(waitTime))
+                            log.info('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
                             
 
                         if row['Action'] == 'Follow':
                             apiW.FollowUser(api,row['UserId'])
                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
-                            print('Follow action : ' + row['Username'])
+                            log.info('Follow action : ' + row['Username'])
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                            print('sleeping for : ' + str(waitTime))
+                            log.info('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
 
                         if row['Action'] == 'Comment':
                             comm = random.choice(Comments)
                             try:
-                                print('Comment action : ' + row['MediaId'])
+                                log.info('Comment action : ' + row['MediaId'])
                                 apiW.CommentOnMedia(api,row['MediaId'],comm)
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.Comment,row['Username'],row['Username'] + 'Comment added : ' + comm)
                                 gVars.GlobalTodo.loc[i,'Data'] = 'Comment added : ' + comm
                             except ClientError as e:
-                                print('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                log.info('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while Commenting : ' + str(row['MediaId']))
                                 gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while Commenting'
 
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                             
-                            print('sleeping for : ' + str(waitTime))
+                            log.info('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
                                     
                         if row['Action'] == 'UnFollow':
@@ -233,21 +245,21 @@ def RunBot(gVars,api,Client,log):
                             else:
                                 apiW.UnFollowUser(api,row['UserId'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'')
-                            print('UnFollow action : ' + row['Username'])
+                            log.info('UnFollow action : ' + row['Username'])
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
-                            print('sleeping for : ' + str(waitTime))
+                            log.info('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
 
                         if row['Action'] == 'StoryView':
-                            print('StoryView action : ' + row['Username'])
+                            log.info('StoryView action : ' + row['Username'])
                             apiW.ViewStory(api,row['MediaId'],row['FriendShipStatus'])
                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'story pages : ' + str(len(row['MediaId'])))
                             
                             gVars.GlobalTodo.loc[i,'Status'] = 2
                             gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                             gVars.GlobalTodo.loc[i,'Data'] = 'story pages : ' + str(len(row['MediaId']))
-                            print('sleeping for : ' + str(waitTime))
+                            log.info('sleeping for : ' + str(waitTime))
                             time.sleep(waitTime) 
 
                         with open('glob.Vars', 'wb') as gVarFile:
@@ -268,14 +280,14 @@ def RunBot(gVars,api,Client,log):
                 
             except:# ClientError:
                 #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                print("exception occurred in main bot action loop")
-                print(sys.exc_info())
+                log.info("exception occurred in main bot action loop")
+                log.info(sys.exc_info())
 
             #gVars.GlobalTodo.to_csv('GlobData.csv')
 
             return gVars
         else:
             #perform login
-            print('IG user is not logged in.')
+            log.info('IG user is not logged in.')
     else:
-        print('Error logging onto SG Server')
+        log.info('Error logging onto SG Server')

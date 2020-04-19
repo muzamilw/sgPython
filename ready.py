@@ -51,7 +51,7 @@ class Ready(Screen):
         log.level = logging.DEBUG
         log.addHandler(MyLabelHandler(label, logging.DEBUG))
 
-        bot.RunBot(app.gVars,app.api,Client,log)
+        bot.RunBot(app.api,Client,log)
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
         # t.start()
@@ -63,7 +63,7 @@ class Ready(Screen):
             log.info("WOO %s", i)
 
     def disconnect(self):
-        self.t.join()
+        #self.t.join()
         self.manager.transition = SlideTransition(direction="right")
         app = App.get_running_app()
         app.AppLogout()

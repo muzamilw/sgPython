@@ -43,7 +43,7 @@ from kivy.core.window import Window
 import os
 from ready import Ready
 from iglogin import IGLogin
-
+from alert import Alert
 
 
 class GlobalVars:
@@ -168,26 +168,6 @@ except ImportError:
 
 
 
-class Alert(Popup):
-
-    def __init__(self, title, text):
-        super(Alert, self).__init__()
-        content = BoxLayout (orientation= 'vertical')#AnchorLayout(anchor_x='center', anchor_y='bottom')
-        content.add_widget(
-            Label(text=text, halign='left', valign='top')
-        )
-        ok_button = Button(text='Ok', size_hint=(None, None))
-        content.add_widget(ok_button)
-
-        popup = Popup(
-            title=title,
-            content=content,
-            size_hint=(None, None),
-            size=(Window.width / 3, Window.height / 3),
-            auto_dismiss=False,
-        )
-        ok_button.bind(on_press=popup.dismiss)
-        popup.open()
 
 
 class Login(Screen):
@@ -248,7 +228,7 @@ class LoginApp(App):
 
     def on_stop(self):
         with open('glob.Vars', 'wb') as gVarFile:
-            print('Updating gVars at end')
+            print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
 
     def on_pause(self):
@@ -281,6 +261,7 @@ class LoginApp(App):
             gVars.BotVer = 'py.1.6'
             gVars.RunStartTime = None
             gVars.RunEndTime = None
+            gVars.TotalSessionTime = 0
             gVars.manifestJson = None
             gVars.manifestObj = None
             gVars.loginResult = None
@@ -295,6 +276,25 @@ class LoginApp(App):
             gVars.DailyStatsSent = False
             gVars.IGusername = None
             gVars.IGpassword = None
+
+            gVars.CurrentFollowDone = 0
+            gVars.CurrentUnFollowDone = 0
+            gVars.CurrentLikeDone = 0
+            gVars.CurrentStoryViewDone = 0
+            gVars.CurrentCommentsDone = 0
+
+            gVars.TotFollow = 0
+            gVars.TotUnFollow = 0
+            gVars.TotLikes = 0
+            gVars.TotStoryViews = 0
+            gVars.TotComments = 0
+
+            gVars.ReqFollow = 0
+            gVars.ReqUnFollow = 0
+            gVars.ReqLikes = 0
+            gVars.ReqStoryViews = 0
+            gVars.ReqComments = 0
+
             gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
 
             self.gVars = gVars
@@ -383,37 +383,4 @@ class LoginApp(App):
         popupWindow.open()
 
 if __name__ == '__main__':
-    #LoginApp().run()
-
-    checkpoint_url = 'https://i.instagram.com/challenge/16677879671/5sdpr89Gtn/'
-
-    checkpoint_url = urlparse(checkpoint_url).path
-    headers = {}
-    authenticated = False
-    logged_in = False
-
-    BASE_URL = 'https://www.instagram.com/'
-    headers.update({'Referer': BASE_URL})
-    req = requests.get(BASE_URL[:-1] + checkpoint_url)
-    headers.update({'X-CSRFToken': req.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
-    headers.update({'Referer': BASE_URL[:-1] + checkpoint_url})
-    mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
-    challenge_data = {'choice': mode}
-    challenge = requests.post(BASE_URL[:-1] + checkpoint_url, data=challenge_data, allow_redirects=True)
-    headers.update({'X-CSRFToken': challenge.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
-
-    code = input('Enter code received: ').strip()
-    code_data = {'security_code': code}
-    code = requests.post(BASE_URL[:-1] + checkpoint_url, data=code_data, allow_redirects=True)
-    headers.update({'X-CSRFToken': code.cookies['csrftoken']})
-    cookies = code.cookies
-    code_text = json.loads(code.text)
-    if code_text.get('status') == 'ok':
-        authenticated = True
-        logged_in = True
-    elif 'errors' in code.text:
-        for count, error in enumerate(code_text['challenge']['errors']):
-            count += 1
-            logging.error('Session error %(count)s: "%(error)s"' % locals())
-    else:
-        logging.error(json.dumps(code_text))
+    LoginApp().run()
