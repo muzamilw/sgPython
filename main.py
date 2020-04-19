@@ -172,6 +172,13 @@ except ImportError:
 
 
 class Login(Screen):
+
+    def build(self):
+        app = App.get_running_app()
+
+        self.ids['login'].text = app.gVars.SGusername
+        self.ids['password'].text = app.gVars.SGPin
+
     def do_login(self, loginText, passwordText):
         app = App.get_running_app()
 
@@ -183,9 +190,11 @@ class Login(Screen):
             Alert(title='Error', text=loginResult[1])
         else:
             app.gVars.loginResult = loginResult[1]
+            app.gVars.SGusername = loginText
+            app.gVars.SGPin = passwordText
 
             self.manager.transition = SlideTransition(direction="left")
-            app.api = app.checkIGLogin()
+            app.api = app.checkIGLogin(app.gVars.SGusername)
             if app.api is None:
                 self.manager.current = 'iglogin'
             else:
@@ -216,7 +225,7 @@ class LoginApp(App):
         manager.add_widget(IGLogin(name='iglogin'))
 
         if self.gVars.loginResult is not None:
-            self.api = self.checkIGLogin()
+            self.api = self.checkIGLogin(self.gVars.SGusername)
             if self.api is None:
                 manager.current = 'iglogin'
             else:
@@ -228,12 +237,12 @@ class LoginApp(App):
         return manager
 
     def on_stop(self):
-        with open('glob.Vars', 'wb') as gVarFile:
+        with open('userdata\\glob.Vars', 'wb') as gVarFile:
             print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
 
     def on_pause(self):
-        with open('glob.Vars', 'wb') as gVarFile:
+        with open('userdata\\glob.Vars', 'wb') as gVarFile:
             print('Updating gVars at pause')
             pickle.dump(self.gVars, gVarFile)
 
@@ -252,8 +261,8 @@ class LoginApp(App):
 
     def loadGlobalConfig(self):
         try:
-            with open('glob.Vars', 'rb') as gVarFile:
-                print('Vars file found, loading')
+            with open('userdata\\glob.Vars', 'rb') as gVarFile:
+                print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
         except IOError:
@@ -275,6 +284,8 @@ class LoginApp(App):
             gVars.GlobalTodo = None
             gVars.Todo = None
             gVars.DailyStatsSent = False
+            gVars.SGusername = None
+            gVars.SGPin = None
             gVars.IGusername = None
             gVars.IGpassword = None
 
@@ -299,8 +310,8 @@ class LoginApp(App):
             gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
 
             self.gVars = gVars
-
-            with open('glob.Vars', 'wb') as gVarFile:
+            print('Loading new Defaults')
+            with open('userdata\\glob.Vars', 'wb') as gVarFile:
                 pickle.dump(gVars, gVarFile)
         
     def to_json(self,python_object):
@@ -320,14 +331,14 @@ class LoginApp(App):
             json.dump(cache_settings, outfile, default=to_json)
             print('SAVED: {0!s}'.format(new_settings_file))
 
-    def checkIGLogin(self):
+    def checkIGLogin(self,username):
         device_id = None
         try:
 
-            settings_file = 'login.json'
+            settings_file = 'userdata\\'+username+'_login.json'
             if not os.path.isfile(settings_file):
                 # settings file does not exist
-                print('Unable to find file: {0!s}'.format(settings_file))
+                print('Unable to find login.json: {0!s}'.format(settings_file))
                 api = None
 
             elif self.gVars.IGusername is None or self.gVars.IGpassword is None:   
@@ -372,8 +383,8 @@ class LoginApp(App):
     def AppLogout(self):
         app = App.get_running_app()
         app.gVars.loginResult = None
-        with open('glob.Vars', 'wb') as gVarFile:
-            print('Updating gVars at pause')
+        with open('userdata\\glob.Vars', 'wb') as gVarFile:
+            print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
     def show_popup(self):

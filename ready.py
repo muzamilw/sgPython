@@ -29,6 +29,7 @@ class Ready(Screen):
         app = App.get_running_app()
         lblusername = self.ids['lblusername'] #Label(text="showing the log here")
         lblusername.text = app.api.authenticated_user_id
+        app.api.feed_timeline()
         # try:
         #     from instagram_private_api import (
         #         Client, ClientError, ClientLoginError,

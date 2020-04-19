@@ -149,6 +149,19 @@ class IGLogin(Screen):
             json.dump(cache_settings, outfile, default=self.to_json)
             print('SAVED: {0!s}'.format(new_settings_file))
 
+    def build(self):
+        app = App.get_running_app()
+
+        if app.gVars.IGusername != '':
+            self.ids['login'].text = app.gVars.IGusername
+        else:
+            self.ids['login'].text = 'nevillekmiec'
+
+
+        if app.gVars.IGpassword != '':
+            self.ids['password'].text = app.gVars.IGpassword
+        else:
+            self.ids['password'].text = '!_LKvXc1'
     
     def do_login(self, loginText, passwordText):
         app = App.get_running_app()
@@ -163,7 +176,7 @@ class IGLogin(Screen):
         app.gVars.IGpassword = passwordText
 
         if api is None:
-            Alert(title='Error', text='Login nai howa')
+            Alert(title='Error', text='Login failed')
         else:
             app.api = api
 
@@ -187,10 +200,10 @@ class IGLogin(Screen):
         # 'version_code': ''
         try:
 
-            settings_file = 'login.json'
+            settings_file = 'userdata\\'+ loginText +'_login.json'
             if not os.path.isfile(settings_file):
                 # settings file does not exist
-                print('Unable to find file: {0!s}'.format(settings_file))
+                print('Unable to find login.json file: {0!s}'.format(settings_file))
                
                 # login new
                 api = Client(
