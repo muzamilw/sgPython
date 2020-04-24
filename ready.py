@@ -15,6 +15,7 @@ from threading import Thread
 import logging
 import threading
 import time
+import datetime
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -24,6 +25,7 @@ from botLogic import Bot
 class Ready(Screen):
 
     t = None
+    StartTime = None
 
     def on_enter(self):
         app = App.get_running_app()
@@ -57,6 +59,8 @@ class Ready(Screen):
         self.lblLikeExchange =  self.ids['lblLikeExchange']
         self.lblFollowExchange =  self.ids['lblFollowExchange']
         self.lblCommentExchange =  self.ids['lblCommentExchange']
+        self.lblTotalTime =  self.ids['lblTotalTime']
+        
 
         log = logging.getLogger("my.logger")
         log.level = logging.DEBUG
@@ -64,10 +68,15 @@ class Ready(Screen):
 
         oBot = Bot(Client,log,self)
         Thread(target=oBot.RunBot).start()
+        self.StartTime = datetime.datetime.now()
+        Clock.schedule_interval(self.updateTime, 1)
         
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
         # t.start()
+
+    def updateTime(self):
+        self.lblTotalTime.text = str((datetime.datetime.now()-self.StartTime).total_seconds())
 
     def my_thread(self,log):
 
