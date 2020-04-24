@@ -51,7 +51,7 @@ class Ready(Screen):
 
         self.lblFollow =  self.ids['lblFollow']
         self.lblUnFollow =  self.ids['lblUnFollow']
-        self.lblUnLike =  self.ids['lblUnLike']
+        self.lblLike =  self.ids['lblLike']
         self.lblStoryView =  self.ids['lblStoryView']
         self.lblComments =  self.ids['lblComments']
         self.lblLikeExchange =  self.ids['lblLikeExchange']

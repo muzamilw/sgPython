@@ -58,21 +58,10 @@ class Bot():
         api = app.api
         log = self.log
 
-        log.info('updating count')
-
-
-        self.ui.lblFollow.text = '99 / gVars.ReqFollow'
-        self.ui.lblUnFollow.text = '99 / ReqUnFollow'
-        self.ui.lblUnLike.text = '99 / ReqLikes'
-        self.ui.lblStoryView.text = '99 / ReqStoryViews'
-        self.ui.lblLikeExchange.text = '99 / 999'
-        self.ui.lblFollowExchange.text = '99 / 999'
-        self.ui.lblCommentExchange.text = '99 / 999'
-        
 
         gVars = app.gVars
         gVars.RunStartTime = datetime.datetime.now()
-        return
+        
         
         if gVars.loginResult is not None:
             gVars.SocialProfileId = gVars.loginResult["SocialProfileId"]
@@ -133,8 +122,21 @@ class Bot():
                         gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
                         gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
                         gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
+
+                        gVars.ReqExComments = len(gVars.manifestObj.FollowersToComment)
+                        gVars.ReqExFollow = len(gVars.manifestObj.FollowList)
+                        gVars.ReqExLikes  = len(gVars.manifestObj.LikeList)
                     
+                    self.ui.lblFollow.text = str(gVars.CurrentFollowDone) +'/'+ str(gVars.TotFollow) +'/'+ str(gVars.ReqFollow)
+                    self.ui.lblUnFollow.text = str(gVars.CurrentUnFollowDone) +'/'+str(gVars.TotUnFollow ) +'/'+ str( gVars.ReqUnFollow)
+                    self.ui.lblLike.text = str(gVars.CurrentLikeDone) +'/'+str(gVars.TotLikes ) +'/'+ str( gVars.ReqLikes)
+                    self.ui.lblStoryView.text = str(gVars.CurrentStoryViewDone) +'/'+str(gVars.TotStoryViews ) +'/'+ str( gVars.ReqStoryViews)
+                    self.ui.lblComments.text = str(gVars.CurrentCommentsDone) +'/'+str(gVars.TotComments ) +'/'+ str( gVars.ReqComments)
+                    self.ui.lblLikeExchange.text = str(gVars.CurrentExLikeDone) +'/'+str(gVars.TotExLikes ) +'/'+ str( gVars.ReqExLikes)
+                    self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
+                    self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                     
+                    return
 
                     if gVars.Todo is None:
                         gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
@@ -203,16 +205,25 @@ class Bot():
                         gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
                         gVars.GlobalTodo.to_csv('GlobData.csv')
                         log.info('GlobalTodo merged')
-                        gVars.TotFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Follow') & (gVars.GlobalTodo['UserId'] != '')])
-                        gVars.TotUnFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'UnFollow') & (gVars.GlobalTodo['UserId'] != '')])
-                        gVars.TotLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Like') & (gVars.GlobalTodo['UserId'] != '')])
-                        gVars.TotStoryViews = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'StoryView') & (gVars.GlobalTodo['UserId'] != '')])
-                        gVars.TotComments = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Comment') & (gVars.GlobalTodo['UserId'] != '')])
-                        
+
+                    gVars.TotFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Follow') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotUnFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'UnFollow') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Like') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotStoryViews = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'StoryView') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotComments = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Comment') & (gVars.GlobalTodo['UserId'] != '')])
+                    
 
                     #GlobalTodo[GlobalTodo['Action'] == 'Like']
-
+                    self.ui.lblFollow.text = str(gVars.CurrentFollowDone) +'/'+ str(gVars.TotFollow) +'/'+ str(gVars.ReqFollow)
+                    self.ui.lblUnFollow.text = str(gVars.CurrentUnFollowDone) +'/'+str(gVars.TotUnFollow ) +'/'+ str( gVars.ReqUnFollow)
+                    self.ui.lblLike.text = str(gVars.CurrentLikeDone) +'/'+str(gVars.TotLikes ) +'/'+ str( gVars.ReqLikes)
+                    self.ui.lblStoryView.text = str(gVars.CurrentStoryViewDone) +'/'+str(gVars.TotStoryViews ) +'/'+ str( gVars.ReqStoryViews)
+                    self.ui.lblComments.text = str(gVars.CurrentCommentsDone) +'/'+str(gVars.TotComments ) +'/'+ str( gVars.ReqComments)
+                    self.ui.lblLikeExchange.text = str(gVars.CurrentExLikeDone) +'/'+str(gVars.TotExLikes ) +'/'+ str( gVars.ReqExLikes)
+                    self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
+                    self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                     
+
                     
                     LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
                     log.info("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
@@ -314,7 +325,17 @@ class Bot():
                                 gVars.GlobalTodo.loc[i,'Data'] = 'story pages : ' + str(len(row['MediaId']))
                                 log.info('sleeping for : ' + str(waitTime))
                                 gVars.CurrentStoryViewDone = gVars.CurrentStoryViewDone + 1
-                                time.sleep(waitTime) 
+                                time.sleep(waitTime)
+
+                            self.ui.lblFollow.text = str(gVars.CurrentFollowDone) +'/'+ str(gVars.TotFollow) +'/'+ str(gVars.ReqFollow)
+                            self.ui.lblUnFollow.text = str(gVars.CurrentUnFollowDone) +'/'+str(gVars.TotUnFollow ) +'/'+ str( gVars.ReqUnFollow)
+                            self.ui.lblLike.text = str(gVars.CurrentLikeDone) +'/'+str(gVars.TotLikes ) +'/'+ str( gVars.ReqLikes)
+                            self.ui.lblStoryView.text = str(gVars.CurrentStoryViewDone) +'/'+str(gVars.TotStoryViews ) +'/'+ str( gVars.ReqStoryViews)
+                            self.ui.lblComments.text = str(gVars.CurrentCommentsDone) +'/'+str(gVars.TotComments ) +'/'+ str( gVars.ReqComments)
+                            self.ui.lblLikeExchange.text = str(gVars.CurrentExLikeDone) +'/'+str(gVars.TotExLikes ) +'/'+ str( gVars.ReqExLikes)
+                            self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
+                            self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
+                    
 
                             with open('glob.Vars', 'wb') as gVarFile:
                                 pickle.dump(gVars, gVarFile)

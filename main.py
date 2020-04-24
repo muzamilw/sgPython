@@ -299,17 +299,29 @@ class LoginApp(App):
             gVars.CurrentStoryViewDone = 0
             gVars.CurrentCommentsDone = 0
 
+            gVars.CurrentExFollowDone = 0
+            gVars.CurrentExCommentsDone = 0
+            gVars.CurrentExLikeDone = 0
+
             gVars.TotFollow = 0
             gVars.TotUnFollow = 0
             gVars.TotLikes = 0
             gVars.TotStoryViews = 0
             gVars.TotComments = 0
 
+            gVars.TotExComments = 0
+            gVars.TotExLikes = 0
+            gVars.TotExFollow = 0
+
             gVars.ReqFollow = 0
             gVars.ReqUnFollow = 0
             gVars.ReqLikes = 0
             gVars.ReqStoryViews = 0
             gVars.ReqComments = 0
+
+            gVars.ReqExFollow = 0
+            gVars.ReqExLikes = 0
+            gVars.ReqExComments = 0
 
             gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
 
