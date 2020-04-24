@@ -225,6 +225,10 @@ class LoginApp(App):
         manager.add_widget(IGLogin(name='iglogin'))
 
         if self.gVars.loginResult is not None:
+            if self.gVars.IGusername == None:
+                self.gVars.IGusername = 'nevillekmiec'
+            if self.gVars.IGpassword == None:
+                self.gVars.IGpassword = '!_LKvXc1'
             self.api = self.checkIGLogin(self.gVars.SGusername)
             if self.api is None:
                 manager.current = 'iglogin'

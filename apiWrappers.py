@@ -3,6 +3,7 @@ from time import sleep
 import datetime
 import time
 import json
+from random import randrange
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -77,7 +78,7 @@ def ViewStory(api, itemids, timestamps):  #post_like(media_id, module_name='feed
     
    
 
-def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, **kwargs)
+def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_token, **kwargs)
     
     rank_token = Client.generate_uuid()
     has_more = True
@@ -103,12 +104,14 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client):   #feed_tag(tag, rank_token, 
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
-        time.sleep(2)
+        sleepTime = randrange(5,10)
+        log.info('pulling hashtag feed for ' + hashTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + len(tag_results) + ' of ' + str(maxCountToGet) )
+        time.sleep(sleepTime)
 
     return tag_results
         
 
-def GetLocationFeed(api, locationTag,maxCountToGet,Client):
+def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
     rank_token = Client.generate_uuid()
     has_more = True
     location_results = []
@@ -132,7 +135,10 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client):
             
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
-            time.sleep(1)
+            
+            sleepTime = randrange(5,10)
+            log.info('pulling location ranked feed for ' + locationTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + len(location_results) + ' of ' + str(maxCountToGet) )
+            time.sleep(sleepTime)
 
         #loading recents if target not met
         next_max_id = True
@@ -149,7 +155,9 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client):
 
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
-            time.sleep(1)
+            sleepTime = randrange(5,10)
+            log.info('pulling location non ranked feed for ' + locationTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + len(location_results) + ' of ' + str(maxCountToGet) )
+            time.sleep(sleepTime)
 
         return location_results
         #res = api.getLocationFeed(locastionSearchResult[0]["location"]["pk"])
@@ -157,7 +165,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client):
     else:
         return None
     
-def GetUserFollowingFeed(api, userName,maxCountToGet,Client):
+def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log):
     try:
     
         follUserRes = None
@@ -198,7 +206,9 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client):
 
                     has_more = results.get('more_available')
                     next_max_id = results.get('next_max_id')
-                    time.sleep(1)
+                    sleepTime = randrange(5,10)
+                    log.info('pulling user following feed for ' + userName + ' sleep for ' +  str(sleepTime) + ' current count = ' + len(follFeed_results) + ' of ' + str(maxCountToGet) )
+                    time.sleep(sleepTime)
 
 
             # api.getUserFollowers(follUserRes['user']['pk'])   #user_followers(user_id, rank_token, **kwargs)

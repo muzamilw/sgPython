@@ -49,7 +49,14 @@ class Ready(Screen):
         app = App.get_running_app()
         label = self.ids['logLabel'] #Label(text="showing the log here")
 
-        self.lblFollowCount =  self.ids['lblFollowCount']
+        self.lblFollow =  self.ids['lblFollow']
+        self.lblUnFollow =  self.ids['lblUnFollow']
+        self.lblUnLike =  self.ids['lblUnLike']
+        self.lblStoryView =  self.ids['lblStoryView']
+        self.lblComments =  self.ids['lblComments']
+        self.lblLikeExchange =  self.ids['lblLikeExchange']
+        self.lblFollowExchange =  self.ids['lblFollowExchange']
+        self.lblCommentExchange =  self.ids['lblCommentExchange']
 
         log = logging.getLogger("my.logger")
         log.level = logging.DEBUG

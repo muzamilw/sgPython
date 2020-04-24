@@ -19,48 +19,85 @@
             size_hint: 1, .2
 
         GridLayout:
-            cols: 5
+            cols: 6
             orientation: 'horizontal'
             padding: 20
             spacing: 10
             Label:
-                id: lblFollowCount
-                text: "0"
+                size_hint_x: None
+                text: "Follow"
+                size_hint: 1, 0.8
+            Label:
+                text: "UnFollow"
+                
+            Label:
+                text: "Likes"
+                
+            Label:
+                text: "StoryView"
+            Label:
+                text: "Comments"
+                
+            Label:
+                text: "Session Time"
+                
+            Label:
+                id: lblFollow
+                text: "0 / 0"
+                size_hint: 1, 0.8
+            Label:
+                id: lblUnFollow
+                text: "0 / 0"
                
             Label:
-                id: lblUnFollowCount
-                text: "0"
-               
+                id: lblUnLike
+                text: "0 / 0"
             Label:
-                id: lblUnLikeCount
-                text: "0"
+                id: lblStoryView
+                text: "0 / 0"
             Label:
-                id: lblStoryViewCount
-                text: "0"
+                id: lblComments
+                text: "0 / 0"
             Label:
                 id: lblTotalTime
                 text: "0:00"
             Label:
-                size_hint_x: None
-                text: "Follow Count"
-                size_hint: 1, None
+                
+                text: "Like Exchange"
+                size_hint: 1, 0.8
             Label:
-                text: "UnFollow Count"
-                size_hint: 1, None
+                text: "Follow Exchange"
+                
             Label:
-                text: "Like Count"
-                size_hint: 1, None
+                text: "Comment Exchange"
+                
             Label:
-                text: "StoryView Count"
-                size_hint: 1, None
+                text: ""
+                
             Label:
-                text: "Bot Run Time"
-                size_hint: 1, None
+                text: ""
+            Label:
+                text: ""
+                
+            Label:
+                text: " 0 / 0 "
+                size_hint: 1, 0.8
+                id: lblLikeExchange
+            Label:
+                text: " 0 / 0 "
+                size_hint: 1, 0.8
+                id: lblFollowExchange
+            Label:
+                id: lblCommentExchange
+                size_hint: 1, 0.8
+               
+            
+            
             
         TextInput:
             id:logLabel
             text: "Bot Log here"
-            font_size: 12
+            font_size: 14
             multiline:True
         Button:
             text: "Stop & Log Off"

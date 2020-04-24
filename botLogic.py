@@ -47,6 +47,7 @@ class Bot():
         self.ui = ui
         self.Client = Client
         self.log = log
+        
 
     def dump(self,obj):
         for attr in dir(obj):
@@ -56,8 +57,22 @@ class Bot():
         app = App.get_running_app()
         api = app.api
         log = self.log
+
+        log.info('updating count')
+
+
+        self.ui.lblFollow.text = '99 / gVars.ReqFollow'
+        self.ui.lblUnFollow.text = '99 / ReqUnFollow'
+        self.ui.lblUnLike.text = '99 / ReqLikes'
+        self.ui.lblStoryView.text = '99 / ReqStoryViews'
+        self.ui.lblLikeExchange.text = '99 / 999'
+        self.ui.lblFollowExchange.text = '99 / 999'
+        self.ui.lblCommentExchange.text = '99 / 999'
+        
+
         gVars = app.gVars
         gVars.RunStartTime = datetime.datetime.now()
+        return
         
         if gVars.loginResult is not None:
             gVars.SocialProfileId = gVars.loginResult["SocialProfileId"]
@@ -129,7 +144,7 @@ class Bot():
                     if gVars.hashtagActions is None:
                         log.info('Getting Feeds of Hashtags and creating action list')
                         hashstart = datetime.datetime.now()
-                        gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client)
+                        gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client,log)
                         LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                         log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
@@ -139,7 +154,7 @@ class Bot():
                     if gVars.locationActions is None:
                         log.info('Getting Feeds of Location and creating action list')
                         locationtart = datetime.datetime.now()
-                        gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client)
+                        gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
                         log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
@@ -149,7 +164,7 @@ class Bot():
                     if gVars.DCActions is None:
                         log.info('Getting Feeds of Competitors and creating action list')
                         DCstart = datetime.datetime.now()
-                        gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client)
+                        gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                         log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
@@ -157,7 +172,7 @@ class Bot():
                     if gVars.SuggestFollowers is None:
                         log.info('Getting Feeds of Suggested Users and creating action list')
                         Suggestedstart = datetime.datetime.now()
-                        gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client)
+                        gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
                         log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
@@ -166,7 +181,7 @@ class Bot():
                     if gVars.UnFollowActions is None:
                         log.info('Getting Feeds of UnFollow and creating action list')
                         UnFollstart = datetime.datetime.now()
-                        gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1])
+                        gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log)
                         LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
                         log.info('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
@@ -174,7 +189,7 @@ class Bot():
                     if gVars.StoryViewActions is None:
                         log.info('Getting Feeds of StoryViews and creating action list')
                         Storystart = datetime.datetime.now()
-                        gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1])
+                        gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log)
                         LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
                         log.info('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
@@ -231,7 +246,7 @@ class Bot():
                                     log.info('like action : ' + row['MediaId'])
                                     apiW.LikeMedia(api,row['MediaId'])
                                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.Like,row['Username'],row['MediaId'])
-                                
+                                    gVars.CurrentLikeDone = gVars.CurrentLikeDone + 1
                                 except ClientError as e:
                                     log.info('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while liking : ' + str(row['MediaId']))
@@ -247,6 +262,7 @@ class Bot():
                             if row['Action'] == 'Follow':
                                 apiW.FollowUser(api,row['UserId'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
+                                gVars.CurrentFollowDone = gVars.CurrentFollowDone + 1 
                                 log.info('Follow action : ' + row['Username'])
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
@@ -260,6 +276,7 @@ class Bot():
                                     log.info('Comment action : ' + row['MediaId'])
                                     apiW.CommentOnMedia(api,row['MediaId'],comm)
                                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.Comment,row['Username'],row['Username'] + 'Comment added : ' + comm)
+                                    gVars.CurrentCommentsDone = gVars.CurrentCommentsDone + 1
                                     gVars.GlobalTodo.loc[i,'Data'] = 'Comment added : ' + comm
                                 except ClientError as e:
                                     log.info('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
@@ -279,6 +296,7 @@ class Bot():
                                 else:
                                     apiW.UnFollowUser(api,row['UserId'])
                                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'')
+                                    gVars.CurrentUnFollowDone = gVars.CurrentUnFollowDone + 1
                                 log.info('UnFollow action : ' + row['Username'])
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
@@ -290,7 +308,7 @@ class Bot():
                                 log.info('StoryView action : ' + row['Username'])
                                 apiW.ViewStory(api,row['MediaId'],row['FriendShipStatus'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'story pages : ' + str(len(row['MediaId'])))
-                                
+                                gVars.CurrentStoryViewDone = gVars.CurrentStoryViewDone + 1
                                 gVars.GlobalTodo.loc[i,'Status'] = 2
                                 gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                 gVars.GlobalTodo.loc[i,'Data'] = 'story pages : ' + str(len(row['MediaId']))

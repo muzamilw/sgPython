@@ -14,6 +14,7 @@ import smtplib
 import time
 import calendar
 import sys
+from random import randrange
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -172,12 +173,12 @@ def LoadManifest(manifest):
     return manifestObj
 
     
-def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client):
+def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client,log):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500,Client) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500,Client,log) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -214,12 +215,12 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
+def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerLocation)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -254,12 +255,12 @@ def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
+def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
     
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor,Client) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor,Client,log) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(manifestObj.totalActionsDirectCompetitor)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -295,7 +296,7 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client):
+def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client,log):
     try:
         locMediaUsers = []
 
@@ -309,7 +310,9 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                                     if ufeed['items'][0]['has_liked'] == False:
                                         # follFeed_results.extend([ufeed['items'][0]])
                                         locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                                time.sleep(1)
+                                sleepTime = randrange(5,10)
+                                log.info('pulling suggested user feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                                time.sleep(sleepTime)
         except:
             print('exception in chaining')
             raise
@@ -333,7 +336,9 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                             if ufeed['items'][0]['has_liked'] == False:
                                 # follFeed_results.extend([ufeed['items'][0]])
                                 locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                        time.sleep(1)
+                        sleepTime = randrange(5,10)
+                        log.info('pulling Follow exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                        time.sleep(sleepTime)
         except Exception as e:
             print('exception in FollowList for user' + folluser)
             raise
@@ -355,7 +360,9 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                             if ufeed['items'][0]['has_liked'] == False:
                                 # follFeed_results.extend([ufeed['items'][0]])
                                 locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
-                        time.sleep(1)
+                        sleepTime = randrange(5,10)
+                        log.info('pulling like exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                        time.sleep(sleepTime)
         except:
             print('exception in LikeList')
             raise
@@ -378,7 +385,9 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
                             if ufeed['items'][0]['has_liked'] == False:
                                 # follFeed_results.extend([ufeed['items'][0]])
                                 locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
-                        time.sleep(1)
+                        sleepTime = randrange(5,10)
+                        log.info('pulling comment exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                        time.sleep(sleepTime)
         except:
             print('exception in FollowersToComment')
             raise
@@ -430,7 +439,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
         print(print(sys.exc_info()))
         return None
 
-def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
+def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
     
     locMediaUsers = []
 
@@ -440,6 +449,10 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
 
         try:
             follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+            sleepTime = randrange(2,7)
+            log.info('pulling user details for unfollow for ' + foll['FollowedSocialUsername'].strip() + ' sleep for ' +  str(sleepTime)  )
+            time.sleep(sleepTime)
+            
         except ClientError as e:
             print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
             follUserRes = None
@@ -469,7 +482,7 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights):
             
     return usersdf
 
-def LoadStoryTodo(api, manifestObj, SubActionWeights):
+def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
     
     reelMediaUsers = []
 
@@ -481,7 +494,9 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights):
                 user_reel_media = api.user_reel_media(reel_user['user']['pk']) #getting the reel media for the user
                 if user_reel_media is not None and len(user_reel_media['items']) > 0:
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
-                    time.sleep(1)
+                sleepTime = randrange(5,10)
+                log.info('pulling story feed for view ' + str(reel_user['user']['username']) + ' sleep for ' +  str(sleepTime)  )
+                time.sleep(sleepTime)
         
   
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
