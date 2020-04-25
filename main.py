@@ -241,12 +241,12 @@ class LoginApp(App):
         return manager
 
     def on_stop(self):
-        with open('userdata/glob.vars', 'wb') as gVarFile:
+        with open('usrdata/glob.vars', 'wb') as gVarFile:
             print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
 
     def on_pause(self):
-        with open('userdata/glob.vars', 'wb') as gVarFile:
+        with open('usrdata/glob.vars', 'wb') as gVarFile:
             print('Updating gVars at pause')
             pickle.dump(self.gVars, gVarFile)
 
@@ -265,7 +265,7 @@ class LoginApp(App):
 
     def loadGlobalConfig(self):
         try:
-            with open('userdata/glob.vars', 'rb') as gVarFile:
+            with open('usrdata/glob.vars', 'rb') as gVarFile:
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
@@ -327,7 +327,7 @@ class LoginApp(App):
 
             self.gVars = gVars
             print('Loading new Defaults')
-            with open('userdata/glob.vars', 'wb') as gVarFile:
+            with open('usrdata/glob.vars', 'wb') as gVarFile:
                 pickle.dump(gVars, gVarFile)
         
     def to_json(self,python_object):
@@ -351,8 +351,8 @@ class LoginApp(App):
         device_id = None
         try:
 
-            settings_file = 'userdata//'+username+'_login.json'
-            if not os.path.isfile(os.path.join('userdata',username+'_login.json')):
+            settings_file = 'usrdata//'+username+'_login.json'
+            if not os.path.isfile(os.path.join('usrdata',username+'_login.json')):
                 # settings file does not exist
                 print('Unable to find login.json: {0!s}'.format(settings_file))
                 api = None
@@ -399,7 +399,7 @@ class LoginApp(App):
     def AppLogout(self):
         app = App.get_running_app()
         app.gVars.loginResult = None
-        with open('userdata//glob.vars', 'wb') as gVarFile:
+        with open('usrdata//glob.vars', 'wb') as gVarFile:
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
