@@ -136,7 +136,7 @@ class Bot():
                     self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                     self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                     
-                    return
+                    
 
                     if gVars.Todo is None:
                         gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
@@ -211,6 +211,11 @@ class Bot():
                     gVars.TotLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Like') & (gVars.GlobalTodo['UserId'] != '')])
                     gVars.TotStoryViews = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'StoryView') & (gVars.GlobalTodo['UserId'] != '')])
                     gVars.TotComments = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Comment') & (gVars.GlobalTodo['UserId'] != '')])
+
+                    gVars.TotExComments = len(gVars.GlobalTodo[(gVars.GlobalTodo['FriendShipStatus'] == 'MustComment') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotExLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['FriendShipStatus'] == 'MustLike') & (gVars.GlobalTodo['UserId'] != '')])
+                    gVars.TotExFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['FriendShipStatus'] == 'MustFollow') & (gVars.GlobalTodo['UserId'] != '')])
+                    #row["FriendShipStatus"]
                     
 
                     #GlobalTodo[GlobalTodo['Action'] == 'Like']
@@ -233,7 +238,6 @@ class Bot():
                 
                     
                 return
-
                 # #iterList = (GlobalTodo[GlobalTodo['Status'] == '1']).iterrows()
                 # #log.info(iterList) 
                 # #for i, row in islice(GlobalTodo.iterrows(),0,10):

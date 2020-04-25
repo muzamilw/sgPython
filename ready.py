@@ -75,8 +75,10 @@ class Ready(Screen):
         #thread.start_new(self.my_thread, (log,))
         # t.start()
 
-    def updateTime(self):
-        self.lblTotalTime.text = str((datetime.datetime.now()-self.StartTime).total_seconds())
+    def updateTime(self,dt):
+
+        secs = (datetime.datetime.now()-self.StartTime).total_seconds()
+        self.lblTotalTime.text = str(datetime.timedelta(seconds= int(secs)))
 
     def my_thread(self,log):
 

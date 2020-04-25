@@ -178,7 +178,7 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client,log):
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag+500,Client,log) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag,Client,log) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
