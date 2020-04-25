@@ -13,10 +13,11 @@
             id: lblusername
 
         Button:
-            text: "Start the Bot"
+            text: "Start Sequence"
             font_size: 15
             on_press: root.startBot()
             size_hint: 1, .2
+            id: btnStart
 
         GridLayout:
             cols: 6
@@ -101,7 +102,8 @@
             font_size: 16
             multiline:True
         Button:
-            text: "Stop & Log Off"
+            text: "Stop"
             font_size: 15
             on_press: root.disconnect()
             size_hint: 1, .1
+            id : btnStop

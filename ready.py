@@ -26,6 +26,8 @@ class Ready(Screen):
 
     t = None
     StartTime = None
+    botThread = None
+    botStop = False
 
     def on_enter(self):
         app = App.get_running_app()
@@ -66,10 +68,12 @@ class Ready(Screen):
         log.level = logging.DEBUG
         log.addHandler(MyLabelHandler(label, logging.DEBUG))
 
-        oBot = Bot(Client,log,self)
-        Thread(target=oBot.RunBot).start()
+        oBot = Bot(Client,log,self,self.botStop)
+        self.botThread = Thread(target=oBot.RunBot)
+        self.botThread.start()
         self.StartTime = datetime.datetime.now()
         Clock.schedule_interval(self.updateTime, 1)
+        self.ids['btnStart'].text = "Sequence started"
         
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
@@ -87,12 +91,14 @@ class Ready(Screen):
             log.info("WOO %s", i)
 
     def disconnect(self):
+        self.botStop = True
+        self.ids['btnStart'].text = "Start Sequence"
         #self.t.join()
-        self.manager.transition = SlideTransition(direction="right")
-        app = App.get_running_app()
-        app.AppLogout()
-        self.manager.current = 'login'
-        self.manager.get_screen('login').resetForm()
+        #self.manager.transition = SlideTransition(direction="right")
+        # app = App.get_running_app()
+        # app.AppLogout()
+        # self.manager.current = 'login'
+        # self.manager.get_screen('login').resetForm()
 
 class MyLabelHandler(logging.Handler):
 
