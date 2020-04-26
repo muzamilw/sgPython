@@ -394,16 +394,18 @@ class Bot():
 
                     #Run Ending
                     gVars.RunEndTime = datetime.datetime.now()
-                    
+                    log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
                     #writing log to file
                     
                     with open("dataframe_GlobalTodo.html", "w", encoding="utf-8") as file:
                         file.writelines('<meta charset="UTF-8">\n')
                         file.write(gVars.GlobalTodo.to_html())
+
+                    log.info('Action List saved for Email' )
                     
                     
-                    
-                    #cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2020','dataframe_GlobalTodo.html','','')
+                    cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2020','dataframe_GlobalTodo.html','','')
+                    log.info('Email sent, existing' )
                 except ClientError as e:
                     #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                     log.info("api Client occurred in main bot action loop")
