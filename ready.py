@@ -16,6 +16,7 @@ import logging
 import threading
 import time
 import datetime
+from alert import Alert
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -31,9 +32,22 @@ class Ready(Screen):
 
     def on_enter(self):
         app = App.get_running_app()
-        lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-        lblusername.text = app.api.authenticated_user_id
-        app.api.feed_timeline()
+        try:
+            lblusername = self.ids['lblusername'] #Label(text="showing the log here")
+            lblusername.text = app.api.authenticated_user_id
+            app.api.feed_timeline()
+
+            
+        
+        except ClientLoginError as e:
+            Alert(title='Error', text='IG Login Error, full error : ' + str(e))
+        except ClientCookieExpiredError as e:
+            Alert(title='Error', text='Client cookie has been expired, relogin to IG needed , full error : ' + str(e))
+        except ClientLoginRequiredError as e:
+             Alert(title='Error', text='Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
+        except ClientError as e:
+            Alert(title='Error', text='General Client error. , full error : ' + str(e))
+
         # try:
         #     from instagram_private_api import (
         #         Client, ClientError, ClientLoginError,

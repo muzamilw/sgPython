@@ -20,7 +20,7 @@ class Alert(Popup):
         content.add_widget(
             Label(text=text, halign='left', valign='top')
         )
-        ok_button = Button(text='Ok', size_hint=(None, None))
+        ok_button = Button(text='Ok', size_hint=(0.5, 0.2),pos_hint={'center_x': .5, 'center_y': .5})
         content.add_widget(ok_button)
 
         popup = Popup(

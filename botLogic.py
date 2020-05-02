@@ -63,6 +63,15 @@ class Bot():
         for attr in dir(obj):
             self.log.info("obj.%s = %r" % (attr, getattr(obj, attr)))
 
+    def CleanupAfterSuccessfulRun(self):
+        app = App.get_running_app()
+        api = app.api
+        log = self.log
+
+
+        gVars = app.gVars
+
+
     def RunBot(self):
         app = App.get_running_app()
         api = app.api
@@ -405,7 +414,11 @@ class Bot():
                     
                     
                     cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2020','dataframe_GlobalTodo.html','','')
-                    log.info('Email sent, existing' )
+                    log.info('Email sent' )
+
+                    self.CleanupAfterSuccessfulRun()
+                    log.info('Cleanup performed exiting main thread')
+
                 except ClientError as e:
                     #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                     log.info("api Client occurred in main bot action loop")
