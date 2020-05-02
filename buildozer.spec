@@ -1,13 +1,13 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = SGLabs
 
 # (str) Package name
-package.name = myapp
+package.name = sglabs
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.test
+package.domain = com.sglabs
 
 # (str) Source code where the main.py live
 source.dir = .
@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy
+requirements = python3,kivy,pandas,pytz,requests,python-dateutil,instagram_private_api
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -46,10 +46,10 @@ requirements = python3,kivy
 #garden_requirements =
 
 # (str) Presplash of the application
-#presplash.filename = %(source.dir)s/data/presplash.png
+presplash.filename = %(source.dir)s/data/sg.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/data/sg.png
 
 # (str) Supported orientation (one of landscape, sensorLandscape, portrait or all)
 orientation = portrait
@@ -62,7 +62,7 @@ orientation = portrait
 #
 
 #
-# author = © Copyright Info
+author = © Muzy
 
 # change the major version of python used by the app
 osx.python_version = 3
