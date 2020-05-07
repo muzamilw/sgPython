@@ -17,6 +17,7 @@ import codecs
 from urllib.parse import urlparse
 import datetime, pytz
 import dateutil.tz
+from pathlib import Path
 #import sys
 
 
@@ -241,12 +242,16 @@ class LoginApp(App):
         return manager
 
     def on_stop(self):
-        with open('usrdata/glob.vars', 'wb') as gVarFile:
+        data_folder = Path("userdata")
+        file_to_open = data_folder / "glob.vars"
+        with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
 
     def on_pause(self):
-        with open('usrdata/glob.vars', 'wb') as gVarFile:
+        data_folder = Path("userdata")
+        file_to_open = data_folder / "glob.vars"
+        with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at pause')
             pickle.dump(self.gVars, gVarFile)
 
@@ -265,7 +270,9 @@ class LoginApp(App):
 
     def loadGlobalConfig(self):
         try:
-            with open('usrdata/glob.vars', 'rb') as gVarFile:
+            data_folder = Path("userdata")
+            file_to_open = data_folder / "glob.vars"
+            with open(file_to_open, 'rb') as gVarFile:
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
@@ -328,7 +335,10 @@ class LoginApp(App):
 
             self.gVars = gVars
             print('Loading new Defaults')
-            with open('usrdata/glob.vars', 'wb') as gVarFile:
+            data_folder = Path("userdata")
+            Path("userdata").mkdir(parents=True, exist_ok=True)
+            file_to_open = data_folder / "glob.vars"
+            with open(file_to_open, 'wb') as gVarFile:
                 pickle.dump(gVars, gVarFile)
         
     def to_json(self,python_object):
@@ -400,7 +410,9 @@ class LoginApp(App):
     def AppLogout(self):
         app = App.get_running_app()
         app.gVars.loginResult = None
-        with open('usrdata//glob.vars', 'wb') as gVarFile:
+        data_folder = Path("userdata")
+        file_to_open = data_folder / "glob.vars"
+        with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 

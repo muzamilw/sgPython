@@ -1,8 +1,12 @@
 __pycache__/apiWrappers.cpython-38.pyc
 __pycache__/botLogic.cpython-38.pyc
+__pycache__
 userdata/
 usrdata/
 env/
 dist/
 bin/
 __pycache__/
+build/
+.buildozer/
+.DS_store/
