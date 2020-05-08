@@ -4,7 +4,7 @@
 import requests 
 import os.path
 import datetime
-#import numpy
+import pandas
 
 #from collections import Counter
 from time import sleep
