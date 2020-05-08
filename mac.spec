@@ -16,11 +16,11 @@ kivy_deps_all = hooks.get_deps_all()
 kivy_factory_modules = hooks.get_factory_modules()
 
 datas = [
-    (join('common', '*.ini'), 'common')
+    (join('userdata', '*.ini'), 'userdata')
 ]
 
 # list of modules to exclude from analysis
-excludes_a = ['Tkinter', '_tkinter', 'twisted', 'pygments']
+excludes_a = ['Tkinter', '_tkinter', 'twisted', 'pygments','mypython']
 
 # list of hiddenimports
 hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_resources.py2_warn']
@@ -32,7 +32,7 @@ hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_re
 
 # assets
 kivy_assets_toc = Tree(kivy_data_dir, prefix=join('kivy_install', 'data'))
-source_assets_toc = Tree('images', prefix='images')
+source_assets_toc = Tree('data', prefix='data')
 assets_toc = [kivy_assets_toc, source_assets_toc]
 
 tocs =  assets_toc #+ bin_tocs
@@ -55,20 +55,20 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe1 = EXE(pyz,
           a.scripts,
-          name='Notiiiiiipy',
+          name='IGBot',
           exclude_binaries=True,
-          icon=join('images', 'sg.ico'),
-          debug=True,
+          icon=join('data', 'sg.ico'),
+          debug=False,
           strip=False,
           upx=True,
-          console=True)
+          console=False)
 
 
-coll = COLLECT(exe1,Tree('/Users/JanatFarooq/Documents/GitHub/Notesx/'),
+coll = COLLECT(exe1,Tree('/Users/JanatFarooq/Documents/GitHub/sgPython/'),
                a.binaries,
                a.zipfiles,
                a.datas,
                *tocs,
                strip=False,
                upx=True,
-               name='Notiiiiiipy')
+               name='IGBot')

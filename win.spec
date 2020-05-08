@@ -13,7 +13,7 @@ kivy_deps_all = hooks.get_deps_all()
 kivy_factory_modules = hooks.get_factory_modules()
 
 datas = [
-    (join('usrdata', '*.ini'), 'usrdata')
+    (join('userdata', '*.ini'), 'userdata')
 ]
 
 # list of modules to exclude from analysis
