@@ -3,7 +3,10 @@ __pycache__/botLogic.cpython-38.pyc
 __pycache__
 userdata/
 usrdata/
-build/
+env/
 dist/
+bin/
+__pycache__/
+build/
 .buildozer/
 .DS_store/

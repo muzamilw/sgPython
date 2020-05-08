@@ -295,6 +295,7 @@ class LoginApp(App):
             gVars.GlobalTodo = None
             gVars.Todo = None
             gVars.DailyStatsSent = False
+            gVars.DailyStatsSentDate = ''
             gVars.SGusername = None
             gVars.SGPin = None
             gVars.IGusername = None

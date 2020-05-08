@@ -71,6 +71,54 @@ class Bot():
 
         gVars = app.gVars
 
+        gVars.RunStartTime = None
+        gVars.RunEndTime = None
+        gVars.TotalSessionTime = 0
+        gVars.manifestJson = None
+        gVars.manifestObj = None
+        
+        gVars.hashtagActions = None
+        gVars.locationActions = None
+        gVars.UnFollowActions = None
+        gVars.DCActions = None
+        gVars.SuggestFollowers = None
+        gVars.StoryViewActions = None
+        gVars.GlobalTodo = None
+        gVars.Todo = None
+        gVars.DailyStatsSent = False
+        gVars.DailyStatsSentDate = ''
+       
+
+        gVars.CurrentFollowDone = 0
+        gVars.CurrentUnFollowDone = 0
+        gVars.CurrentLikeDone = 0
+        gVars.CurrentStoryViewDone = 0
+        gVars.CurrentCommentsDone = 0
+
+        gVars.CurrentExFollowDone = 0
+        gVars.CurrentExCommentsDone = 0
+        gVars.CurrentExLikeDone = 0
+
+        gVars.TotFollow = 0
+        gVars.TotUnFollow = 0
+        gVars.TotLikes = 0
+        gVars.TotStoryViews = 0
+        gVars.TotComments = 0
+
+        gVars.TotExComments = 0
+        gVars.TotExLikes = 0
+        gVars.TotExFollow = 0
+
+        gVars.ReqFollow = 0
+        gVars.ReqUnFollow = 0
+        gVars.ReqLikes = 0
+        gVars.ReqStoryViews = 0
+        gVars.ReqComments = 0
+
+        gVars.ReqExFollow = 0
+        gVars.ReqExLikes = 0
+        gVars.ReqExComments = 0
+
 
     def RunBot(self):
         app = App.get_running_app()
@@ -127,7 +175,7 @@ class Bot():
 
                         
                     #sending daily stats
-                    if gVars.DailyStatsSent == False:
+                    if gVars.DailyStatsSent == False and gVars.DailyStatsSentDate != datetime.datetime.today:
                         # InitFollowers = len(apiW.getTotalFollowers(api,api.username_id))
                         # InitFollowing = len(apiW.getTotalFollowings(api,api.username_id))
                         # InitPosts = len(apiW.getTotalUserFeed(api,api.username_id))
@@ -135,8 +183,9 @@ class Bot():
                         log.info('Sending Daily Stats')
                         cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(user_info['user']['following_count'])+'\",\"InitialFollowers\":\"'+ str(user_info['user']['follower_count']) +'\",\"InitialPosts\":\"'+str(user_info['user']['media_count'])+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
                         gVars.DailyStatsSent = True
+                        gVars.DailyStatsSentDate = datetime.datetime.today
                     else:
-                        log.info('Daily Stats already sent')
+                        log.info('Daily Stats already sent for today')
                     #"Message":"{\"InitialFollowings\":\"400\",\"InitialFollowers\":\"1200\",\"InitialPosts\":\"6\",\"SocialProfileId\":28}"
                         
                     
