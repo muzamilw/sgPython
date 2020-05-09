@@ -1,6 +1,7 @@
 <Ready>:
     BoxLayout:
         orientation: 'vertical'
+        
 
         Label:
             text: "Ready to start social growth"
@@ -18,6 +19,10 @@
             on_press: root.startBot()
             size_hint: 1, .2
             id: btnStart
+
+        Image:
+            source: '.\\data\\ig.gif'
+            size: self.texture_size
 
         GridLayout:
             cols: 6

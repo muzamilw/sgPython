@@ -15,6 +15,7 @@ import time
 import calendar
 import sys
 from random import randrange
+import math
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -118,6 +119,7 @@ def LoadManifest(manifest):
     
     manifestObj = Manifest()
 
+    manifestObj.FollowOn = manifest["MobileJsonRootObject"]["TargetInformation"]["FollowOn"]
     manifestObj.AfterFollLikeuserPosts = manifest["MobileJsonRootObject"]["TargetInformation"]["AfterFollLikeuserPosts"]
     manifestObj.AfterFollCommentUserPosts = manifest["MobileJsonRootObject"]["TargetInformation"]["AfterFollCommentUserPosts"]
     manifestObj.AfterFollViewUserStory = manifest["MobileJsonRootObject"]["TargetInformation"]["AfterFollViewUserStory"]
@@ -158,7 +160,22 @@ def LoadManifest(manifest):
     manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
     manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
 
-    manifestObj.totalActions = manifestObj.FollAccSearchTags + manifestObj.UnFoll16DaysEngage + manifestObj.LikeFollowingPosts  + manifestObj.VwStoriesFollowing + manifestObj.CommFollowingPosts
+    manifestObj.totalActions = 0
+
+    if manifestObj.FollowOn == 1:
+        manifestObj.totalActions += manifestObj.FollAccSearchTags 
+
+    if manifestObj.UnFollFollowersAfterMinDays == 1:
+        manifestObj.totalActions += manifestObj.UnFoll16DaysEngage 
+
+    if manifestObj.AfterFollLikeuserPosts == 1:
+        manifestObj.totalActions += manifestObj.LikeFollowingPosts
+
+    if manifestObj.AfterFollViewUserStory == 1:  
+        manifestObj.totalActions += manifestObj.VwStoriesFollowing 
+
+    if manifestObj.AfterFollCommentUserPosts == 1:
+        manifestObj.totalActions += manifestObj.CommFollowingPosts
 
     
     
@@ -173,14 +190,14 @@ def LoadManifest(manifest):
     return manifestObj
 
     
-def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client,log):
+def LoadHashtagsTodo(api, manifestObj ,Client,log):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
         lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag,Client,log) #api.getHashtagFeed(tag)
 
-        for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerHahTag)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
+        for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
                 if photo["user"]["is_private"] == False and photo["user"]["friendship_status"]["following"] == False:                
                     tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
@@ -190,7 +207,27 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client,log):
    
     usersdf = pd.DataFrame(tagMediaUsers,columns = hcols)
     usersdf.insert(0, 'Seq',0)
-    actions = ['Follow', 'Like', 'Comment' ]
+    SubActionWeights = []
+    weightedObjects = 0
+    actions = []
+    if manifestObj.FollowOn == 1:
+        actions.extend (['Follow'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollLikeuserPosts == 1 :
+        actions.extend (['Like'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollCommentUserPosts == 1:
+        actions.extend (['Comment'])
+        weightedObjects = weightedObjects + 1
+
+    if ( weightedObjects == 1):
+        SubActionWeights = [1]
+    if ( weightedObjects == 2):
+        SubActionWeights = [0.5, 0.5]
+    if ( weightedObjects == 3):
+        SubActionWeights = [0.33, 0.33, 0.33]
+
+
     
     Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
@@ -215,14 +252,14 @@ def LoadHashtagsTodo(api, manifestObj, SubActionWeights,Client,log):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
+def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
         lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log)
 
-        for photo in  islice(lItems, 0, int(manifestObj.totalActionsPerLocation)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
+        for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
                 locMediaUsers.append([loc,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
   
@@ -230,15 +267,36 @@ def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
    
     usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
     usersdf.insert(0, 'Seq',0)
-    actions = ['Follow', 'Like', 'Comment' ]
+    SubActionWeights = []
+    weightedObjects = 0
+    actions = []
+    if manifestObj.FollowOn == 1:
+        actions.extend (['Follow'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollLikeuserPosts == 1 :
+        actions.extend (['Like'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollCommentUserPosts == 1:
+        actions.extend (['Comment'])
+        weightedObjects = weightedObjects + 1
+
+    if ( weightedObjects == 1):
+        SubActionWeights = [1]
+    if ( weightedObjects == 2):
+        SubActionWeights = [0.5, 0.5]
+    if ( weightedObjects == 3):
+        SubActionWeights = [0.33, 0.33, 0.33]
     
     Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
     usersdf['Action'] = Samples
 
-    fc = SeqNos[1]+1
-    lc = SeqNos[2]+1
-    cc = SeqNos[0]+1
+    if (SeqNos is not None and len(SeqNos  > 1) ):
+        fc = SeqNos[1]+1
+    if (SeqNos is not None and len(SeqNos  > 2) ):
+        lc = SeqNos[2]+1
+    if (SeqNos is not None and len(SeqNos  > 0) ):
+        cc = SeqNos[0]+1
 
     for i, row in usersdf.iterrows():
         if row["Action"] == 'Follow':
@@ -255,7 +313,7 @@ def LoadLocationsTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
+def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
     
     locMediaUsers = []
 
@@ -263,7 +321,7 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
         lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor,Client,log) 
 
         if lItems is not None and len(lItems) > 0:
-            for photo in  islice(lItems, 0, int(manifestObj.totalActionsDirectCompetitor)): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
+            for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
                 if (photo["has_liked"] == False):
                     locMediaUsers.append([compe,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), '' ])
   
@@ -271,15 +329,40 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
    
     usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
     usersdf.insert(0, 'Seq',0)
-    actions = ['Follow', 'Like', 'Comment' ]
+    SubActionWeights = []
+    weightedObjects = 0
+    actions = []
+    if manifestObj.FollowOn == 1:
+        actions.extend (['Follow'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollLikeuserPosts == 1 :
+        actions.extend (['Like'])
+        weightedObjects = weightedObjects + 1
+    if manifestObj.AfterFollCommentUserPosts == 1:
+        actions.extend (['Comment'])
+        weightedObjects = weightedObjects + 1
+
+    if ( weightedObjects == 1):
+        SubActionWeights = [1]
+    if ( weightedObjects == 2):
+        SubActionWeights = [0.5, 0.5]
+    if ( weightedObjects == 3):
+        SubActionWeights = [0.33, 0.33, 0.33]
     
     Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
     usersdf['Action'] = Samples
 
-    fc = SeqNos[1]+1
-    lc = SeqNos[2]+1
-    cc = SeqNos[0]+1
+    # fc = SeqNos[1]+1
+    # lc = SeqNos[2]+1
+    # cc = SeqNos[0]+1
+
+    if (SeqNos is not None and len(SeqNos  > 1) ):
+        fc = SeqNos[1]+1
+    if (SeqNos is not None and len(SeqNos  > 2) ):
+        lc = SeqNos[2]+1
+    if (SeqNos is not None and len(SeqNos  > 0) ):
+        cc = SeqNos[0]+1
 
     for i, row in usersdf.iterrows():
         if row["Action"] == 'Follow':
@@ -296,7 +379,7 @@ def LoadCompetitorTodo(api, manifestObj, SubActionWeights,SeqNos,Client,log):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client,log):
+def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
     try:
         locMediaUsers = []
 
@@ -396,15 +479,36 @@ def LoadSuggestedUsersForFollow(api, manifestObj, SubActionWeights,SeqNos,Client
     
         usersdf = pd.DataFrame(locMediaUsers,columns = hcols)
         usersdf.insert(0, 'Seq',0)
-        actions = ['Follow', 'Like', 'Comment' ]
+        SubActionWeights = []
+        weightedObjects = 0
+        actions = []
+        if manifestObj.FollowOn == 1:
+            actions.extend (['Follow'])
+            weightedObjects = weightedObjects + 1
+        if manifestObj.AfterFollLikeuserPosts == 1 :
+            actions.extend (['Like'])
+            weightedObjects = weightedObjects + 1
+        if manifestObj.AfterFollCommentUserPosts == 1:
+            actions.extend (['Comment'])
+            weightedObjects = weightedObjects + 1
+
+        if ( weightedObjects == 1):
+            SubActionWeights = [1]
+        if ( weightedObjects == 2):
+            SubActionWeights = [0.5, 0.5]
+        if ( weightedObjects == 3):
+            SubActionWeights = [0.33, 0.33, 0.33]
         
         Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
         usersdf['Action'] = Samples
 
-        fc = SeqNos[1]+1
-        lc = SeqNos[2]+1
-        cc = SeqNos[0]+1
+        if (SeqNos is not None and len(SeqNos  > 1) ):
+            fc = SeqNos[1]+1
+        if (SeqNos is not None and len(SeqNos  > 2) ):
+            lc = SeqNos[2]+1
+        if (SeqNos is not None and len(SeqNos  > 0) ):
+            cc = SeqNos[0]+1
 
         for i, row in usersdf.iterrows():
             if row["FriendShipStatus"] == 'MustFollow':

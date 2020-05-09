@@ -220,7 +220,7 @@ class Bot():
                     
                     
 
-                    if gVars.Todo is None:
+                    if gVars.Todo is not  None:
                         gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
                         log.info('Creating Empty Global todo')
                     
@@ -228,17 +228,16 @@ class Bot():
                     if gVars.hashtagActions is None:
                         log.info('Getting Feeds of Hashtags and creating action list')
                         hashstart = datetime.datetime.now()
-                        gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],Client,log)
+                        gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log)
                         LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                         log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
-                    
                     
                         
                     if gVars.locationActions is None:
                         log.info('Getting Feeds of Location and creating action list')
                         locationtart = datetime.datetime.now()
-                        gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log)
+                        gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
                         log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
@@ -248,7 +247,7 @@ class Bot():
                     if gVars.DCActions is None:
                         log.info('Getting Feeds of Competitors and creating action list')
                         DCstart = datetime.datetime.now()
-                        gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.locationActions.groupby(['Action'])['Seq'].count(),Client,log)
+                        gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,gVars.locationActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                         log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
@@ -256,7 +255,7 @@ class Bot():
                     if gVars.SuggestFollowers is None:
                         log.info('Getting Feeds of Suggested Users and creating action list')
                         Suggestedstart = datetime.datetime.now()
-                        gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,[0.33, 0.33, 0.33],gVars.DCActions.groupby(['Action'])['Seq'].count(),Client,log)
+                        gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,gVars.DCActions.groupby(['Action'])['Seq'].count(),Client,log)
                         LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
                         log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
                         gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
@@ -348,7 +347,7 @@ class Bot():
                             waitTime = randrange(20,30)
                             
                             
-                            if row['Action'] == 'Like':
+                            if row['Action'] == 'Like' and gVars.manifestObj.AfterFollLikeuserPosts == 1 and ( gVars.CurrentLikeDone < gVars.manifestObj.LikeFollowingPosts or gVars.CurrentExLikeDone < gVars.ReqExLikes):
                                 try:
                                     log.info('like action : ' + row['MediaId'])
                                     apiW.LikeMedia(api,row['MediaId'])
@@ -370,7 +369,7 @@ class Bot():
                                 time.sleep(waitTime) 
                                 
 
-                            if row['Action'] == 'Follow':
+                            if row['Action'] == 'Follow' and gVars.manifestObj.FollowOn == 1 and (gVars.CurrentFollowDone < gVars.manifestObj.FollAccSearchTags or gVars.CurrentExFollowDone < gVars.ReqExFollow) :
                                 apiW.FollowUser(api,row['UserId'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
                                 log.info('Follow action : ' + row['Username'])
@@ -384,7 +383,7 @@ class Bot():
                                 
                                 time.sleep(waitTime) 
 
-                            if row['Action'] == 'Comment':
+                            if row['Action'] == 'Comment' and gVars.manifestObj.AfterFollCommentUserPosts == 1 and (gVars.CurrentCommentsDone < gVars.manifestObj.CommFollowingPosts or  gVars.CurrentExCommentsDone < gVars.ReqExComments):
                                 comm = random.choice(Comments)
                                 try:
                                     log.info('Comment action : ' + row['MediaId'])
@@ -407,7 +406,7 @@ class Bot():
                                 
                                 time.sleep(waitTime) 
                                         
-                            if row['Action'] == 'UnFollow':
+                            if row['Action'] == 'UnFollow' and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
                                 log.info('UnFollow action : ' + row['Username'])
                                 if row['Tag'] == 'delete_not_found':  ##ignore the IG action and send it anyways
                                     cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'delete_not_found')
@@ -425,7 +424,7 @@ class Bot():
                                 gVars.CurrentUnFollowDone = gVars.CurrentUnFollowDone + 1
                                 time.sleep(waitTime) 
 
-                            if row['Action'] == 'StoryView':
+                            if row['Action'] == 'StoryView' and gVars.manifestObj.AfterFollViewUserStory == 1 and gVars.CurrentStoryViewDone < gVars.manifestObj.VwStoriesFollowing :
                                 log.info('StoryView action : ' + row['Username'])
                                 apiW.ViewStory(api,row['MediaId'],row['FriendShipStatus'])
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'story pages : ' + str(len(row['MediaId'])))
