@@ -220,7 +220,7 @@ class Bot():
                     
                     
 
-                    if gVars.Todo is not  None:
+                    if gVars.Todo is None:
                         gVars.Todo = cf.SetupGlobalTodo([0.2, 0.3, 0.2, 0.2, 0.1], gVars.manifestObj.totalActions)
                         log.info('Creating Empty Global todo')
                     

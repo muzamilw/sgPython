@@ -16,6 +16,8 @@ import calendar
 import sys
 from random import randrange
 import math
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -105,7 +107,15 @@ def GetManifest(SocialProfileId,gVars):
     API_Manifest = gVars.API_BaseURL + "/Mobile/GetManifest"
     data = {'SocialProfileId':SocialProfileId,    #1101
             'SocialPassword':'1'} 
-    r = requests.post(url = API_Manifest, data = data) 
+
+    session = requests.Session()
+    retry = Retry(connect=3, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    r = session.post(url = API_Manifest, data = data)
+    #r = requests.post(url = API_Manifest, data = data) 
     return json.loads(r.text)
 
 class Manifest:
@@ -290,12 +300,15 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
     Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
     usersdf['Action'] = Samples
+    fc = 0
+    lc = 0
+    cc = 0
 
-    if (SeqNos is not None and len(SeqNos  > 1) ):
+    if (SeqNos is not None and len(SeqNos)  > 1 ):
         fc = SeqNos[1]+1
-    if (SeqNos is not None and len(SeqNos  > 2) ):
+    if (SeqNos is not None and len(SeqNos)  > 2 ):
         lc = SeqNos[2]+1
-    if (SeqNos is not None and len(SeqNos  > 0) ):
+    if (SeqNos is not None and len(SeqNos)  > 0 ):
         cc = SeqNos[0]+1
 
     for i, row in usersdf.iterrows():
@@ -356,12 +369,15 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
     # fc = SeqNos[1]+1
     # lc = SeqNos[2]+1
     # cc = SeqNos[0]+1
+    fc = 0
+    lc = 0
+    cc = 0
 
-    if (SeqNos is not None and len(SeqNos  > 1) ):
+    if (SeqNos is not None and len(SeqNos)  > 1 ):
         fc = SeqNos[1]+1
-    if (SeqNos is not None and len(SeqNos  > 2) ):
+    if (SeqNos is not None and len(SeqNos)  > 2 ):
         lc = SeqNos[2]+1
-    if (SeqNos is not None and len(SeqNos  > 0) ):
+    if (SeqNos is not None and len(SeqNos)  > 0 ):
         cc = SeqNos[0]+1
 
     for i, row in usersdf.iterrows():
@@ -383,11 +399,13 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
     try:
         locMediaUsers = []
 
+        iguserCount = 0
+
         try:
             suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
             if suggUsers is not None and len(suggUsers) > 0:
                         for user in suggUsers:
-                            if user["is_private"] == False:
+                            if user["is_private"] == False and iguserCount <= manifestObj.totalActionsIGUsers :
                                 ufeed = api.user_feed(user['pk'])
                                 if ufeed is not None and len(ufeed['items']) > 0 :
                                     if ufeed['items'][0]['has_liked'] == False:
@@ -396,8 +414,11 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                 sleepTime = randrange(5,10)
                                 log.info('pulling suggested user feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
                                 time.sleep(sleepTime)
+                                iguserCount = iguserCount + 1
+                            
+                            
         except:
-            print('exception in chaining')
+            print('exception in chaining i.e suggested users')
             raise
 
         folluser = ''
@@ -502,12 +523,15 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
         Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
         usersdf['Action'] = Samples
+        fc = 0
+        lc = 0
+        cc = 0
 
-        if (SeqNos is not None and len(SeqNos  > 1) ):
+        if (SeqNos is not None and len(SeqNos)  > 1 ):
             fc = SeqNos[1]+1
-        if (SeqNos is not None and len(SeqNos  > 2) ):
+        if (SeqNos is not None and len(SeqNos)  > 2 ):
             lc = SeqNos[2]+1
-        if (SeqNos is not None and len(SeqNos  > 0) ):
+        if (SeqNos is not None and len(SeqNos)  > 0 ):
             cc = SeqNos[0]+1
 
         for i, row in usersdf.iterrows():
@@ -589,15 +613,17 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
 def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
     
     reelMediaUsers = []
+    storyviewsCount = 0
 
     reel_tray = api.reels_tray()
     if reel_tray is not None and len(reel_tray['tray']) > 0:
         for reel_user in reel_tray['tray']:
             #reel_tray_users = [(x['user']['pk'],x['user']['username'],x['seen'],x['media_count']) for x in reel_tray()['tray']]
-            if reel_user['seen'] == 0 :
+            if reel_user['seen'] == 0  and storyviewsCount <= manifestObj.VwStoriesFollowing :
                 user_reel_media = api.user_reel_media(reel_user['user']['pk']) #getting the reel media for the user
                 if user_reel_media is not None and len(user_reel_media['items']) > 0:
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
+                    storyviewsCount = storyviewsCount + 1
                 sleepTime = randrange(5,10)
                 log.info('pulling story feed for view ' + str(reel_user['user']['username']) + ' sleep for ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
