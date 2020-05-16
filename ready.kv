@@ -1,14 +1,16 @@
+#:kivy 1.9.0
+
 <Ready>:
     BoxLayout:
         orientation: 'vertical'
         
 
         Label:
-            text: "Ready to start social growth"
+            text: "Social Planner"
             font_size: 20
             size_hint: 1, .2
         Label:
-            text: "nev"
+            text: "Loggiedin Username : "
             font_size: 20
             size_hint: 1, .2
             id: lblusername
@@ -21,8 +23,13 @@
             id: btnStart
 
         Image:
-            source: '.\\data\\ig.gif'
+            source: 'data//processing.gif'
             size: self.texture_size
+            center: self.parent.center
+            size: 500, 500
+            allow_stretch: True
+            anim_delay: -1
+            anim_loop: 1
 
         GridLayout:
             cols: 6

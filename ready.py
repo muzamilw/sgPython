@@ -10,7 +10,10 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.clock import Clock
+import traceback
+import sys
 import os
+os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from threading import Thread
 import logging
 import threading
@@ -28,15 +31,16 @@ class Ready(Screen):
     t = None
     StartTime = None
     botThread = None
-    botStop = False
+    botStop_event = threading.Event()
+    log = None
 
     def on_enter(self):
         app = App.get_running_app()
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-            lblusername.text = app.api.authenticated_user_id
-            app.api.feed_timeline()
-
+            lblusername.text += app.api.authenticated_user_id
+            # app.api.feed_timeline()
+            pass
             
         
         except ClientLoginError as e:
@@ -81,8 +85,9 @@ class Ready(Screen):
         log = logging.getLogger("my.logger")
         log.level = logging.DEBUG
         log.addHandler(MyLabelHandler(label, logging.DEBUG))
+        self.log = log
 
-        oBot = Bot(Client,log,self,self.botStop)
+        oBot = Bot(Client,log,self,self.botStop_event)
         self.botThread = Thread(target=oBot.RunBot)
         self.botThread.start()
         self.StartTime = datetime.datetime.now()
@@ -105,8 +110,10 @@ class Ready(Screen):
             log.info("WOO %s", i)
 
     def disconnect(self):
-        self.botStop = True
+        #self.botThread.join()
+        self.botStop_event.set()
         self.ids['btnStart'].text = "Start Sequence"
+        self.log.info("Stop Signal Sent")
         #self.t.join()
         #self.manager.transition = SlideTransition(direction="right")
         # app = App.get_running_app()

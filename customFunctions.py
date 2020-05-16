@@ -141,7 +141,8 @@ def LoadManifest(manifest):
     manifestObj.FollDoNotFollowUsernamewithdigits = manifest["MobileJsonRootObject"]["TargetInformation"]["FollDoNotFollowUsernamewithdigits"]
     manifestObj.FollDoNotFollowUsernamewithdigitsVal = manifest["MobileJsonRootObject"]["TargetInformation"]["FollDoNotFollowUsernamewithdigitsVal"]
 
-    manifestObj.FollUserLangsList = manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"].strip().split(",")
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"] is not None:
+        manifestObj.FollUserLangsList = manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"].strip().split(",")
 
     manifestObj.GenderEngagmentPref = manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"]
     manifestObj.IncludeBusinessAccounts = manifest["MobileJsonRootObject"]["TargetInformation"]["IncludeBusinessAccounts"]
@@ -189,13 +190,13 @@ def LoadManifest(manifest):
 
     
     
-    manifestObj.totalActionsHashTag = (manifestObj.totalActions / 4) + 5
-    manifestObj.totalActionsLocation = (manifestObj.totalActions / 4 ) + 5
-    manifestObj.totalActionsDirectCompetitor = (manifestObj.totalActions / 4) + 5
-    manifestObj.totalActionsIGUsers = (manifestObj.totalActions / 4) + 5
+    manifestObj.totalActionsHashTag = math.ceil(manifestObj.totalActions / 4)
+    manifestObj.totalActionsLocation = math.ceil(manifestObj.totalActions / 4 )
+    manifestObj.totalActionsDirectCompetitor = math.ceil(manifestObj.totalActions / 4)
+    manifestObj.totalActionsIGUsers = math.ceil(manifestObj.totalActions / 4)
 
-    manifestObj.totalActionsPerHahTag = manifestObj.totalActionsHashTag / len(manifestObj.hashtags)
-    manifestObj.totalActionsPerLocation = manifestObj.totalActionsLocation / len(manifestObj.locations)
+    manifestObj.totalActionsPerHahTag = math.ceil(manifestObj.totalActionsHashTag / len(manifestObj.hashtags))
+    manifestObj.totalActionsPerLocation = math.ceil(manifestObj.totalActionsLocation / len(manifestObj.locations))
     
     return manifestObj
 
@@ -304,12 +305,17 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
     lc = 0
     cc = 0
 
-    if (SeqNos is not None and len(SeqNos)  > 1 ):
-        fc = SeqNos[1]+1
-    if (SeqNos is not None and len(SeqNos)  > 2 ):
-        lc = SeqNos[2]+1
-    if (SeqNos is not None and len(SeqNos)  > 0 ):
-        cc = SeqNos[0]+1
+    # len(SeqNos.keys())
+    # SeqNos.keys()[0]
+
+    if len(SeqNos.keys()) > 0:
+        for key in SeqNos.keys():
+            if key == 'Follow':
+                fc = SeqNos['Follow'] + 1
+            if key == 'Like':
+                lc = SeqNos['Like'] + 1
+            if key == 'Comment':
+                cc = SeqNos['Comment'] + 1
 
     for i, row in usersdf.iterrows():
         if row["Action"] == 'Follow':
@@ -373,12 +379,14 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
     lc = 0
     cc = 0
 
-    if (SeqNos is not None and len(SeqNos)  > 1 ):
-        fc = SeqNos[1]+1
-    if (SeqNos is not None and len(SeqNos)  > 2 ):
-        lc = SeqNos[2]+1
-    if (SeqNos is not None and len(SeqNos)  > 0 ):
-        cc = SeqNos[0]+1
+    if len(SeqNos.keys()) > 0:
+        for key in SeqNos.keys():
+            if key == 'Follow':
+                fc = SeqNos['Follow'] + 1
+            if key == 'Like':
+                lc = SeqNos['Like'] + 1
+            if key == 'Comment':
+                cc = SeqNos['Comment'] + 1
 
     for i, row in usersdf.iterrows():
         if row["Action"] == 'Follow':
@@ -402,19 +410,20 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
         iguserCount = 0
 
         try:
-            suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
-            if suggUsers is not None and len(suggUsers) > 0:
-                        for user in suggUsers:
-                            if user["is_private"] == False and iguserCount <= manifestObj.totalActionsIGUsers :
-                                ufeed = api.user_feed(user['pk'])
-                                if ufeed is not None and len(ufeed['items']) > 0 :
-                                    if ufeed['items'][0]['has_liked'] == False:
-                                        # follFeed_results.extend([ufeed['items'][0]])
-                                        locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                                sleepTime = randrange(5,10)
-                                log.info('pulling suggested user feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
-                                time.sleep(sleepTime)
-                                iguserCount = iguserCount + 1
+            if manifestObj.FollowOn == 1:
+                suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
+                if suggUsers is not None and len(suggUsers) > 0:
+                            for user in suggUsers:
+                                if user["is_private"] == False and iguserCount <= manifestObj.totalActionsIGUsers :
+                                    ufeed = api.user_feed(user['pk'])
+                                    if ufeed is not None and len(ufeed['items']) > 0 :
+                                        if ufeed['items'][0]['has_liked'] == False:
+                                            # follFeed_results.extend([ufeed['items'][0]])
+                                            locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
+                                    sleepTime = randrange(5,10)
+                                    log.info('pulling suggested user feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                                    time.sleep(sleepTime)
+                                    iguserCount = iguserCount + 1
                             
                             
         except:
@@ -423,75 +432,77 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
 
         folluser = ''
         try:
-            #server follow list
-            for foll in manifestObj.FollowList:
-                folluser = foll['FollowedSocialUsername'].strip()
-                try:
-                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-                except ClientError as e:
-                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-                    user = None
+            if manifestObj.FollowOn == 1:
+                #server follow list
+                for foll in manifestObj.FollowList:
+                    folluser = foll['FollowedSocialUsername'].strip()
+                    try:
+                        user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                    except ClientError as e:
+                        print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                        user = None
 
-                if user is not None:
-                    user = user['user']
-                    if user["is_private"] == False:
-                        ufeed = api.user_feed(user['pk'])
-                        if ufeed is not None and len(ufeed['items']) > 0 :
-                            if ufeed['items'][0]['has_liked'] == False:
-                                # follFeed_results.extend([ufeed['items'][0]])
-                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                        sleepTime = randrange(5,10)
-                        log.info('pulling Follow exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
-                        time.sleep(sleepTime)
+                    if user is not None:
+                        user = user['user']
+                        if user["is_private"] == False:
+                            ufeed = api.user_feed(user['pk'])
+                            if ufeed is not None and len(ufeed['items']) > 0 :
+                                if ufeed['items'][0]['has_liked'] == False:
+                                    # follFeed_results.extend([ufeed['items'][0]])
+                                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
+                            sleepTime = randrange(5,10)
+                            log.info('pulling Follow exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            time.sleep(sleepTime)
         except Exception as e:
             print('exception in FollowList for user' + folluser)
             raise
 
         #server Like list
         try:
-            for foll in manifestObj.LikeList:
-                try:
-                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-                except ClientError as e:
-                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-                    user = None
+            if manifestObj.AfterFollLikeuserPosts == 1:
+                for foll in manifestObj.LikeList:
+                    try:
+                        user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                    except ClientError as e:
+                        print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                        user = None
 
-                if user is not None:
-                    user = user['user']
-                    if user["is_private"] == False:
-                        ufeed = api.user_feed(user['pk'])
-                        if ufeed is not None and len(ufeed['items']) > 0 :
-                            if ufeed['items'][0]['has_liked'] == False:
-                                # follFeed_results.extend([ufeed['items'][0]])
-                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
-                        sleepTime = randrange(5,10)
-                        log.info('pulling like exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
-                        time.sleep(sleepTime)
+                    if user is not None:
+                        user = user['user']
+                        if user["is_private"] == False:
+                            ufeed = api.user_feed(user['pk'])
+                            if ufeed is not None and len(ufeed['items']) > 0 :
+                                if ufeed['items'][0]['has_liked'] == False:
+                                    # follFeed_results.extend([ufeed['items'][0]])
+                                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
+                            sleepTime = randrange(5,10)
+                            log.info('pulling like exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            time.sleep(sleepTime)
         except:
             print('exception in LikeList')
             raise
 
         #server Comment list
         try:
+            if manifestObj.AfterFollCommentUserPosts == 1:
+                for foll in manifestObj.FollowersToComment:
+                    try:
+                        user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                    except ClientError as e:
+                        print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                        user = None
 
-            for foll in manifestObj.FollowersToComment:
-                try:
-                    user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-                except ClientError as e:
-                    print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-                    user = None
-
-                if user is not None:
-                    user = user['user']
-                    if user["is_private"] == False:
-                        ufeed = api.user_feed(user['pk'])
-                        if ufeed is not None and len(ufeed['items']) > 0 :
-                            if ufeed['items'][0]['has_liked'] == False:
-                                # follFeed_results.extend([ufeed['items'][0]])
-                                locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
-                        sleepTime = randrange(5,10)
-                        log.info('pulling comment exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
-                        time.sleep(sleepTime)
+                    if user is not None:
+                        user = user['user']
+                        if user["is_private"] == False:
+                            ufeed = api.user_feed(user['pk'])
+                            if ufeed is not None and len(ufeed['items']) > 0 :
+                                if ufeed['items'][0]['has_liked'] == False:
+                                    # follFeed_results.extend([ufeed['items'][0]])
+                                    locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
+                            sleepTime = randrange(5,10)
+                            log.info('pulling comment exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            time.sleep(sleepTime)
         except:
             print('exception in FollowersToComment')
             raise
@@ -527,12 +538,14 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
         lc = 0
         cc = 0
 
-        if (SeqNos is not None and len(SeqNos)  > 1 ):
-            fc = SeqNos[1]+1
-        if (SeqNos is not None and len(SeqNos)  > 2 ):
-            lc = SeqNos[2]+1
-        if (SeqNos is not None and len(SeqNos)  > 0 ):
-            cc = SeqNos[0]+1
+        if len(SeqNos.keys()) > 0:
+            for key in SeqNos.keys():
+                if key == 'Follow':
+                    fc = SeqNos['Follow'] + 1
+                if key == 'Like':
+                    lc = SeqNos['Like'] + 1
+                if key == 'Comment':
+                    cc = SeqNos['Comment'] + 1
 
         for i, row in usersdf.iterrows():
             if row["FriendShipStatus"] == 'MustFollow':
@@ -650,9 +663,33 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
     return usersdf
 
 
-def SetupGlobalTodo(GlobalActionWeights, totalActions):
-            
-    actions = ['Follow', 'UnFollow', 'Like', 'Comment', 'StoryView' ]
+def SetupGlobalTodo(manifestObj):
+    
+    # GlobalActionWeights = [0.2, 0.3, 0.2, 0.2, 0.1]
+    totalActions = manifestObj.totalActions
+    # actions = ['Follow', 'UnFollow', 'Like', 'Comment', 'StoryView' ]
+    GlobalActionWeights = []
+    actions = []
+    if manifestObj.FollowOn == 1:
+        actions.extend (['Follow'])
+        GlobalActionWeights.extend([0.2])
+
+    if manifestObj.AfterFollLikeuserPosts == 1 :
+        actions.extend (['Like'])
+        GlobalActionWeights.extend([0.2])
+
+    if manifestObj.AfterFollCommentUserPosts == 1:
+        actions.extend (['Comment'])
+        GlobalActionWeights.extend([0.2])
+
+    if manifestObj.UnFollFollowersAfterMinDays == 1:
+        actions.extend (['UnFollow' ])
+        GlobalActionWeights.extend([0.3])
+
+    if manifestObj.AfterFollViewUserStory == 1:  
+        actions.extend (['StoryView' ])
+        GlobalActionWeights.extend([0.1])
+
     Samples = choices(actions, GlobalActionWeights, k=totalActions)
 
     list_dict = []

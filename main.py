@@ -29,7 +29,8 @@ import apiWrappers as apiW
 import botLogic
 
 import kivy
-kivy.require('1.0.7')
+kivy.require('1.11.0')
+
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.app import App
@@ -44,6 +45,7 @@ from kivy.core.window import Window
 from kivy.config import Config
 
 import os
+os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
 from iglogin import IGLogin
 from alert import Alert
@@ -336,7 +338,7 @@ class LoginApp(App):
             gVars.ReqExLikes = 0
             gVars.ReqExComments = 0
 
-            gVars.API_BaseURL = "https://socialgrowthlabs.com/API"
+            gVars.API_BaseURL = "http://sg2/API"
 
             self.gVars = gVars
             print('Loading new Defaults')
