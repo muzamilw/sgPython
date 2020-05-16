@@ -224,7 +224,8 @@ class Bot():
                             if gVars.DCActions is None:
                                 log.info('Getting Feeds of Competitors and creating action list')
                                 DCstart = datetime.datetime.now()
-                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,gVars.locationActions.groupby(['Action'])['Seq'].count(),Client,log)
+                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log)
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                                 log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
@@ -232,7 +233,14 @@ class Bot():
                             if gVars.SuggestFollowers is None:
                                 log.info('Getting Feeds of Suggested Users and creating action list')
                                 Suggestedstart = datetime.datetime.now()
-                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,gVars.DCActions.groupby(['Action'])['Seq'].count(),Client,log)
+                                SeqNos = gVars.DCActions.groupby(['Action'])['Seq'].count() + gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+
+                                # if len(SeqNos.keys()) == 0:
+                                #     SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count()
+                                #     if len(SeqNos.keys()) == 0:
+                                #         SeqNos = gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+
+                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log)
                                 LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
                                 log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo

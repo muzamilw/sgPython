@@ -530,6 +530,16 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
             SubActionWeights = [0.5, 0.5]
         if ( weightedObjects == 3):
             SubActionWeights = [0.33, 0.33, 0.33]
+
+        for i, row in usersdf.iterrows():
+            if row["FriendShipStatus"] == 'MustFollow':
+                usersdf.loc[i,'Action']  = 'Follow'
+
+            if row["FriendShipStatus"] == 'MustLike':
+                usersdf.loc[i,'Action']  = 'Like'
+
+            if row["FriendShipStatus"] == 'MustComment':
+                usersdf.loc[i,'Action']  = 'Comment'
         
         Samples = choices(actions, SubActionWeights, k=len(usersdf))
 
@@ -546,17 +556,6 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                     lc = SeqNos['Like'] + 1
                 if key == 'Comment':
                     cc = SeqNos['Comment'] + 1
-
-        for i, row in usersdf.iterrows():
-            if row["FriendShipStatus"] == 'MustFollow':
-                usersdf.loc[i,'Action']  = 'Follow'
-
-            if row["FriendShipStatus"] == 'MustLike':
-                usersdf.loc[i,'Action']  = 'Like'
-
-            if row["FriendShipStatus"] == 'MustComment':
-                usersdf.loc[i,'Action']  = 'Comment'
-
 
         for i, row in usersdf.iterrows():
             if row["Action"] == 'Follow':

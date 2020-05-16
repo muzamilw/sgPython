@@ -1,17 +1,14 @@
 ,Seq,Action,Status,ActionDateTime,Data,Tag,MediaId,UserId,Username,FullName,FriendShipStatus
 0,1,Follow,1,,,rolex,2309731813996298532,7552146593,exitwatch,Ed | Creator of #exitwatch,False
-1,1,Follow,1,,, london,2310491940722189224,520926723,izadora.hodges,Izadora Hodges,False
-2,1,Follow,1,,,suggested joker_soufiane,2308419227469691245,31220700541,joker_soufiane,Soufiane Jo Ker,MustFollow
-3,2,Follow,1,,,omega,2308302468306393186,19946737339,dyt.duyguonurpenekli,Diyetisyen Duygu ONUR PENEKLİ,False
-4,2,Follow,1,,, paris,2310492695713338301,2204861617,elieperaldi,elise🦋              Paris,False
-5,2,Follow,1,,,suggested muhammadkashifhanif,2184162294946440198,3097612405,muhammadkashifhanif,Muhammad Kashif Hanif,MustFollow
-6,3,Follow,1,,,swatch,2303262255800519815,8644132758,polish.lab.rat,All The Nail Polish Things,False
-7,3,Follow,1,,, stockholm,2310321823819987021,201062735,bojandjordjic7,Bojan Đorđić,False
-8,3,Follow,1,,,suggested kaka,2308178460521867246,6643170,kaka,Kaká,MustFollow
-9,4,Follow,1,,,suggested donga,2310375082848242941,472410,donga,Gaetano la Rosa,MustFollow
-10,5,Follow,1,,,suggested reeeta,2310384738086890053,20831560,reeeta,reeta®,MustFollow
-11,6,Follow,1,,,suggested nevillekmiec,2094328427422408266,16677879671,nevillekmiec,Neville Kmiec,MustFollow
-12,7,Follow,1,,,,,,,,
-13,8,Follow,1,,,,,,,,
-14,9,Follow,1,,,,,,,,
-15,10,Follow,1,,,,,,,,
+1,2,Follow,1,,,omega,2308302468306393186,19946737339,dyt.duyguonurpenekli,Diyetisyen Duygu ONUR PENEKLİ,False
+2,3,Follow,1,,,swatch,2303262255800519815,8644132758,polish.lab.rat,All The Nail Polish Things,False
+3,4,Follow,1,,,newyork,2310541714987010539,225090865,josephgarratt,Jᴏᴇ Gᴀʀʀᴀᴛᴛ,False
+4,5,Follow,1,,, london,2310540275587385647,452698783,lordaleem_official,Lord Aleem,False
+5,5,Follow,1,,,suggested caredmont,2309305852793973654,35774425016,caredmont,Carmen Rodriguez,MustFollow
+6,6,Follow,1,,, paris,2310529914885003450,32085887,lisafreestyle,Lisa Zimouche,False
+7,6,Follow,1,,,suggested joker_soufiane,2308419227469691245,31220700541,joker_soufiane,Soufiane Jo Ker,MustFollow
+8,7,Follow,1,,, stockholm,2310425647599972706,295793143,idaslundgren,Ida Lundgren,False
+9,7,Follow,1,,,suggested muhammadkashifhanif,2184162294946440198,3097612405,muhammadkashifhanif,Muhammad Kashif Hanif,MustFollow
+10,8,Follow,1,,,suggested kaka,2308178460521867246,6643170,kaka,Kaká,MustFollow
+11,9,Follow,1,,,suggested donga,2310375082848242941,472410,donga,Gaetano la Rosa,MustFollow
+12,10,Follow,1,,,suggested reeeta,2310384738086890053,20831560,reeeta,reeta®,MustFollow
