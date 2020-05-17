@@ -233,8 +233,9 @@ class Bot():
                             if gVars.SuggestFollowers is None:
                                 log.info('Getting Feeds of Suggested Users and creating action list')
                                 Suggestedstart = datetime.datetime.now()
-                                SeqNos = gVars.DCActions.groupby(['Action'])['Seq'].count() + gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
-
+                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+                                if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
+                                    SeqNos = SeqNos + gVars.DCActions.groupby(['Action'])['Seq'].count()
                                 # if len(SeqNos.keys()) == 0:
                                 #     SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count()
                                 #     if len(SeqNos.keys()) == 0:
