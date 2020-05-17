@@ -177,6 +177,7 @@ except ImportError:
 
 
 class Login(Screen):
+    
 
     def build(self):
         app = App.get_running_app()
@@ -223,6 +224,8 @@ class LoginApp(App):
     api = None
     username = StringProperty(None)
     password = StringProperty(None)
+    icon = 'data//sg.ico'
+    title = 'Social Planner'
 
     def build(self):
         self.loadGlobalConfig()

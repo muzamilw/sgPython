@@ -236,10 +236,7 @@ class Bot():
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
                                 if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
                                     SeqNos = SeqNos + gVars.DCActions.groupby(['Action'])['Seq'].count()
-                                # if len(SeqNos.keys()) == 0:
-                                #     SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count()
-                                #     if len(SeqNos.keys()) == 0:
-                                #         SeqNos = gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+                                
 
                                 gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log)
                                 LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
@@ -300,8 +297,6 @@ class Bot():
                         except Exception as e: ## try catch block for the 
                             log.info('Unexpected Exception in initial feed loads : {0!s}'.format(traceback.format_exc()))
                             
-                        return
-                        
                         Comments = ['😀','👍','💓','🤩','🥰']
                         curRow = None
 

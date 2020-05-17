@@ -10,7 +10,7 @@
             font_size: 20
             size_hint: 1, .2
         Label:
-            text: "Loggiedin Username : "
+            text: "Loggedin Username : "
             font_size: 20
             size_hint: 1, .2
             id: lblusername
@@ -21,15 +21,6 @@
             on_press: root.startBot()
             size_hint: 1, .2
             id: btnStart
-
-        Image:
-            source: 'data//processing.gif'
-            size: self.texture_size
-            center: self.parent.center
-            size: 500, 500
-            allow_stretch: True
-            anim_delay: -1
-            anim_loop: 1
 
         GridLayout:
             cols: 6
