@@ -1,0 +1,1 @@
+pyinstaller win.spec -i FILE.exe -w
