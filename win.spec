@@ -52,9 +52,9 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe1 = EXE(pyz,
           a.scripts,
-          name='SgBot',
+          name='SPlannerPro',
           exclude_binaries=True,
-          icon=join('data', 'sg.ico'),
+          icon=join('data', 'sp.ico'),
           debug=True,
           strip=False,
           upx=True,
@@ -68,4 +68,4 @@ coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\'),
                *tocs,
                strip=False,
                upx=True,
-               name='SGBot')
+               name='SPlannerPro')
