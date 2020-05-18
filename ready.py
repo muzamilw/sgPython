@@ -38,7 +38,7 @@ class Ready(Screen):
         app = App.get_running_app()
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-            lblusername.text += app.api1
+            lblusername.text += app.api.authenticated_user_name
             # app.api.feed_timeline()
             pass
             

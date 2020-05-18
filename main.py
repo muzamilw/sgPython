@@ -224,7 +224,7 @@ class LoginApp(App):
     api = None
     username = StringProperty(None)
     password = StringProperty(None)
-    icon = 'data//sg.ico'
+    icon = 'data//sp.ico'
     title = 'Social Planner'
 
     def build(self):
@@ -341,10 +341,10 @@ class LoginApp(App):
             gVars.ReqExLikes = 0
             gVars.ReqExComments = 0
 
-            gVars.API_BaseURL = "http://sg2/API"
+            gVars.API_BaseURL = "https://socialplannerpro.com/API"
 
             self.gVars = gVars
-            print('Loading new Defaults')
+            print('Loading New Defaults')
             data_folder = Path("userdata")
             Path("userdata").mkdir(parents=True, exist_ok=True)
             file_to_open = data_folder / "glob.vars"
@@ -372,8 +372,8 @@ class LoginApp(App):
         device_id = None
         try:
 
-            settings_file = 'usrdata//'+username+'_login.json'
-            if not os.path.isfile(os.path.join('usrdata',username+'_login.json')):
+            settings_file = 'userdata//'+username+'_login.json'
+            if not os.path.isfile(os.path.join('userdata',username+'_login.json')):
                 # settings file does not exist
                 print('Unable to find login.json: {0!s}'.format(settings_file))
                 api = None
