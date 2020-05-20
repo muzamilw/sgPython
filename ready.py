@@ -25,6 +25,8 @@ from instagram_private_api import (
         ClientCookieExpiredError, ClientLoginRequiredError,
         __version__ as client_version)
 from botLogic import Bot
+import SPButton 
+from kivymd.app import MDApp
 
 class Ready(Screen):
 
@@ -34,12 +36,50 @@ class Ready(Screen):
     botStop_event = threading.Event()
     log = None
 
+    
+
+    def showLog(self):
+        label = self.ids['logLabel']
+        self.ids['btnShowLog'].disabled = True
+        self.ids['btnShowLog'].text = "Hiding Log"
+        #self.h_widget(label)
+        #self.log.info("Stop Signal Sent")
+    
+    def h_widget(wid, dohide=True):
+        if hasattr(wid, 'saved_attrs'):
+            if not dohide:
+                wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
+                del wid.saved_attrs
+        elif dohide:
+            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
+
     def on_enter(self):
         app = App.get_running_app()
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
             lblusername.text += app.api.authenticated_user_name
             # app.api.feed_timeline()
+
+            label = self.ids['logLabel'] #Label(text="showing the log here")
+
+            self.lblFollow =  self.ids['lblFollow']
+            self.lblUnFollow =  self.ids['lblUnFollow']
+            self.lblLike =  self.ids['lblLike']
+            self.lblStoryView =  self.ids['lblStoryView']
+            self.lblComments =  self.ids['lblComments']
+            self.lblLikeExchange =  self.ids['lblLikeExchange']
+            self.lblFollowExchange =  self.ids['lblFollowExchange']
+            self.lblCommentExchange =  self.ids['lblCommentExchange']
+            self.lblTotalTime =  self.ids['lblTotalTime']
+
+            
+            self.ids['btnStop'].disabled = True
+
+            log = logging.getLogger("my.logger")
+            log.level = logging.DEBUG
+            log.addHandler(MyLabelHandler(label, logging.DEBUG))
+            self.log = log
             pass
             
         
@@ -69,30 +109,16 @@ class Ready(Screen):
 
     def startBot(self):
         app = App.get_running_app()
-        label = self.ids['logLabel'] #Label(text="showing the log here")
-
-        self.lblFollow =  self.ids['lblFollow']
-        self.lblUnFollow =  self.ids['lblUnFollow']
-        self.lblLike =  self.ids['lblLike']
-        self.lblStoryView =  self.ids['lblStoryView']
-        self.lblComments =  self.ids['lblComments']
-        self.lblLikeExchange =  self.ids['lblLikeExchange']
-        self.lblFollowExchange =  self.ids['lblFollowExchange']
-        self.lblCommentExchange =  self.ids['lblCommentExchange']
-        self.lblTotalTime =  self.ids['lblTotalTime']
         
 
-        log = logging.getLogger("my.logger")
-        log.level = logging.DEBUG
-        log.addHandler(MyLabelHandler(label, logging.DEBUG))
-        self.log = log
-
-        oBot = Bot(Client,log,self,self.botStop_event)
-        self.botThread = Thread(target=oBot.RunBot)
-        self.botThread.start()
-        self.StartTime = datetime.datetime.now()
-        Clock.schedule_interval(self.updateTime, 1)
+        # oBot = Bot(Client,log,self,self.botStop_event)
+        # self.botThread = Thread(target=oBot.RunBot)
+        # self.botThread.start()
+        # self.StartTime = datetime.datetime.now()
+        # Clock.schedule_interval(self.updateTime, 1)
         self.ids['btnStart'].text = "Sequence started"
+        self.ids['btnStart'].disabled = True
+        self.ids['btnStop'].disabled = False
         
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
@@ -113,6 +139,8 @@ class Ready(Screen):
         #self.botThread.join()
         self.botStop_event.set()
         self.ids['btnStart'].text = "Start Sequence"
+        self.ids['btnStart'].disabled = False
+        self.ids['btnStop'].disabled = True
         self.log.info("Stop Signal Sent")
         #self.t.join()
         #self.manager.transition = SlideTransition(direction="right")

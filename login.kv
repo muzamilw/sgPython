@@ -2,50 +2,79 @@
 #:include iglogin.kv
 
 <Login>:
-    BoxLayout:
-        id: login_layout
-        orientation: 'vertical'
-        padding: [10,50,10,50]
-        spacing: 50
 
-        Label:
-            text: 'Welcome to Intelligent Learning'
-            font_size: 32
+    name: "screen_login"
+    email: login
+    password: password
+
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "data//bg.jpg"
+
+    
+
+    StackLayout:
+        orientation: "lr-tb"
 
         BoxLayout:
-            orientation: 'vertical'
+            orientation: "vertical"
+            size_hint_y: .8
+            spacing: 20
 
-            Label:
-                text: 'Enter your username'
-                font_size: 18
-                halign: 'left'
-                text_size: root.width-20, 20
+            Image:
+                source: "data//iglogo.png"
+                size_hint: None, None
+                size: dp(140), dp(140)
+                pos_hint: {"center_x": .5}
 
-            TextInput:
+            MDLabel:
+                text: 'Enter username and pin to continue'
+                pos_hint: {"center_x": .5}
+                size_hint: 0.5, None
+
+            MDTextFieldRound:
                 id: login
-                multiline:False
-                font_size: 28
-                text: ''
-                hint_text : 'your social growth labs username'
+                normal_color: [0, 0, 0, 0.2]
+                active_color: [0, 0, 0, 0.2]
+                icon_type: "left"
+                size_hint: .5, None
+                pos_hint: {"center_x": .5}
+                hint_text: "Social Planner Username"
+                max_text_length: 60
+                required: True
+                helper_text_mode: "on_error"
 
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: 'pin'
-                halign: 'left'
-                font_size: 18
-                text_size: root.width-20, 20
-
-            TextInput:
+            MDTextFieldRound:
                 id: password
-                multiline:False
-                password:True
-                font_size: 28
-                text:''
-                hint_text : 'your pin code'
+                password: True
+                normal_color: [0, 0, 0, 0.2]
+                active_color: [0, 0, 0, 0.2]
+                icon_type: "left"
+                icon_left: "lock"
+                size_hint: .5, None
+                pos_hint: {"center_x": .5}
+                hint_text: "pin"
+                max_text_length: 60
+                required: True
+                helper_text_mode: "on_error"
 
-        Button:
-            text: 'Connect to SG Server'
-            font_size: 24
+            MDRaisedButton:
+                text: "Login"
+                size_hint: .3, None
+                pos_hint: {"center_x": .5}
+                on_release: root.do_login(login.text, password.text)
 
-            on_press: root.do_login(login.text, password.text)
+            MDLabel:
+                text: 'Usage instructions'
+                font_style: 'H5'
+                pos_hint: {"center_x": .5}
+                size_hint: 0.5, 0.1
+                theme_text_color: 'Primary'
+            MDLabel:
+                text: 'Usage instructions'
+                font_style: 'Body1'
+                pos_hint: {"center_x": .5}
+                size_hint: 0.5, 0.1
+                theme_text_color: 'Primary'

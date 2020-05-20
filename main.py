@@ -48,8 +48,11 @@ import os
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
 from iglogin import IGLogin
+from login import Login
 from alert import Alert
 from instagram_private_api import Client, ClientCompatPatch
+import SPButton
+from kivymd.app import MDApp
 
 
 class GlobalVars:
@@ -176,47 +179,10 @@ except ImportError:
 
 
 
-class Login(Screen):
-    
-
-    def build(self):
-        app = App.get_running_app()
-
-        self.ids['login'].text = app.gVars.SGusername
-        self.ids['password'].text = app.gVars.SGPin
-
-    def do_login(self, loginText, passwordText):
-        app = App.get_running_app()
-
-        app.username = loginText
-        app.password = passwordText
-
-        loginResult = cf.AppLogin(loginText,passwordText,'123',app.gVars)
-        if loginResult[0] == False:
-            Alert(title='Error', text=loginResult[1])
-        else:
-            app.gVars.loginResult = loginResult[1]
-            app.gVars.SGusername = loginText
-            app.gVars.SGPin = passwordText
-
-            self.manager.transition = SlideTransition(direction="left")
-            app.api = app.checkIGLogin(app.gVars.SGusername)
-            if app.api is None:
-                self.manager.current = 'iglogin'
-            else:
-                self.manager.current = 'ready'
-
-
-            app.config.read(app.get_application_config())
-            app.config.write()
-
-    def resetForm(self):
-        self.ids['login'].text = ""
-        self.ids['password'].text = ""
 
 
 
-class LoginApp(App):
+class LoginApp(MDApp):
     Config.set('graphics', 'resizable', '0')
     Config.set('graphics', 'width', '500')
     Config.set('graphics', 'height', '500')
@@ -225,7 +191,13 @@ class LoginApp(App):
     username = StringProperty(None)
     password = StringProperty(None)
     icon = 'data//sp.ico'
-    title = 'Social Planner'
+    
+    def __init__(self, **kwargs):
+        self.title = "Machine Learning Growth API v1.9"
+        self.theme_cls.theme_style = "Light"
+        self.theme_cls.primary_palette = "DeepPurple"
+        self.theme_cls.primary_hue = "500"
+        super().__init__(**kwargs)
 
     def build(self):
         self.loadGlobalConfig()
@@ -429,7 +401,7 @@ class LoginApp(App):
     def show_popup(self):
         show = P()
 
-        popupWindow = Popup(title="Popup Window", content=show, size_hint=(None,None),size=(400,400))
+        popupWindow = Popup(title="Popup Window", content=show, size_hint=(None,None),size=(400,200))
 
         popupWindow.open()
 

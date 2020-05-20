@@ -130,7 +130,8 @@ class MyAppClient(Client):
 class IGLogin(Screen):
 
     headers = None
-
+    alert_dialog = None
+    Login_alert_dialog = None
 
     def to_json(self,python_object):
         if isinstance(python_object, bytes):
@@ -169,6 +170,21 @@ class IGLogin(Screen):
         app.username = loginText
         app.password = passwordText
 
+        if ( loginText == "" or  passwordText == ""):
+            if not self.alert_dialog:
+                self.alert_dialog = MDDialog(
+                    title="Error!",
+                    text="Either username or pin is missing.",
+                    buttons=[
+                        MDFlatButton(
+                            text="Ok",
+                            text_color=app.theme_cls.primary_color,
+                        ),
+                    ],
+                )
+            self.alert_dialog.open()
+            return
+
         loginRes = self.apilogin(loginText,passwordText)
         api = loginRes[0]
 
@@ -176,7 +192,17 @@ class IGLogin(Screen):
         app.gVars.IGpassword = passwordText
 
         if api is None:
-            Alert(title='Error', text='Login failed')
+            self.Login_alert_dialog = MDDialog(
+                title="Instagram Login Error!",
+                text="There was error in performing login on Instagram, please try again",
+                buttons=[
+                    MDFlatButton(
+                        text="Ok",
+                        text_color=app.theme_cls.primary_color,
+                    ),
+                ],
+            )
+            self.Login_alert_dialog.open()
         else:
             app.api = api
 

@@ -1,48 +1,67 @@
 <IGLogin>:
-    BoxLayout:
-        id: login_layout
-        orientation: 'vertical'
-        padding: [10,50,10,50]
-        spacing: 50
+    name: "ig_screen_login"
+    email: login
+    password: password
 
-        Label:
-            text: 'Please enter your Instagram username and password to continue.'
-            font_size: 32
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "data//bg.jpg"
+
+    
+
+    StackLayout:
+        orientation: "lr-tb"
 
         BoxLayout:
-            orientation: 'vertical'
+            orientation: "vertical"
+            size_hint_y: .8
+            spacing: 20
 
-            Label:
-                text: 'Enter your Instsagram username'
-                font_size: 18
-                halign: 'left'
-                text_size: root.width-20, 20
+            Image:
+                source: "data//iglogo.png"
+                size_hint: None, None
+                size: dp(140), dp(140)
+                pos_hint: {"center_x": .5}
 
-            TextInput:
+            
+            MDLabel:
+                text: 'Enter your Instsagram username and login to continue'
+                pos_hint: {"center_x": .5}
+                size_hint: 0.5, None
+
+            MDTextFieldRound:
                 id: login
-                multiline:False
-                font_size: 28
-                text: ''
-                hint_text : 'Your Instagram username'
+                normal_color: [0, 0, 0, 0.2]
+                active_color: [0, 0, 0, 0.2]
+                icon_type: "left"
+                size_hint: .5, None
+                pos_hint: {"center_x": .5}
+                hint_text: "Instagram Username"
+                max_text_length: 60
+                required: True
+                helper_text_mode: "on_error"
+            
 
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: 'password'
-                halign: 'left'
-                font_size: 18
-                text_size: root.width-20, 20
-
-            TextInput:
+            MDTextFieldRound:
                 id: password
-                multiline:False
-                password:True
-                font_size: 28
-                text:''
-                hint_text : 'Your Instagram Password'
+                password: True
+                normal_color: [0, 0, 0, 0.2]
+                active_color: [0, 0, 0, 0.2]
+                icon_type: "left"
+                icon_left: "lock"
+                size_hint: .5, None
+                pos_hint: {"center_x": .5}
+                hint_text: "Password"
+                max_text_length: 60
+                required: True
+                helper_text_mode: "on_error"
 
-        Button:
-            text: 'Login on Instagram'
-            font_size: 24
+            MDRaisedButton:
+                text: "Instagram Login"
+                size_hint: .3, None
+                pos_hint: {"center_x": .5}
+                on_release: root.do_login(login.text, password.text)
 
-            on_press: root.do_login(login.text, password.text)
+    

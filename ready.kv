@@ -4,94 +4,107 @@
     BoxLayout:
         orientation: 'vertical'
         
+        canvas:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: "data//bg.jpg"
 
-        Label:
+        MDLabel:
             text: "Social Planner"
             font_size: 20
-            size_hint: 1, .2
-        Label:
+           
+        MDLabel:
             text: "Loggedin Username : "
             font_size: 20
-            size_hint: 1, .2
+           
             id: lblusername
+        
+        GridLayout:
+            cols: 4
+            orientation: 'horizontal'
+           
 
-        Button:
-            text: "Start Sequence"
-            font_size: 15
-            on_press: root.startBot()
-            size_hint: 1, .2
-            id: btnStart
+            MDRaisedButton:
+                text: "Start Sequence"
+                on_press: root.startBot()
+                id: btnStart
+            MDLabel:
+                id: lblTotalTime
+                text: "0:00"
+            
+            MDRaisedButton:
+                text: "Stop"
+                on_press: root.disconnect()
+                id : btnStop
 
         GridLayout:
-            cols: 6
+            cols: 4
             orientation: 'horizontal'
             padding: 20
             spacing: 10
-            Label:
+            MDLabel:
                 size_hint_x: None
-                text: "Follow"
+                text: "F"
                 size_hint: 1, 0.8
-            Label:
-                text: "UnFollow"
+            MDLabel:
+                text: "U"
                 
-            Label:
-                text: "Likes"
+            MDLabel:
+                text: "L"
                 
-            Label:
-                text: "StoryView"
-            Label:
-                text: "Comments"
+            MDLabel:
+                text: "S"
+            MDLabel:
+                text: "C"
                 
-            Label:
-                text: "Session Time"
+           
                 
-            Label:
+            MDLabel:
                 id: lblFollow
                 text: "0 / 0"
                 size_hint: 1, 0.8
-            Label:
+            MDLabel:
                 id: lblUnFollow
                 text: "0 / 0"
                
-            Label:
+            MDLabel:
                 id: lblLike
                 text: "0 / 0"
-            Label:
+            MDLabel:
                 id: lblStoryView
                 text: "0 / 0"
-            Label:
+            MDLabel:
                 id: lblComments
                 text: "0 / 0"
-            Label:
-                id: lblTotalTime
-                text: "0:00"
-            Label:
+           
+            MDLabel:
                 
                 text: "Like Exchange"
                 size_hint: 1, 0.8
-            Label:
+            MDLabel:
                 text: "Follow Exchange"
                 
-            Label:
+            MDLabel:
                 text: "Comment Exchange"
                 
-            Label:
+            MDLabel:
                 text: ""
                 
-            Label:
+            MDLabel:
                 text: ""
-            Label:
+            MDLabel:
                 text: ""
                 
-            Label:
+            MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblLikeExchange
-            Label:
+            MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblFollowExchange
-            Label:
+            MDLabel:
                 id: lblCommentExchange
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
@@ -99,14 +112,9 @@
             
             
             
-        TextInput:
+        MDTextFieldRect:
             id:logLabel
             text: "Bot Log here"
             font_size: 16
             multiline:True
-        Button:
-            text: "Stop"
-            font_size: 15
-            on_press: root.disconnect()
-            size_hint: 1, .1
-            id : btnStop
+        
