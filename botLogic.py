@@ -454,7 +454,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Api Client Error occurred, Please open Instagram in browser and manually clear Challenges')
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc(),gVars.SGusername)
+                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             IsApiClientError = True
                             return
 
@@ -462,7 +462,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Exception occurred in main sequence action loop")
                             log.info(traceback.format_exc())
-                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc(),gVars.SGusername)
+                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             raise e
 
                         #gVars.GlobalTodo.to_csv('GlobData.csv')
