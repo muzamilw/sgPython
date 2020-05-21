@@ -35,7 +35,10 @@ from instagram_private_api import (
         ClientCookieExpiredError, ClientLoginRequiredError,ClientCheckpointRequiredError,ClientChallengeRequiredError,
         __version__ as client_version)
 from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
-
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import OneLineAvatarIconListItem
+from kivy.app import App
 # from instagram_web_api import Client as WebClient
 
 class MyAppClient(Client):

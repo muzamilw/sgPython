@@ -10,58 +10,71 @@
             source: "data//bg.jpg"
 
     
+    BoxLayout:
+        orientation:'horizontal'
+        StackLayout:
+            orientation: "lr-tb"
 
-    StackLayout:
-        orientation: "lr-tb"
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_y: .8
+                spacing: 20
 
-        BoxLayout:
-            orientation: "vertical"
-            size_hint_y: .8
-            spacing: 20
+                Label:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
 
-            Image:
-                source: "data//iglogo.png"
-                size_hint: None, None
-                size: dp(140), dp(140)
-                pos_hint: {"center_x": .5}
+                Image:
+                    source: "data//iglogo.png"
+                    size_hint: None, None
+                    size: dp(140), dp(140)
+                    pos_hint: {"center_x": .5}
 
-            
-            MDLabel:
-                text: 'Enter your Instsagram username and login to continue'
-                pos_hint: {"center_x": .5}
-                size_hint: 0.5, None
+                
+                MDLabel:
+                    text: 'Enter your Instsagram username and login to continue'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
 
-            MDTextFieldRound:
-                id: login
-                normal_color: [0, 0, 0, 0.2]
-                active_color: [0, 0, 0, 0.2]
-                icon_type: "left"
-                size_hint: .5, None
-                pos_hint: {"center_x": .5}
-                hint_text: "Instagram Username"
-                max_text_length: 60
-                required: True
-                helper_text_mode: "on_error"
-            
+                MDTextFieldRound:
+                    id: login
+                    normal_color: [0, 0, 0, 0.2]
+                    active_color: [0, 0, 0, 0.2]
+                    icon_type: "left"
+                    size_hint: .5, None
+                    pos_hint: {"center_x": .5}
+                    hint_text: "Instagram Username"
+                    max_text_length: 60
+                    required: True
+                    
+                
 
-            MDTextFieldRound:
-                id: password
-                password: True
-                normal_color: [0, 0, 0, 0.2]
-                active_color: [0, 0, 0, 0.2]
-                icon_type: "left"
-                icon_left: "lock"
-                size_hint: .5, None
-                pos_hint: {"center_x": .5}
-                hint_text: "Password"
-                max_text_length: 60
-                required: True
-                helper_text_mode: "on_error"
+                MDTextFieldRound:
+                    id: password
+                    password: True
+                    normal_color: [0, 0, 0, 0.2]
+                    active_color: [0, 0, 0, 0.2]
+                    icon_type: "left"
+                    icon_left: "lock"
+                    size_hint: .5, None
+                    pos_hint: {"center_x": .5}
+                    hint_text: "Password"
+                    max_text_length: 60
+                    required: True
+                    
 
-            MDRaisedButton:
-                text: "Instagram Login"
-                size_hint: .3, None
-                pos_hint: {"center_x": .5}
-                on_release: root.do_login(login.text, password.text)
+                MDRaisedButton:
+                    text: "Instagram Login"
+                    size_hint: .3, 0.1
+                    pos_hint: {"center_x": .5}
+                    on_release: root.do_login(login.text, password.text)
+                
+                MDLabel:
+                    text: ' '
+                    font_style: 'H5'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
+                    theme_text_color: 'Primary'
 
-    
+        

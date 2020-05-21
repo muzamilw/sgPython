@@ -14,67 +14,75 @@
             source: "data//bg.jpg"
 
     
+    BoxLayout:
+        orientation:'horizontal'
 
-    StackLayout:
-        orientation: "lr-tb"
+        StackLayout:
+            orientation: "lr-tb"
 
-        BoxLayout:
-            orientation: "vertical"
-            size_hint_y: .8
-            spacing: 20
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_y: 0.8
+                spacing: 20
 
-            Image:
-                source: "data//iglogo.png"
-                size_hint: None, None
-                size: dp(140), dp(140)
-                pos_hint: {"center_x": .5}
+                Label:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
 
-            MDLabel:
-                text: 'Enter username and pin to continue'
-                pos_hint: {"center_x": .5}
-                size_hint: 0.5, None
 
-            MDTextFieldRound:
-                id: login
-                normal_color: [0, 0, 0, 0.2]
-                active_color: [0, 0, 0, 0.2]
-                icon_type: "left"
-                size_hint: .5, None
-                pos_hint: {"center_x": .5}
-                hint_text: "Social Planner Username"
-                max_text_length: 60
-                required: True
-                helper_text_mode: "on_error"
+                Image:
+                    source: "data//iglogo.png"
+                    size_hint: None, None
+                    size: dp(140), dp(140)
+                    pos_hint: {"center_x": .5}
 
-            MDTextFieldRound:
-                id: password
-                password: True
-                normal_color: [0, 0, 0, 0.2]
-                active_color: [0, 0, 0, 0.2]
-                icon_type: "left"
-                icon_left: "lock"
-                size_hint: .5, None
-                pos_hint: {"center_x": .5}
-                hint_text: "pin"
-                max_text_length: 60
-                required: True
-                helper_text_mode: "on_error"
+                MDLabel:
+                    text: 'Enter username and pin to continue'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
 
-            MDRaisedButton:
-                text: "Login"
-                size_hint: .3, None
-                pos_hint: {"center_x": .5}
-                on_release: root.do_login(login.text, password.text)
+                MDTextFieldRound:
+                    id: login
+                    normal_color: [0, 0, 0, 0.2]
+                    active_color: [0, 0, 0, 0.2]
+                    icon_type: "left"
+                    size_hint: .5, None
+                    pos_hint: {"center_x": .5}
+                    hint_text: "Social Planner Username"
+                    max_text_length: 60
+                    required: True
+                    
 
-            MDLabel:
-                text: 'Usage instructions'
-                font_style: 'H5'
-                pos_hint: {"center_x": .5}
-                size_hint: 0.5, 0.1
-                theme_text_color: 'Primary'
-            MDLabel:
-                text: 'Usage instructions'
-                font_style: 'Body1'
-                pos_hint: {"center_x": .5}
-                size_hint: 0.5, 0.1
-                theme_text_color: 'Primary'
+                MDTextFieldRound:
+                    id: password
+                    password: True
+                    normal_color: [0, 0, 0, 0.2]
+                    active_color: [0, 0, 0, 0.2]
+                    icon_type: "left"
+                    icon_left: "lock"
+                    size_hint: .5, None
+                    pos_hint: {"center_x": .5}
+                    hint_text: "pin"
+                    max_text_length: 60
+                    required: True
+                    
+
+                MDRaisedButton:
+                    text: "Login"
+                    size_hint: .3, 0.1
+                    pos_hint: {"center_x": .5}
+                    on_release: root.do_login(login.text, password.text)
+
+                MDLabel:
+                    text: 'Usage instructions'
+                    font_style: 'H5'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
+                    theme_text_color: 'Primary'
+                MDLabel:
+                    text: '1 - Open Instagram website on this pc before logging in. \n2 - You can minimise this application after starting \n3 - To close the app press close button'
+                    font_style: 'Body1'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.1
+                    theme_text_color: 'Primary'
