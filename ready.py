@@ -28,6 +28,7 @@ from botLogic import Bot
 import SPButton 
 from kivymd.app import MDApp
 
+
 class Ready(Screen):
 
     t = None
@@ -40,8 +41,14 @@ class Ready(Screen):
 
     def showLog(self):
         label = self.ids['logLabel']
-        self.ids['btnShowLog'].disabled = True
-        self.ids['btnShowLog'].text = "Hiding Log"
+        if label.opacity == 0 :
+            label.opacity = 1
+            self.ids['btnShowLog'].text = "Hide Log"
+        else:
+            label.opacity = 0
+            self.ids['btnShowLog'].text = "Show Log"
+        # self.ids['btnShowLog'].disabled = True
+        # self.ids['btnShowLog'].text = "Hiding Log"
         #self.h_widget(label)
         #self.log.info("Stop Signal Sent")
     
@@ -111,14 +118,19 @@ class Ready(Screen):
         app = App.get_running_app()
         
 
-        # oBot = Bot(Client,log,self,self.botStop_event)
-        # self.botThread = Thread(target=oBot.RunBot)
-        # self.botThread.start()
-        # self.StartTime = datetime.datetime.now()
-        # Clock.schedule_interval(self.updateTime, 1)
+        oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
+        self.botThread = Thread(target=oBot.RunBot)
+        self.botThread.start()
+        self.StartTime = datetime.datetime.now()
+        Clock.schedule_interval(self.updateTime, 1)
+
         self.ids['btnStart'].text = "Sequence started"
         self.ids['btnStart'].disabled = True
         self.ids['btnStop'].disabled = False
+        
+        self.ids['spinner'].active = True
+
+        
         
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
@@ -137,11 +149,13 @@ class Ready(Screen):
 
     def disconnect(self):
         #self.botThread.join()
+        Clock.unschedule(self.updateTime)
         self.botStop_event.set()
         self.ids['btnStart'].text = "Start Sequence"
         self.ids['btnStart'].disabled = False
         self.ids['btnStop'].disabled = True
         self.log.info("Stop Signal Sent")
+        self.ids['spinner'].active = False
         #self.t.join()
         #self.manager.transition = SlideTransition(direction="right")
         # app = App.get_running_app()

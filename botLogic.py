@@ -46,11 +46,12 @@ class Actions(Enum):
     BadHashtag = 86
 
 class Bot():
-    def __init__(self,  Client, log, ui,botStop):
+    def __init__(self,  Client, log, ui,botStop, logControl):
         self.ui = ui
         self.Client = Client
         self.log = log
         self.botStop = botStop
+        self.logControl = logControl
 
     def raise_exception(self): 
         thread_id = self.get_id() 
@@ -126,13 +127,16 @@ class Bot():
         app = App.get_running_app()
         api = app.api
         log = self.log
-        
+        MaxRetryCount = 10
+        RetryCount = 0
+        RetryTimeSeconds = 30
+        IsApiClientError = False
 
         gVars = app.gVars
 
-        while True and self.botStop.is_set() == False:
+        while True and self.botStop.is_set() == False and RetryCount <= MaxRetryCount and IsApiClientError:
             try:
-                
+                RetryCount = RetryCount + 1
                 log.info("Starting Sequence")
                 # return
                 gVars.RunStartTime = datetime.datetime.now()
@@ -150,11 +154,11 @@ class Bot():
 
                                 user_info = api.user_info(api.authenticated_user_id)
                                 cf.UpdateInitialStatsToServer(gVars.SocialProfileId,user_info['user']['follower_count'],user_info['user']['following_count'],user_info['user']['media_count'],gVars)
-                                log.info('int followers' + str(user_info['user']['follower_count']))
-                                log.info('Init Following' +str(user_info['user']['following_count']))
-                                log.info('InitPosts' + str(user_info['user']['media_count']))
+                                log.info('Int followers : ' + str(user_info['user']['follower_count']))
+                                log.info('Init Following : ' +str(user_info['user']['following_count']))
+                                log.info('InitPosts : ' + str(user_info['user']['media_count']))
                             else:
-                                log.info('initial stats already sent')
+                                log.info('Initial stats already sent')
 
                             #sending daily stats
                             if gVars.DailyStatsSent == False and gVars.DailyStatsSentDate != datetime.datetime.today:
@@ -288,6 +292,7 @@ class Bot():
                             self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                             self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
+                            raise Exception("Sorry, no numbers below zero")
 
                             
                             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
@@ -296,13 +301,15 @@ class Bot():
                             
                         except Exception as e: ## try catch block for the 
                             log.info('Unexpected Exception in initial feed loads : {0!s}'.format(traceback.format_exc()))
+                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
+                            raise e
                             
                         Comments = ['😀','👍','💓','🤩','🥰']
                         curRow = None
 
                         try:
                             for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
-
+                            
                                 if (self.botStop.is_set() == True):
                                     print('Stopping Sequence')
                                     break
@@ -425,7 +432,7 @@ class Bot():
 
                             log.info('Action List saved for Email' )
                             
-                            cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2020','dataframe_GlobalTodo.html','','')
+                            cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060','dataframe_GlobalTodo.html',gVars.SGusername,'')
                             log.info('Email sent' )
 
                             self.CleanupAfterSuccessfulRun()
@@ -445,15 +452,22 @@ class Bot():
 
                         except ClientError as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Api Client occurred in main bot action loop")
+                            log.info("Api Client Error occurred, Please open Instagram in browser and manually clear Challenges')
                             log.info(str(traceback.format_exc()))
+                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc(),gVars.SGusername)
+                            IsApiClientError = True
+                            return
 
                         except:# ClientError:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Exception occurred in main sequence action loop")
                             log.info(traceback.format_exc())
+                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc(),gVars.SGusername)
+                            raise e
 
                         #gVars.GlobalTodo.to_csv('GlobData.csv')
+                        log.info('Sequence Completed Successfully')
+                        return
 
                         #return gVars
                     else:
@@ -463,13 +477,14 @@ class Bot():
                     log.info('Error logging onto SG Server')
             except:
                 # restart main loop
-                log.info('An Exception happened restarting Session in 60 seconds')
-                time.sleep(60) 
+                log.info('An Exception happened restarting Session in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
+                log.info('###################################################################')
+                log.info('Retry #'+str(RetryCount)+' \n')
+                
+                time.sleep(RetryTimeSeconds * RetryCount) 
                 pass
             finally:
                 # restart main loop
-                log.info('Sequence Completed, Restarting Session in 60 seconds')
-                time.sleep(60) 
                 pass
 
-        log.info('Stopping Sequence')
+        log.info('Ending')

@@ -43,7 +43,37 @@ def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
     
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'Bot Run Report'   #The subject line
+    message['Subject'] = 'Bot Run Report for ' + SocialProfileName   #The subject line
+    #The body and the attachments for the mail
+    #message.attach(MIMEText(mail_content, 'plain'))
+    #Create SMTP session for sending the mail
+    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session.starttls() #enable security
+    session.login(sender_address, sender_pass) #login with mail_id and password
+    #text = message.as_string()
+    
+    session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
+    session.quit()
+    print('Mail Sent')
+
+def SendError(you,me,pwd,ErrorLog,SocialProfileName):
+    msg= ''
+    
+    # with open(filename,mode="r", encoding="utf-8") as fp:
+    # # Create a text/plain message
+    #     #msg = EmailMessage()
+    #     msg = fp.read()
+
+    message = MIMEMultipart()
+    message = MIMEText(ErrorLog, 'html')
+    sender_address = me
+    sender_pass = pwd
+    receiver_address = you
+    #Setup the MIME
+    
+    message['From'] = sender_address
+    message['To'] = receiver_address
+    message['Subject'] = 'Sequence Error : ' + SocialProfileName   #The subject line
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail

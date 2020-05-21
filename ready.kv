@@ -1,4 +1,6 @@
 #:kivy 1.9.0
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
 
 <Ready>:
     canvas:
@@ -34,40 +36,43 @@
             
 
             GridLayout:
-                size_hint: 0.6, None
+                size_hint: 0.5, None
                 orientation:'horizontal'
                 cols : 2
 
            
             GridLayout:
-                size_hint: 0.3, None
+                size_hint: 0.4, None
                 orientation:'horizontal'
                 cols : 2
+                spacing:10
 
                 MDLabel:
-                    id: lblTotalTime
-                    text: "0:00"
+                    text: " "
 
                 MDRaisedButton:
                     text: "Start"
                     on_press: root.startBot()
                     id: btnStart
-                    size_hint: 1, 0.1
-                    pos_hint: {"center_x": .5}
-                MDSpinner:
-                    id: spinner
-                    size_hint: None, None
-                    size: dp(46), dp(46)
-                    pos_hint: {'center_x': .5, 'center_y': .5}
-                    active: True
+                    size_hint: 1, 0.05
+                    os_hint: {'center_x': .5, 'center_y': .5}
                 
                 
+                
+                MDLabel:
+                    id: lblTotalTime
+                    text: "0:00"
+
                 MDRaisedButton:
                     text: "Stop"
                     on_press: root.disconnect()
                     id : btnStop
                     size_hint: 1, 0.1
                     pos_hint: {"center_x": .5}
+                    md_bg_color: get_color_from_hex("#FF0000")
+
+               
+
             GridLayout:
                 size_hint: 0.1, None
                 orientation:'horizontal'
@@ -87,72 +92,102 @@
                 id: lblFollow
                 text: "0 / 0"
                 size_hint: 1, 0.8
+                halign : 'center'
             MDLabel:
                 id: lblUnFollow
                 text: "0 / 0"
+                halign : 'center'
                
             MDLabel:
                 id: lblLike
                 text: "0 / 0"
+                halign : 'center'
             MDLabel:
                 id: lblStoryView
                 text: "0 / 0"
-            MDLabel:
-                id: lblComments
-                text: "0 / 0"
+                halign : 'center'
+            
 
             MDLabel:
                 text: "F"
                 size_hint: 1, 0.8
+                halign : 'center'
             MDLabel:
                 text: "U"
+                halign : 'center'
                 
             MDLabel:
                 text: "L"
+                halign : 'center'
                 
             MDLabel:
                 text: "S"
-            MDLabel:
-                text: "C"
+                halign : 'center'
+           
            
             
+            MDLabel:
+                id: lblComments
+                text: "0 / 0"
+                halign : 'center'
                 
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblLikeExchange
+                halign : 'center'
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblFollowExchange
+                halign : 'center'
             MDLabel:
                 id: lblCommentExchange
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
+                halign : 'center'
+
+            MDLabel:
+                text: "C"
+                halign : 'center'
 
             MDLabel:
                 text: "LX"
                 size_hint: 1, 0.8
+                halign : 'center'
             MDLabel:
                 text: "FX"
+                halign : 'center'
                 
             MDLabel:
                 text: "CX"
+                halign : 'center'
                 
-            MDLabel:
-                text: ""
-                
-            MDLabel:
-                text: ""
-            MDLabel:
-                text: ""
-               
-            
-            
-            
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.3
+            spacing:5
+
+            MDSpinner:
+                id: spinner
+                size_hint: None, None
+                size: dp(20), dp(20)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                active: False
+
+            MDRaisedButton:
+                text: "Show Log"
+                on_press: root.showLog()
+                id : btnShowLog
+                size_hint: 0.1, 0.1
+                pos_hint: {"center_x": .5}
+
+
+
         MDTextFieldRect:
             id:logLabel
             text: "Bot Log here"
             font_size: 16
             multiline:True
+            opacity:0
         
