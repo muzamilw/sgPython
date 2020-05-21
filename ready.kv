@@ -1,62 +1,85 @@
 #:kivy 1.9.0
 
 <Ready>:
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "data//bg.jpg"
     BoxLayout:
         orientation: 'vertical'
-        
-        canvas:
-            Rectangle:
-                pos: self.pos
-                size: self.size
-                source: "data//bg.jpg"
+        size_hint_y: 1
 
-        MDLabel:
-            text: "Social Planner"
-            font_size: 20
-           
-        MDLabel:
-            text: "Loggedin Username : "
-            font_size: 20
-           
-            id: lblusername
-        
-        GridLayout:
-            cols: 4
-            orientation: 'horizontal'
-           
+        BoxLayout:
+            orientation: 'horizontal'            
 
-            MDRaisedButton:
-                text: "Start Sequence"
-                on_press: root.startBot()
-                id: btnStart
+            Image:
+                source: "data//iglogo.png"
+                size_hint: 0.2, None
+                size: dp(120), dp(120)
+                pos_hint: {"center_y": .5}
+
             MDLabel:
-                id: lblTotalTime
-                text: "0:00"
+                font_style: 'H3'
+                theme_text_color: 'Primary'
+                size_hint: 0.8, None
+                text: ""
+                halign: 'left'
+                valign : 'center'
+                id: lblusername
+           
+        BoxLayout:
+            orientation:'horizontal'
+            size_hint: 1, 0.4
             
-            MDRaisedButton:
-                text: "Stop"
-                on_press: root.disconnect()
-                id : btnStop
+
+            GridLayout:
+                size_hint: 0.6, None
+                orientation:'horizontal'
+                cols : 2
+
+           
+            GridLayout:
+                size_hint: 0.3, None
+                orientation:'horizontal'
+                cols : 2
+
+                MDLabel:
+                    id: lblTotalTime
+                    text: "0:00"
+
+                MDRaisedButton:
+                    text: "Start"
+                    on_press: root.startBot()
+                    id: btnStart
+                    size_hint: 1, 0.1
+                    pos_hint: {"center_x": .5}
+                MDSpinner:
+                    id: spinner
+                    size_hint: None, None
+                    size: dp(46), dp(46)
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    active: True
+                
+                
+                MDRaisedButton:
+                    text: "Stop"
+                    on_press: root.disconnect()
+                    id : btnStop
+                    size_hint: 1, 0.1
+                    pos_hint: {"center_x": .5}
+            GridLayout:
+                size_hint: 0.1, None
+                orientation:'horizontal'
+                cols : 2
 
         GridLayout:
             cols: 4
             orientation: 'horizontal'
             padding: 20
             spacing: 10
-            MDLabel:
-                size_hint_x: None
-                text: "F"
-                size_hint: 1, 0.8
-            MDLabel:
-                text: "U"
-                
-            MDLabel:
-                text: "L"
-                
-            MDLabel:
-                text: "S"
-            MDLabel:
-                text: "C"
+            
+            
                 
            
                 
@@ -77,24 +100,22 @@
             MDLabel:
                 id: lblComments
                 text: "0 / 0"
-           
+
             MDLabel:
-                
-                text: "Like Exchange"
+                text: "F"
                 size_hint: 1, 0.8
             MDLabel:
-                text: "Follow Exchange"
+                text: "U"
                 
             MDLabel:
-                text: "Comment Exchange"
+                text: "L"
                 
             MDLabel:
-                text: ""
-                
+                text: "S"
             MDLabel:
-                text: ""
-            MDLabel:
-                text: ""
+                text: "C"
+           
+            
                 
             MDLabel:
                 text: " 0 / 0 "
@@ -108,6 +129,23 @@
                 id: lblCommentExchange
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
+
+            MDLabel:
+                text: "LX"
+                size_hint: 1, 0.8
+            MDLabel:
+                text: "FX"
+                
+            MDLabel:
+                text: "CX"
+                
+            MDLabel:
+                text: ""
+                
+            MDLabel:
+                text: ""
+            MDLabel:
+                text: ""
                
             
             
