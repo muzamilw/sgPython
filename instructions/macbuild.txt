@@ -1,1 +1,7 @@
-ins
+pyinstaller mac.spec -i FILE.exe -w --onefile --windowed --osx-bundle-identifier com.SocialPlanner.growth.socialplannerpro
+
+codesign -s "SocialPlannerPro" SocialPlannerPro.app
+
+pushd dist
+hdiutil create ./SPlannerPro.dmg -srcfolder SPlannerPro -ov
+popd
