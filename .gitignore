@@ -9,3 +9,5 @@ build/
 .DS_store/
 .vscode/
 mypython/
+instructions/Output/
+instructions/Output/InnoSetupOutput.exe
