@@ -1,1 +1,39 @@
-pyinstaller win.spec -i FILE.exe -w
+pyinstaller win.spec -i FILE.exe -w --noconsole --clean 
+
+
+pyinstaller mac.spec --onefile --windowed
+
+pyinstaller main.py --onedir --windowed --log-level=debug --debug -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+
+
+pyinstaller main.py --onedir --windowed --log-level=DEBUG --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+
+pyinstaller main.py --onedir --console --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+
+pyinstaller mzapp.spec --onefile --windowed
+
+pyinstaller mzapp.spec --onefile --windowed --noconsole --clean 
+
+codesign --force --sign "SocialPlannerPro" mzapp.dmg
+
+
+
+
+
+
+
+
+
+###windowed
+
+
+pyarmor obfuscate foo.py
+
+
+$cert = New-SelfSignedCertificate -DnsName "socialplannerpro.com" -Type CodeSigning -CertStoreLocation "cert:\LocalMachine\My"
+$CertPassword = ConvertTo-SecureString -String "p@ssw0rd" -Force –AsPlainText
+Export-PfxCertificate -Cert "cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "c:\socialplannerpro.pfx" -Password $CertPassword
+
+
+
+SIGNTOOL.EXE sign /F C:\Development\Notes\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com Notiiiiiipy.exe
