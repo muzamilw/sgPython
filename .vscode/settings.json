@@ -1,3 +1,3 @@
 {
-    "python.pythonPath": "mypython/bin/python"
+    "python.pythonPath": "env\\Scripts\\python.exe"
 }

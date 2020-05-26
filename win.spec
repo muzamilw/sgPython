@@ -7,6 +7,7 @@ from kivy import kivy_data_dir
 #from kivy.deps import sdl2, glew
 from kivy_deps import sdl2, glew
 from kivy.tools.packaging import pyinstaller_hooks as hooks
+from kivymd import hooks_path as kivymd_hooks_path
 
 block_cipher = None
 kivy_deps_all = hooks.get_deps_all()
@@ -39,7 +40,7 @@ a = Analysis(['main.py'],
              binaries=None,
              datas=datas,
              hiddenimports=hiddenimports,
-             hookspath=[],
+             hookspath=[kivymd_hooks_path],
              runtime_hooks=[],
              excludes=excludes_a,
              win_no_prefer_redirects=False,
