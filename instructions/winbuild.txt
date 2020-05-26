@@ -1,4 +1,4 @@
-pyinstaller win.spec -i FILE.exe -w --noconsole --clean 
+pyinstaller win.spec -i data\sp.ico -w --noconsole --clean 
 
 
 pyinstaller mac.spec --onefile --windowed
@@ -18,22 +18,22 @@ codesign --force --sign "SocialPlannerPro" mzapp.dmg
 
 
 
+1 - delete folders
+env
+git
+vscode
+build
+2- delte all py files
 
+3 - pyarmor obfuscate foo.py  - dp we need it ?
 
-
-
-
-
-###windowed
-
-
-pyarmor obfuscate foo.py
-
-
+4 - generate self signed cert below. only needed once. as we have the pfx in the folder
 $cert = New-SelfSignedCertificate -DnsName "socialplannerpro.com" -Type CodeSigning -CertStoreLocation "cert:\LocalMachine\My"
 $CertPassword = ConvertTo-SecureString -String "p@ssw0rd" -Force –AsPlainText
 Export-PfxCertificate -Cert "cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "c:\socialplannerpro.pfx" -Password $CertPassword
 
 
-
-SIGNTOOL.EXE sign /F C:\Development\Notes\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com Notiiiiiipy.exe
+cmd with administrator rights
+Path C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86
+CD DIST
+SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerPro.exe
