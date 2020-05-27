@@ -1,0 +1,150 @@
+#:kivy 1.9.0
+
+<Home>:
+
+    name: "home"
+  
+    canvas:
+        Rectangle:
+            pos: self.pos
+            size: self.size
+            source: "data//bg.jpg"
+
+    
+    BoxLayout:
+        orientation:'vertical'
+
+        MDLabel:
+            id:xyz
+            pos_hint: {"center_x": .5}
+            size_hint: 0.8, 0.2
+            text : "Connect to a Service"
+            halign: 'center'
+
+        
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_x: 0.8
+            spacing: 10
+            pos_hint: {"center_x": .5}
+
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_y: 1
+                spacing: 20
+                canvas.before:        
+                    RoundedRectangle:
+                        source: 'data//light_grey.png'
+                        pos: self.pos
+                        size: self.size
+                border: 30,30,30,30
+
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.8, 0.2
+                    text : "Instagram"
+                    halign: 'center'
+                    font_style: 'H5'
+
+
+                Image:
+                    source: "data//iglogo.png"
+                    size_hint: None, 0.5
+                    size: dp(140), dp(140)
+                    pos_hint: {"center_x": .5}
+
+                MDFillRoundFlatButton:
+                    text: "Connect"
+                    size_hint: 0.8, 0.1
+                    pos_hint: {"center_x": .5}
+                    id : btnIG
+                    on_release: root.btnIG_released()
+                
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    text : " "
+                    size_hint: 0.5, 0.1
+
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_y: 1
+                spacing: 20
+                canvas.before:        
+                    RoundedRectangle:
+                        source: 'data//light_grey.png'
+                        pos: self.pos
+                        size: self.size
+                border: 30,30,30,30
+
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.2
+                    text : "Linkedin"
+                    halign: 'center'
+
+
+                Image:
+                    source: "data//linkedinlogo.png"
+                    size_hint: None, 0.5
+                    size: dp(140), dp(140)
+                    pos_hint: {"center_x": .5}
+
+                MDFillRoundFlatButton:
+                    text: "Connect"
+                    size_hint: 0.8, 0.1
+                    pos_hint: {"center_x": .5}
+                
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    text : " "
+                    size_hint: 0.5, 0.1
+
+            BoxLayout:
+                orientation: "vertical"
+                size_hint_y: 1
+                spacing: 20
+                canvas.before:        
+                    RoundedRectangle:
+                        source: 'data//light_grey.png'
+                        pos: self.pos
+                        size: self.size
+                border: 30,30,30,30
+
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.5, 0.2
+                    text : "Tictoc"
+                    halign: 'center'
+
+
+                Image:
+                    source: "data//tictoclogo.png"
+                    size_hint: None, 0.5
+                    size: dp(140), dp(140)
+                    pos_hint: {"center_x": .5}
+
+                
+                MDFillRoundFlatButton:
+                    text: "Connect"
+                    size_hint: 0.8, 0.1
+                    pos_hint: {"center_x": .5}
+                    # on_release: root.do_login(login.text, password.text)
+                
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    text : " "
+                    size_hint: 0.5, 0.1
+                    
+
+        MDLabel:
+            id:xyz
+            pos_hint: {"center_x": .5}
+            size_hint: 0.8, 0.2
+            text : ""
