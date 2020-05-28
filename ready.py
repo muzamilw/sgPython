@@ -27,6 +27,9 @@ from instagram_private_api import (
 from botLogic import Bot
 import SPButton 
 from kivymd.app import MDApp
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import OneLineAvatarIconListItem
 
 
 class Ready(Screen):
@@ -35,7 +38,11 @@ class Ready(Screen):
     StartTime = None
     botThread = None
     botStop_event = threading.Event()
+    Logout_alert_dialog = None
     log = None
+
+    # def __init__(self, **kwargs):
+    #     self.ids['btnStop'].disabled = True
 
     
 
@@ -43,10 +50,10 @@ class Ready(Screen):
         label = self.ids['logLabel']
         if label.opacity == 0 :
             label.opacity = 1
-            self.ids['btnShowLog'].text = "Hide Log"
+            
         else:
             label.opacity = 0
-            self.ids['btnShowLog'].text = "Show Log"
+            
         # self.ids['btnShowLog'].disabled = True
         # self.ids['btnShowLog'].text = "Hiding Log"
         #self.h_widget(label)
@@ -65,7 +72,7 @@ class Ready(Screen):
         app = App.get_running_app()
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-            lblusername.text += app.api.authenticated_user_name
+            lblusername.text = app.api.authenticated_user_name
             # app.api.feed_timeline()
 
             label = self.ids['logLabel'] #Label(text="showing the log here")
@@ -81,13 +88,13 @@ class Ready(Screen):
             self.lblTotalTime =  self.ids['lblTotalTime']
 
             
-            self.ids['btnStop'].disabled = True
-
-            log = logging.getLogger("my.logger")
-            log.level = logging.DEBUG
-            log.addHandler(MyLabelHandler(label, logging.DEBUG))
-            self.log = log
-            pass
+           
+            if self.log is None :
+                log = logging.getLogger("my.logger")
+                log.level = logging.DEBUG
+                log.addHandler(MyLabelHandler(label, logging.DEBUG))
+                self.log = log
+            
             
         
         except ClientLoginError as e:
@@ -147,7 +154,11 @@ class Ready(Screen):
             time.sleep(1)
             log.info("WOO %s", i)
 
-    def disconnect(self):
+    def navToHome(self):
+        self.manager.current = 'home'
+
+
+    def stop(self):
         #self.botThread.join()
         Clock.unschedule(self.updateTime)
         self.botStop_event.set()
@@ -162,6 +173,50 @@ class Ready(Screen):
         # app.AppLogout()
         # self.manager.current = 'login'
         # self.manager.get_screen('login').resetForm()
+
+    def logoutConfirm(self):
+        app = App.get_running_app()
+        self.Logout_alert_dialog = MDDialog(
+                title="Confirm Logout",
+                text="This will reset your logins for both server and API",
+                type = "confirmation",
+                buttons=[
+                    MDFlatButton(
+                        text="CANCEL",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=self.on_cancelDialog
+                    ),
+                    MDFlatButton(
+                        text="OK",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=self.logout
+                    ),
+                ],
+            )
+        res = self.Logout_alert_dialog.open()
+
+    def on_cancelDialog(self, *args):
+        self.Logout_alert_dialog.dismiss(force=True)
+        
+
+    def logout(self,*args):
+
+        app = App.get_running_app()
+        #self.botThread.join()
+        Clock.unschedule(self.updateTime)
+        self.botStop_event.set()
+        self.ids['btnStart'].text = "Start Sequence"
+        self.ids['btnStart'].disabled = False
+        self.ids['btnStop'].disabled = True
+        self.log.info("Logging out")
+        self.ids['spinner'].active = False
+        #self.t.join()
+        #self.manager.transition = SlideTransition(direction="right")
+        # app = App.get_running_app()
+        app.AppLogout()
+        self.Logout_alert_dialog.dismiss(force=True)
+        self.manager.current = 'home'
+        
 
 class MyLabelHandler(logging.Handler):
 

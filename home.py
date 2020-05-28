@@ -27,6 +27,8 @@ class Home(Screen):
         app = App.get_running_app()
         self.app = app
 
+        # self.ids['bottom_toolbar'].remove_notch()
+
         if app.gVars.loginResult is not None:
             if app.gVars.IGusername == None:
                 app.gVars.IGusername = 'nevillekmiec'

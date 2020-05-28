@@ -10,7 +10,6 @@
             size: self.size
             source: "data//bg.jpg"
 
-    
     BoxLayout:
         orientation:'vertical'
 
@@ -97,6 +96,7 @@
                     text: "Connect"
                     size_hint: 0.8, 0.1
                     pos_hint: {"center_x": .5}
+                    enabled : False
                 
                 MDLabel:
                     id:xyz
@@ -135,6 +135,7 @@
                     size_hint: 0.8, 0.1
                     pos_hint: {"center_x": .5}
                     # on_release: root.do_login(login.text, password.text)
+                    enabled : False
                 
                 MDLabel:
                     id:xyz
@@ -148,3 +149,6 @@
             pos_hint: {"center_x": .5}
             size_hint: 0.8, 0.2
             text : ""
+
+    
+    
