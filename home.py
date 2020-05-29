@@ -17,6 +17,7 @@ from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
 from kivy.app import App
+import kivy.utils as util
 
 
 class Home(Screen):
@@ -41,6 +42,7 @@ class Home(Screen):
             else:
                 # manager.current = 'ready'
                 self.ids['btnIG'].text = 'Today\'s Status'
+                self.ids['btnIG'].md_bg_color = util.get_color_from_hex("##16D39A")
         else:
             # manager.current = 'login'
             # self.ids['btnIG'].text = 'Today\'s Status'
