@@ -191,7 +191,7 @@ class LoginApp(MDApp):
     api = None
     username = StringProperty(None)
     password = StringProperty(None)
-    icon = 'data//sp.ico'
+    icon = 'data//ml.ico'
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -302,6 +302,8 @@ class LoginApp(MDApp):
             gVars.ReqExFollow = 0
             gVars.ReqExLikes = 0
             gVars.ReqExComments = 0
+
+            gVars.SequenceRunning = False
 
             gVars.API_BaseURL = "https://socialplannerpro.com/API"
 

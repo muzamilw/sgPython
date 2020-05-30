@@ -17,6 +17,7 @@ os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from threading import Thread
 import logging
 import threading
+import schedule
 import time
 import datetime
 from alert import Alert
@@ -30,6 +31,7 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
+import customFunctions as cf
 
 
 class Ready(Screen):
@@ -40,6 +42,8 @@ class Ready(Screen):
     botStop_event = threading.Event()
     Logout_alert_dialog = None
     log = None
+    RunScheduled = False
+    
 
     # def __init__(self, **kwargs):
     #     self.ids['btnStop'].disabled = True
@@ -53,21 +57,8 @@ class Ready(Screen):
             
         else:
             label.opacity = 0
-            
-        # self.ids['btnShowLog'].disabled = True
-        # self.ids['btnShowLog'].text = "Hiding Log"
-        #self.h_widget(label)
-        #self.log.info("Stop Signal Sent")
     
-    def h_widget(wid, dohide=True):
-        if hasattr(wid, 'saved_attrs'):
-            if not dohide:
-                wid.height, wid.size_hint_y, wid.opacity, wid.disabled = wid.saved_attrs
-                del wid.saved_attrs
-        elif dohide:
-            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled
-            wid.height, wid.size_hint_y, wid.opacity, wid.disabled = 0, None, 0, True
-
+    
     def on_enter(self):
         app = App.get_running_app()
         try:
@@ -87,13 +78,27 @@ class Ready(Screen):
             self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
 
-            
+            if hasattr(app.gVars, 'SequenceRunning'):
+                if app.gVars.SequenceRunning is None:
+                    app.gVars.SequenceRunning = False
+            else:
+                app.gVars.SequenceRunning = False
            
             if self.log is None :
                 log = logging.getLogger("my.logger")
                 log.level = logging.DEBUG
                 log.addHandler(MyLabelHandler(label, logging.DEBUG))
                 self.log = log
+
+            if app.gVars.manifestObj is None:
+                app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
+                app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
+            
+            self.ids['lblAutoStart'].text = "Autostart at : " + app.gVars.manifestObj.starttime
+
+            if self.RunScheduled == False:
+                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
+                self.RunScheduled = True
             
             
         
@@ -123,19 +128,21 @@ class Ready(Screen):
 
     def startBot(self):
         app = App.get_running_app()
-        
 
-        oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
-        self.botThread = Thread(target=oBot.RunBot)
-        self.botThread.start()
-        self.StartTime = datetime.datetime.now()
-        Clock.schedule_interval(self.updateTime, 1)
+        if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
+            oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
+            self.botThread = Thread(target=oBot.RunBot)
+            self.botThread.start()
+            self.StartTime = datetime.datetime.now()
+            Clock.schedule_interval(self.updateTime, 1)
 
-        self.ids['btnStart'].text = "Sequence started"
-        self.ids['btnStart'].disabled = True
-        self.ids['btnStop'].disabled = False
-        
-        self.ids['spinner'].active = True
+            self.ids['btnStart'].text = "Sequence Running"
+            self.ids['btnStart'].disabled = True
+            self.ids['btnStop'].disabled = False
+            
+            self.ids['spinner'].active = True
+        else:
+            self.log.info("Sequence is already running, skipping re-launch")
 
         
         

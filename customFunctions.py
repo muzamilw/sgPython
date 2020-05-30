@@ -26,7 +26,7 @@ from instagram_private_api import (
 
 import apiWrappers as apiW
 
-def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
+def SendEmail(you,filename,SocialProfileName, Header):
     msg= ''
     
     with open(filename,mode="r", encoding="utf-8") as fp:
@@ -36,8 +36,8 @@ def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
 
     message = MIMEMultipart()
     message = MIMEText(msg, 'html')
-    sender_address = me
-    sender_pass = pwd
+    sender_address = 'info@socialplannerpro.com'
+    
     receiver_address = you
     #Setup the MIME
     
@@ -47,16 +47,16 @@ def SendEmail(you,me,pwd,filename,SocialProfileName, Header):
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
     session.starttls() #enable security
-    session.login(sender_address, sender_pass) #login with mail_id and password
+    session.login('myprintcloud.com', 'p@ssw0rd') #login with mail_id and password
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
     session.quit()
     print('Mail Sent')
 
-def SendError(you,me,pwd,ErrorLog,SocialProfileName):
+def SendError(you,ErrorLog,SocialProfileName):
     msg= ''
     
     # with open(filename,mode="r", encoding="utf-8") as fp:
@@ -66,8 +66,8 @@ def SendError(you,me,pwd,ErrorLog,SocialProfileName):
 
     message = MIMEMultipart()
     message = MIMEText(ErrorLog, 'html')
-    sender_address = me
-    sender_pass = pwd
+    sender_address = 'info@socialplannerpro.com'
+    
     receiver_address = you
     #Setup the MIME
     
@@ -77,9 +77,9 @@ def SendError(you,me,pwd,ErrorLog,SocialProfileName):
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
+    session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
     session.starttls() #enable security
-    session.login(sender_address, sender_pass) #login with mail_id and password
+    session.login('myprintcloud.com', 'p@ssw0rd') #login with mail_id and password
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
@@ -200,6 +200,8 @@ def LoadManifest(manifest):
     manifestObj.LikeFollowingPosts = int(intervals[0]["LikeFollowingPosts"])
     manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
     manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
+
+    manifestObj.starttime = intervals[0]["starttime"]
 
     manifestObj.totalActions = 0
 
