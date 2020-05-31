@@ -7,6 +7,7 @@ from kivy import kivy_data_dir
 #from kivy.deps import sdl2, glew
 from kivy_deps import sdl2, glew
 from kivy.tools.packaging import pyinstaller_hooks as hooks
+from kivymd import hooks_path as kivymd_hooks_path
 
 block_cipher = None
 kivy_deps_all = hooks.get_deps_all()
@@ -20,7 +21,7 @@ datas = [
 excludes_a = ['Tkinter', '_tkinter', 'twisted', 'pygments']
 
 # list of hiddenimports
-hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn']
+hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn'] + ['pandas._libs.tslibs.timedelta']
 
 # binary data
 sdl2_bin_tocs = [Tree(p) for p in sdl2.dep_bins]
@@ -39,7 +40,7 @@ a = Analysis(['main.py'],
              binaries=None,
              datas=datas,
              hiddenimports=hiddenimports,
-             hookspath=[],
+             hookspath=[kivymd_hooks_path],
              runtime_hooks=[],
              excludes=excludes_a,
              win_no_prefer_redirects=False,
@@ -52,13 +53,13 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe1 = EXE(pyz,
           a.scripts,
-          name='SPlannerPro',
+          name='SocialPlannerPro',
           exclude_binaries=True,
-          icon=join('data', 'sp.ico'),
-          debug=True,
+          icon=join('data', 'ml.ico'),
+          debug=False,
           strip=False,
           upx=True,
-          console=True)
+          console=False)
 
 
 coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\'),
@@ -68,4 +69,4 @@ coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\'),
                *tocs,
                strip=False,
                upx=True,
-               name='SPlannerPro')
+               name='SocialPlannerPro')

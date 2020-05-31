@@ -52,6 +52,7 @@ from login import Login
 from alert import Alert
 from instagram_private_api import Client, ClientCompatPatch
 import SPButton
+from home import Home
 from kivymd.app import MDApp
 
 
@@ -190,7 +191,7 @@ class LoginApp(MDApp):
     api = None
     username = StringProperty(None)
     password = StringProperty(None)
-    icon = 'data//sp.ico'
+    icon = 'data//ml.ico'
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -202,24 +203,13 @@ class LoginApp(MDApp):
     def build(self):
         self.loadGlobalConfig()
         manager = ScreenManager()
-        manager.add_widget(Login(name='login'))
         
+        manager.add_widget(Login(name='login'))
         manager.add_widget(Ready(name='ready'))
         manager.add_widget(IGLogin(name='iglogin'))
+        manager.add_widget(Home(name='home'))
 
-        if self.gVars.loginResult is not None:
-            if self.gVars.IGusername == None:
-                self.gVars.IGusername = 'nevillekmiec'
-            if self.gVars.IGpassword == None:
-                self.gVars.IGpassword = '!_LKvXc1'
-            self.api = self.checkIGLogin(self.gVars.SGusername)
-            if self.api is None:
-                manager.current = 'iglogin'
-            else:
-                manager.current = 'ready'
-        else:
-            manager.current = 'login'
-
+        manager.current = 'home'
 
         return manager
 
@@ -312,6 +302,8 @@ class LoginApp(MDApp):
             gVars.ReqExFollow = 0
             gVars.ReqExLikes = 0
             gVars.ReqExComments = 0
+
+            gVars.SequenceRunning = False
 
             gVars.API_BaseURL = "https://socialplannerpro.com/API"
 

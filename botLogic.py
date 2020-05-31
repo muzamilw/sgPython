@@ -134,12 +134,13 @@ class Bot():
 
         gVars = app.gVars
 
-        while True and self.botStop.is_set() == False and RetryCount <= MaxRetryCount and IsApiClientError:
+        while True and self.botStop.is_set() == False and RetryCount <= MaxRetryCount and IsApiClientError == False:
             try:
                 RetryCount = RetryCount + 1
                 log.info("Starting Sequence")
                 # return
                 gVars.RunStartTime = datetime.datetime.now()
+                gVars.SequenceRunning = True
                 
                 
                 if gVars.loginResult is not None:
@@ -149,7 +150,7 @@ class Bot():
                     if api.authenticated_user_id is not None:
 
                         try:
-                            
+
                             if (gVars.loginResult["InitialStatsReceived"] != True):
 
                                 user_info = api.user_info(api.authenticated_user_id)
@@ -292,7 +293,7 @@ class Bot():
                             self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                             self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
-                            raise Exception("Sorry, no numbers below zero")
+                            
 
                             
                             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
@@ -301,7 +302,7 @@ class Bot():
                             
                         except Exception as e: ## try catch block for the 
                             log.info('Unexpected Exception in initial feed loads : {0!s}'.format(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
+                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
                             raise e
                             
                         Comments = ['😀','👍','💓','🤩','🥰']
@@ -432,7 +433,7 @@ class Bot():
 
                             log.info('Action List saved for Email' )
                             
-                            cf.SendEmail('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060','dataframe_GlobalTodo.html',gVars.SGusername,'')
+                            cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
                             log.info('Email sent' )
 
                             self.CleanupAfterSuccessfulRun()
@@ -454,7 +455,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Api Client Error occurred, Please open Instagram in browser and manually clear Challenges")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             IsApiClientError = True
                             return
 
@@ -462,7 +463,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Exception occurred in main sequence action loop")
                             log.info(traceback.format_exc())
-                            cf.SendError('muzamilw@gmail.com','muzamilw@gmail.com','Sh@rp2060',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             raise e
 
                         #gVars.GlobalTodo.to_csv('GlobData.csv')
@@ -487,4 +488,5 @@ class Bot():
                 # restart main loop
                 pass
 
+        gVars.SequenceRunning = False
         log.info('Ending')

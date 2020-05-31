@@ -8,9 +8,27 @@
             pos: self.pos
             size: self.size
             source: "data//bg.jpg"
+
+    # MDBackdrop:
+    #     id: backdrop
+    #     # on_open: home.opening_animation_backdrop_components(backdrop, backlayer)
+    #     # on_close:
+    #     #     backlayer.ids.screen_manager.current = "settings"
+    #     #     home.closing_animation_backdrop_components(backdrop, backlayer)
+    #     # left_action_items: [['menu', lambda x: self.open()]]
+    #     title: "Instagram Status"
+    #     header_text: "Menu:"    
+   
+    
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: 1
+
+        MDToolbar:
+            title: "Instagram Status"
+            elevation: 10
+            type: "top"
+            right_action_items: [["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
 
         BoxLayout:
             orientation: 'horizontal'            
@@ -48,11 +66,12 @@
                 spacing:10
 
                 MDLabel:
-                    text: " "
+                    text: "Auto Start at"
+                    id :lblAutoStart
 
                 MDRaisedButton:
                     text: "Start"
-                    on_press: root.startBot()
+                    on_release: root.startBot()
                     id: btnStart
                     size_hint: 1, 0.05
                     os_hint: {'center_x': .5, 'center_y': .5}
@@ -65,11 +84,12 @@
 
                 MDRaisedButton:
                     text: "Stop"
-                    on_press: root.disconnect()
+                    on_release: root.stop()
                     id : btnStop
                     size_hint: 1, 0.1
                     pos_hint: {"center_x": .5}
                     md_bg_color: get_color_from_hex("#FF0000")
+                    disabled : True
 
                
 
@@ -112,17 +132,21 @@
                 text: "F"
                 size_hint: 1, 0.8
                 halign : 'center'
+                font_style: 'H5'
             MDLabel:
                 text: "U"
                 halign : 'center'
+                font_style: 'H5'
                 
             MDLabel:
                 text: "L"
                 halign : 'center'
+                font_style: 'H5'
                 
             MDLabel:
                 text: "S"
                 halign : 'center'
+                font_style: 'H5'
            
            
             
@@ -150,18 +174,22 @@
             MDLabel:
                 text: "C"
                 halign : 'center'
+                font_style: 'H5'
 
             MDLabel:
                 text: "LX"
                 size_hint: 1, 0.8
                 halign : 'center'
+                font_style: 'H5'
             MDLabel:
                 text: "FX"
                 halign : 'center'
+                font_style: 'H5'
                 
             MDLabel:
                 text: "CX"
                 halign : 'center'
+                font_style: 'H5'
                 
         BoxLayout:
             orientation: 'vertical'
@@ -175,19 +203,12 @@
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 active: False
 
-            MDRaisedButton:
-                text: "Show Log"
-                on_press: root.showLog()
-                id : btnShowLog
-                size_hint: 0.1, 0.1
-                pos_hint: {"center_x": .5}
-
-
 
         MDTextFieldRect:
             id:logLabel
-            text: "Bot Log here"
+            text: ""
             font_size: 16
             multiline:True
             opacity:0
         
+   
