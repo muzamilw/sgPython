@@ -76,5 +76,17 @@ coll = COLLECT(exe1,Tree('/Users/JanatFarooq/Documents/GitHub/sgPython/'),
 
 app = BUNDLE(exe1,
          name='SocialPlannerPro.app',
-         icon='sp.ico',
-         bundle_identifier='SocialPlannerPro')
+         icon=join('data', 'sp.ico'),
+         bundle_identifier='SocialPlannerPro',
+         info_plist={
+            'NSPrincipalClass': 'NSApplication',
+            'NSAppleScriptEnabled': False,
+            'CFBundleDocumentTypes': [
+                {
+                    'CFBundleTypeName': 'My File Format',
+                    'CFBundleTypeIconFile': 'MyFileIcon.icns',
+                    'LSItemContentTypes': ['com.example.myformat'],
+                    'LSHandlerRank': 'Owner'
+                    }
+                ]
+            },)
