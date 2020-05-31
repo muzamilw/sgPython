@@ -191,19 +191,26 @@ class Ready(Screen):
                     MDFlatButton(
                         text="CANCEL",
                         text_color=app.theme_cls.primary_color,
-                        on_release=self.on_cancelDialog
+                        on_release=self.dismiss_callback
                     ),
                     MDFlatButton(
-                        text="OK",
+                        text="ACCEPT",
                         text_color=app.theme_cls.primary_color,
                         on_release=self.logout
                     ),
                 ],
             )
-        res = self.Logout_alert_dialog.open()
+
+        # self.Logout_alert_dialog.buttons.append ("Close me!",action=lambda *x: self.dismiss_callback())
+        self.Logout_alert_dialog.set_normal_height()
+        self.Logout_alert_dialog.open()
+
+    def dismiss_callback(self, *args):
+        self.Logout_alert_dialog.dismiss()
 
     def on_cancelDialog(self, *args):
-        self.Logout_alert_dialog.dismiss(force=True)
+        if self.Logout_alert_dialog is not None:
+            self.Logout_alert_dialog.dismiss(force=True)
         
 
     def logout(self,*args):
@@ -221,6 +228,8 @@ class Ready(Screen):
         #self.manager.transition = SlideTransition(direction="right")
         # app = App.get_running_app()
         app.AppLogout()
+        app.gVars.loginResult = None
+        app.api = None
         self.Logout_alert_dialog.dismiss(force=True)
         self.manager.current = 'home'
         

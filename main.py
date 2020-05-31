@@ -382,9 +382,7 @@ class LoginApp(MDApp):
     def ResetGlobalVars(self):
         app = App.get_running_app()
         api = app.api
-        log = self.log
-
-
+        
         gVars = app.gVars
 
         gVars.RunStartTime = None
@@ -444,6 +442,7 @@ class LoginApp(MDApp):
         igusername = app.gVars.IGusername
         self.ResetGlobalVars()    
         app.gVars.loginResult = None
+        app.api = None
         data_folder = Path("userdata")
         settings_file = 'userdata//'+igusername+'_login.json'
         os.remove(settings_file)
