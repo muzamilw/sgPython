@@ -378,24 +378,81 @@ class LoginApp(MDApp):
 
         return api
 
+
+    def ResetGlobalVars(self):
+        app = App.get_running_app()
+        api = app.api
+        log = self.log
+
+
+        gVars = app.gVars
+
+        gVars.RunStartTime = None
+        gVars.RunEndTime = None
+        gVars.TotalSessionTime = 0
+        gVars.manifestJson = None
+        gVars.manifestObj = None
+        
+        gVars.hashtagActions = None
+        gVars.locationActions = None
+        gVars.UnFollowActions = None
+        gVars.DCActions = None
+        gVars.SuggestFollowers = None
+        gVars.StoryViewActions = None
+        gVars.GlobalTodo = None
+        gVars.Todo = None
+        gVars.DailyStatsSent = False
+        gVars.DailyStatsSentDate = ''
+    
+
+        gVars.CurrentFollowDone = 0
+        gVars.CurrentUnFollowDone = 0
+        gVars.CurrentLikeDone = 0
+        gVars.CurrentStoryViewDone = 0
+        gVars.CurrentCommentsDone = 0
+
+        gVars.CurrentExFollowDone = 0
+        gVars.CurrentExCommentsDone = 0
+        gVars.CurrentExLikeDone = 0
+
+        gVars.TotFollow = 0
+        gVars.TotUnFollow = 0
+        gVars.TotLikes = 0
+        gVars.TotStoryViews = 0
+        gVars.TotComments = 0
+
+        gVars.TotExComments = 0
+        gVars.TotExLikes = 0
+        gVars.TotExFollow = 0
+
+        gVars.ReqFollow = 0
+        gVars.ReqUnFollow = 0
+        gVars.ReqLikes = 0
+        gVars.ReqStoryViews = 0
+        gVars.ReqComments = 0
+
+        gVars.ReqExFollow = 0
+        gVars.ReqExLikes = 0
+        gVars.ReqExComments = 0
+        gVars.SequenceRunning = False
+
    
         
 
     def AppLogout(self):
         app = App.get_running_app()
+        igusername = app.gVars.IGusername
+        self.ResetGlobalVars()    
         app.gVars.loginResult = None
         data_folder = Path("userdata")
+        settings_file = 'userdata//'+igusername+'_login.json'
+        os.remove(settings_file)
         file_to_open = data_folder / "glob.vars"
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
-    def show_popup(self):
-        show = P()
-
-        popupWindow = Popup(title="Popup Window", content=show, size_hint=(None,None),size=(400,200))
-
-        popupWindow.open()
+    
 
 if __name__ == '__main__':
    

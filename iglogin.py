@@ -152,20 +152,27 @@ class IGLogin(Screen):
         with open(new_settings_file, 'w') as outfile:
             json.dump(cache_settings, outfile, default=self.to_json)
             print('SAVED: {0!s}'.format(new_settings_file))
+    
+    def show_keyboard(self,args):
+        self.ids['password'].focus = True
 
-    def build(self):
+    
+        
+    def on_enter(self):
         app = App.get_running_app()
 
         if app.gVars.IGusername != '':
-            self.ids['login'].text = app.gVars.IGusername
-        else:
-            self.ids['login'].text = 'nevillekmiec'
+            self.ids['login'].text = app.gVars.SGusername
+        # else:
+            # self.ids['login'].text = 'nevillekmiec'
 
 
-        if app.gVars.IGpassword != '':
+        if app.gVars.IGpassword is not None and app.gVars.IGpassword != "":
             self.ids['password'].text = app.gVars.IGpassword
         else:
             self.ids['password'].text = '!_LKvXc1'
+
+        Clock.schedule_once(self.show_keyboard)
     
     def do_login(self, loginText, passwordText):
         app = App.get_running_app()
@@ -229,8 +236,9 @@ class IGLogin(Screen):
         # 'version_code': ''
         try:
 
-            settings_file = 'userdata\\'+ loginText +'_login.json'
-            if not os.path.isfile(settings_file):
+            # settings_file = 'userdata\\'+ loginText +'_login.json'
+            settings_file = 'userdata//'+loginText+'_login.json'
+            if not os.path.isfile(os.path.join('userdata',loginText+'_login.json')):
                 # settings file does not exist
                 print('Unable to find login.json file: {0!s}'.format(settings_file))
                

@@ -66,61 +66,7 @@ class Bot():
         for attr in dir(obj):
             self.log.info("obj.%s = %r" % (attr, getattr(obj, attr)))
 
-    def CleanupAfterSuccessfulRun(self):
-        app = App.get_running_app()
-        api = app.api
-        log = self.log
-
-
-        gVars = app.gVars
-
-        gVars.RunStartTime = None
-        gVars.RunEndTime = None
-        gVars.TotalSessionTime = 0
-        gVars.manifestJson = None
-        gVars.manifestObj = None
-        
-        gVars.hashtagActions = None
-        gVars.locationActions = None
-        gVars.UnFollowActions = None
-        gVars.DCActions = None
-        gVars.SuggestFollowers = None
-        gVars.StoryViewActions = None
-        gVars.GlobalTodo = None
-        gVars.Todo = None
-        gVars.DailyStatsSent = False
-        gVars.DailyStatsSentDate = ''
-       
-
-        gVars.CurrentFollowDone = 0
-        gVars.CurrentUnFollowDone = 0
-        gVars.CurrentLikeDone = 0
-        gVars.CurrentStoryViewDone = 0
-        gVars.CurrentCommentsDone = 0
-
-        gVars.CurrentExFollowDone = 0
-        gVars.CurrentExCommentsDone = 0
-        gVars.CurrentExLikeDone = 0
-
-        gVars.TotFollow = 0
-        gVars.TotUnFollow = 0
-        gVars.TotLikes = 0
-        gVars.TotStoryViews = 0
-        gVars.TotComments = 0
-
-        gVars.TotExComments = 0
-        gVars.TotExLikes = 0
-        gVars.TotExFollow = 0
-
-        gVars.ReqFollow = 0
-        gVars.ReqUnFollow = 0
-        gVars.ReqLikes = 0
-        gVars.ReqStoryViews = 0
-        gVars.ReqComments = 0
-
-        gVars.ReqExFollow = 0
-        gVars.ReqExLikes = 0
-        gVars.ReqExComments = 0
+    
 
 
     def RunBot(self):
@@ -436,7 +382,7 @@ class Bot():
                             cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
                             log.info('Email sent' )
 
-                            self.CleanupAfterSuccessfulRun()
+                            app.CleanupAfterSuccessfulRun()
                             log.info('Cleanup performed exiting main thread')
 
                             # log.info("Action sequence running")

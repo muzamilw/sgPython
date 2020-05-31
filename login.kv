@@ -33,13 +33,13 @@
 
 
                 Image:
-                    source: "data//iglogo.png"
+                    source: "data//ml.png"
                     size_hint: None, None
                     size: dp(140), dp(140)
                     pos_hint: {"center_x": .5}
 
                 MDLabel:
-                    text: 'Enter username and pin to continue'
+                    text: 'Enter Social Planner username and pin to continue'
                     pos_hint: {"center_x": .5}
                     size_hint: 0.5, 0.1
 
@@ -53,6 +53,7 @@
                     hint_text: "Social Planner Username"
                     max_text_length: 60
                     required: True
+                    write_tab: False
                     
 
                 MDTextFieldRound:
@@ -67,6 +68,7 @@
                     hint_text: "pin"
                     max_text_length: 60
                     required: True
+                    write_tab: False
                     
 
                 MDRaisedButton:

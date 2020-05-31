@@ -18,6 +18,7 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
 from kivy.app import App
 import customFunctions as cf
+from kivy.clock import Clock
 
 class Login(Screen):
     
@@ -29,7 +30,14 @@ class Login(Screen):
 
         self.ids['login'].text = app.gVars.SGusername
         self.ids['password'].text = app.gVars.SGPin
+
         
+            
+    def show_keyboard(self,args):
+        self.ids['login'].focus = True
+
+    def on_enter(self):
+        Clock.schedule_once(self.show_keyboard)
 
     def do_login(self, loginText, passwordText):
         app = App.get_running_app()
