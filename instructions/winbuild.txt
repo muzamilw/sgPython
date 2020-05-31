@@ -1,4 +1,4 @@
-pyinstaller win.spec -i data\ml.ico -w --noconsole --clean 
+pyinstaller win.spec -i data\ml.ico -w --noconsole --clean
 
 
 pyinstaller mac.spec --onefile --windowed

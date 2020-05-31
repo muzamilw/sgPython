@@ -21,7 +21,7 @@ datas = [
 excludes_a = ['Tkinter', '_tkinter', 'twisted', 'pygments']
 
 # list of hiddenimports
-hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn']
+hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn'] + ['pandas._libs.tslibs.timedelta']
 
 # binary data
 sdl2_bin_tocs = [Tree(p) for p in sdl2.dep_bins]
