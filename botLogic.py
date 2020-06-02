@@ -425,7 +425,8 @@ class Bot():
                     log.info('Error logging onto SG Server')
             except:
                 # restart main loop
-                log.info('An Exception happened restarting Session in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
+                self.logControl.text = ""
+                log.info('An Exception happened, Restarting Session in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
                 log.info('###################################################################')
                 log.info('Retry #'+str(RetryCount)+' \n')
                 
