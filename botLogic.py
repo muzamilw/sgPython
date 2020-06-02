@@ -119,13 +119,13 @@ class Bot():
                                 log.info('Daily Stats already sent for today')
                             
 
-                            if gVars.manifestJson is not None:
+                            if gVars.manifestJson is None:
                                 log.info('getting manifest from SGServer')
                                 gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
                             
 
-                            if gVars.manifestObj is not None:
+                            if gVars.manifestObj is None:
                                 log.info('loading manifest')
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
                                 gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
