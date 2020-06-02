@@ -31,6 +31,8 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
+from kivymd.uix.bottomsheet import MDListBottomSheet
+from kivymd.uix.bottomsheet import MDCustomBottomSheet
 import customFunctions as cf
 
 
@@ -57,6 +59,8 @@ class Ready(Screen):
             
         else:
             label.opacity = 0
+
+    
     
     
     def on_enter(self):

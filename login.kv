@@ -35,20 +35,22 @@
                 Image:
                     source: "data//ml.png"
                     size_hint: None, None
-                    size: dp(140), dp(140)
+                    size: dp(100), dp(100)
                     pos_hint: {"center_x": .5}
 
                 MDLabel:
-                    text: 'Enter Social Planner username and pin to continue'
+                    text: 'Enter SPPro username and pin'
                     pos_hint: {"center_x": .5}
                     size_hint: 0.5, 0.1
+                    font_style: 'H5'
+                    halign : 'center'
 
                 MDTextFieldRound:
                     id: login
-                    normal_color: [0, 0, 0, 0.2]
-                    active_color: [0, 0, 0, 0.2]
+                    # normal_color: [0, 0, 0, 0.2]
+                    # active_color: [0, 0, 0, 0.2]
                     icon_type: "left"
-                    size_hint: .5, None
+                    size_hint: .5, 0.1
                     pos_hint: {"center_x": .5}
                     hint_text: "Social Planner Username"
                     max_text_length: 60
@@ -59,11 +61,11 @@
                 MDTextFieldRound:
                     id: password
                     password: True
-                    normal_color: [0, 0, 0, 0.2]
-                    active_color: [0, 0, 0, 0.2]
+                    # normal_color: [0, 0, 0, 0.2]
+                    # active_color: [0, 0, 0, 0.2]
                     icon_type: "left"
                     icon_left: "lock"
-                    size_hint: .5, None
+                    size_hint: .5, 0.1
                     pos_hint: {"center_x": .5}
                     hint_text: "pin"
                     max_text_length: 60

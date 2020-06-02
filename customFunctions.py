@@ -65,7 +65,7 @@ def SendError(you,ErrorLog,SocialProfileName):
     #     msg = fp.read()
 
     message = MIMEMultipart()
-    message = MIMEText(ErrorLog, 'html')
+    message = MIMEText(ErrorLog.replace("\n", "<br>"), 'html')
     sender_address = 'info@socialplannerpro.com'
     
     receiver_address = you
@@ -229,6 +229,7 @@ def LoadManifest(manifest):
 
     manifestObj.totalActionsPerHahTag = math.ceil(manifestObj.totalActionsHashTag / len(manifestObj.hashtags))
     manifestObj.totalActionsPerLocation = math.ceil(manifestObj.totalActionsLocation / len(manifestObj.locations))
+    manifestObj.totalActionsPerDirectCompetitor = math.ceil(manifestObj.totalActionsDirectCompetitor / len(manifestObj.DirectCompetitors))
     
     return manifestObj
 
@@ -238,7 +239,7 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log):
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsHashTag,Client,log) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -369,10 +370,10 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsDirectCompetitor,Client,log) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log) 
 
         if lItems is not None and len(lItems) > 0:
-            for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
+            for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
                 if (photo["has_liked"] == False):
                     locMediaUsers.append([compe,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), '' ])
   
@@ -670,7 +671,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
                 if user_reel_media is not None and len(user_reel_media['items']) > 0:
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
                     storyviewsCount = storyviewsCount + 1
-                sleepTime = randrange(5,10)
+                sleepTime = randrange(5,15)
                 log.info('pulling story feed for view ' + str(reel_user['user']['username']) + ' sleep for ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
         

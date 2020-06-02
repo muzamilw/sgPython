@@ -30,73 +30,84 @@
             type: "top"
             right_action_items: [["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
 
-        BoxLayout:
-            orientation: 'horizontal'            
-
-            Image:
-                source: "data//iglogo.png"
-                size_hint: 0.2, None
-                size: dp(120), dp(120)
-                pos_hint: {"center_y": .5}
-
-            MDLabel:
-                font_style: 'H3'
-                theme_text_color: 'Primary'
-                size_hint: 0.8, None
-                text: ""
-                halign: 'left'
-                valign : 'center'
-                id: lblusername
-           
+        
         BoxLayout:
             orientation:'horizontal'
-            size_hint: 1, 0.4
-            
+        
+        
+            BoxLayout:
+                orientation: 'horizontal' 
+                size_hint: 0.6, None           
 
-            GridLayout:
-                size_hint: 0.5, None
-                orientation:'horizontal'
-                cols : 2
+                Image:
+                    source: "data//iglogo.png"
+                    size_hint: 0.3, None
+                    size: dp(100), dp(100)
+                    pos_hint: {"center_y": .5}
 
+                MDLabel:
+                    font_style: 'H3'
+                    theme_text_color: 'Primary'
+                    size_hint: 0.7, None
+                    text: ""
+                    halign: 'left'
+                    valign : 'center'
+                    id: lblusername
            
-            GridLayout:
-                size_hint: 0.4, None
+            BoxLayout:
                 orientation:'horizontal'
-                cols : 2
-                spacing:10
-
-                MDLabel:
-                    text: "Auto Start at"
-                    id :lblAutoStart
-
-                MDRaisedButton:
-                    text: "Start"
-                    on_release: root.startBot()
-                    id: btnStart
-                    size_hint: 1, 0.05
-                    os_hint: {'center_x': .5, 'center_y': .5}
+                size_hint: 0.4, None           
                 
-                
-                
-                MDLabel:
-                    id: lblTotalTime
-                    text: "0:00"
 
-                MDRaisedButton:
-                    text: "Stop"
-                    on_release: root.stop()
-                    id : btnStop
-                    size_hint: 1, 0.1
-                    pos_hint: {"center_x": .5}
-                    md_bg_color: get_color_from_hex("#FF0000")
-                    disabled : True
+                GridLayout:
+                    size_hint: 1, None
+                    orientation:'horizontal'
+                    cols : 2
 
-               
+            
+                    GridLayout:
+                        size_hint: 0.95, None
+                        orientation:'horizontal'
+                        cols : 2
+                        spacing:10
 
-            GridLayout:
-                size_hint: 0.1, None
-                orientation:'horizontal'
-                cols : 2
+                        MDLabel:
+                            text: "Auto Start at"
+                            id :lblAutoStart
+
+                        MDRaisedButton:
+                            text: "Start"
+                            on_release: root.startBot()
+                            id: btnStart
+                            size_hint: 1, 0.05
+                            os_hint: {'center_x': .5, 'center_y': .5}
+                        
+                        
+                        
+                        MDLabel:
+                            id: lblTotalTime
+                            text: "0:00"
+
+                        MDRaisedButton:
+                            text: "Stop"
+                            on_release: root.stop()
+                            id : btnStop
+                            size_hint: 1, 0.1
+                            pos_hint: {"center_x": .5}
+                            md_bg_color: get_color_from_hex("#FF0000")
+                            disabled : True
+
+                    
+
+                    GridLayout:
+                        size_hint: 0.05, None
+                        orientation:'horizontal'
+                        cols : 2
+        MDLabel:
+           #spacer
+            text: " "
+            size_hint: 1, 0.1
+            halign : 'center'
 
         GridLayout:
             cols: 4
@@ -104,49 +115,48 @@
             padding: 20
             spacing: 10
             
-            
-                
-           
-                
             MDLabel:
                 id: lblFollow
                 text: "0 / 0"
                 size_hint: 1, 0.8
                 halign : 'center'
+                font_style: 'H4'
             MDLabel:
                 id: lblUnFollow
                 text: "0 / 0"
                 halign : 'center'
+                font_style: 'H4'
                
             MDLabel:
                 id: lblLike
                 text: "0 / 0"
                 halign : 'center'
+                font_style: 'H4'
             MDLabel:
                 id: lblStoryView
                 text: "0 / 0"
                 halign : 'center'
-            
+                font_style: 'H4'
 
             MDLabel:
                 text: "F"
                 size_hint: 1, 0.8
                 halign : 'center'
-                font_style: 'H5'
+               
             MDLabel:
                 text: "U"
                 halign : 'center'
-                font_style: 'H5'
+                
                 
             MDLabel:
                 text: "L"
                 halign : 'center'
-                font_style: 'H5'
+                
                 
             MDLabel:
                 text: "S"
                 halign : 'center'
-                font_style: 'H5'
+                
            
            
             
@@ -154,47 +164,53 @@
                 id: lblComments
                 text: "0 / 0"
                 halign : 'center'
-                
+                font_style: 'H4'
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblLikeExchange
                 halign : 'center'
+                font_style: 'H4'
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblFollowExchange
                 halign : 'center'
+                font_style: 'H4'
             MDLabel:
                 id: lblCommentExchange
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 halign : 'center'
+                font_style: 'H4'
 
             MDLabel:
                 text: "C"
                 halign : 'center'
-                font_style: 'H5'
+                
 
             MDLabel:
                 text: "LX"
                 size_hint: 1, 0.8
                 halign : 'center'
-                font_style: 'H5'
+                
             MDLabel:
                 text: "FX"
                 halign : 'center'
-                font_style: 'H5'
+                
                 
             MDLabel:
                 text: "CX"
                 halign : 'center'
-                font_style: 'H5'
+                
                 
         BoxLayout:
             orientation: 'vertical'
-            size_hint: 1, 0.3
+            size_hint: 1, 0.2
             spacing:5
+            # Line:
+            #     width:1
+                # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
 
             MDSpinner:
                 id: spinner
@@ -202,7 +218,7 @@
                 size: dp(20), dp(20)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 active: False
-
+        
 
         MDTextFieldRect:
             id:logLabel

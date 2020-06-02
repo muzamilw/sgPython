@@ -43,8 +43,10 @@ class Home(Screen):
                 pass
             else:
                 # manager.current = 'ready'
-                self.ids['btnIG'].text = 'Today\'s Status'
+                self.ids['btnIG'].text = 'Running'
                 self.ids['btnIG'].md_bg_color = util.get_color_from_hex("##16D39A")
+                
+                self.ids['lblstatusIG'].text = "View Todays Status"
         else:
             # manager.current = 'login'
             # self.ids['btnIG'].text = 'Today\'s Status'

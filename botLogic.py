@@ -97,6 +97,7 @@ class Bot():
 
                         try:
 
+                            
                             if (gVars.loginResult["InitialStatsReceived"] != True):
 
                                 user_info = api.user_info(api.authenticated_user_id)
@@ -118,13 +119,13 @@ class Bot():
                                 log.info('Daily Stats already sent for today')
                             
 
-                            if gVars.manifestJson is None:
+                            if gVars.manifestJson is not None:
                                 log.info('getting manifest from SGServer')
                                 gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
                             
 
-                            if gVars.manifestObj is None:
+                            if gVars.manifestObj is not None:
                                 log.info('loading manifest')
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
                                 gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
@@ -382,7 +383,7 @@ class Bot():
                             cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
                             log.info('Email sent' )
 
-                            app.CleanupAfterSuccessfulRun()
+                            app.ResetGlobalVars()
                             log.info('Cleanup performed exiting main thread')
 
                             # log.info("Action sequence running")
