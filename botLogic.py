@@ -45,6 +45,8 @@ class Actions(Enum):
     BotError = 80
     BadHashtag = 86
 
+    dialog = None
+
 class Bot():
     def __init__(self,  Client, log, ui,botStop, logControl):
         self.ui = ui
@@ -52,6 +54,29 @@ class Bot():
         self.log = log
         self.botStop = botStop
         self.logControl = logControl
+
+    def ShowErrorMessage(self, Error):
+        app = App.get_running_app()
+        self.dialog = MDDialog(
+                title="Error!",
+                text="Error,
+                type = "simple",
+                buttons=[
+                   
+                    MDFlatButton(
+                        text="OK",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=self.dismiss_callback
+                    ),
+                ],
+            )
+
+        # self.Logout_alert_dialog.buttons.append ("Close me!",action=lambda *x: self.dismiss_callback())
+        self.dialog.set_normal_height()
+        self.dialog.open()
+
+    def dismiss_callback(self, *args):
+        self.dialog.dismiss()
 
     def raise_exception(self): 
         thread_id = self.get_id() 
@@ -369,22 +394,23 @@ class Bot():
                                     with open('glob.Vars', 'wb') as gVarFile:
                                         pickle.dump(gVars, gVarFile)
 
-                            #Run Ending
-                            gVars.RunEndTime = datetime.datetime.now()
-                            log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
-                            #writing log to file
-                            
-                            with open("dataframe_GlobalTodo.html", "w", encoding="utf-8") as file:
-                                file.writelines('<meta charset="UTF-8">\n')
-                                file.write(gVars.GlobalTodo.to_html())
+                            if self.botStop.is_set() != True :  #do not perform cleanup and send email if stop signal is sent.. 
+                                #Run Ending
+                                gVars.RunEndTime = datetime.datetime.now()
+                                log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
+                                #writing log to file
+                                
+                                with open("dataframe_GlobalTodo.html", "w", encoding="utf-8") as file:
+                                    file.writelines('<meta charset="UTF-8">\n')
+                                    file.write(gVars.GlobalTodo.to_html())
 
-                            log.info('Action List saved for Email' )
-                            
-                            cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
-                            log.info('Email sent' )
+                                log.info('Action List saved for Email' )
+                                
+                                cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
+                                log.info('Email sent' )
 
-                            app.ResetGlobalVars()
-                            log.info('Cleanup performed exiting main thread')
+                                app.ResetGlobalVars()
+                                log.info('Cleanup performed exiting main thread')
 
                             # log.info("Action sequence running")
 
@@ -398,13 +424,22 @@ class Bot():
                             #         print('exiting thread')
                             #         return
 
-                        except ClientError as e:
+                         except (ClientSentryBlockError, ClientChallengeRequiredError, ClientCheckpointRequiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Api Client Error occurred, Please open Instagram in browser and manually clear Challenges")
+                            log.info("Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             IsApiClientError = True
                             return
+
+                        except ClientError as e:
+                            #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            log.info("Api Client Error occurred, Restarting")
+                            log.info(str(traceback.format_exc()))
+                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                           
+                            raise e
 
                         except:# ClientError:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)

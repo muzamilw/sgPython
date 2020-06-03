@@ -216,6 +216,7 @@ class LoginApp(MDApp):
     def on_stop(self):
         data_folder = Path("userdata")
         file_to_open = data_folder / "glob.vars"
+        self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
@@ -223,6 +224,7 @@ class LoginApp(MDApp):
     def on_pause(self):
         data_folder = Path("userdata")
         file_to_open = data_folder / "glob.vars"
+        self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at pause')
             pickle.dump(self.gVars, gVarFile)
