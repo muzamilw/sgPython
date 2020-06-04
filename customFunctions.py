@@ -454,7 +454,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                             # follFeed_results.extend([ufeed['items'][0]])
                                             locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                                     sleepTime = randrange(5,10)
-                                    log.info('pulling suggested user feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                                    log.info('Pulling suggested user feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                                     time.sleep(sleepTime)
                                     iguserCount = iguserCount + 1
                             
@@ -484,7 +484,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                             sleepTime = randrange(5,10)
-                            log.info('pulling Follow exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            log.info('Pulling Follow exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
         except Exception as e:
             print('exception in FollowList for user' + folluser)
@@ -509,7 +509,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
                             sleepTime = randrange(5,10)
-                            log.info('pulling like exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            log.info('Pulling like exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
         except:
             print('exception in LikeList')
@@ -534,7 +534,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
                             sleepTime = randrange(5,10)
-                            log.info('pulling comment exchange feed for ' + user['username'] + ' sleep for ' +  str(sleepTime)  )
+                            log.info('Pulling comment exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
         except:
             print('exception in FollowersToComment')
@@ -617,25 +617,28 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
 def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
     
     locMediaUsers = []
+    unfollCount = 0
 
     for foll in manifestObj.FollowersToUnFollow:
         
         # resUser = api.searchUsername(foll['FollowedSocialUsername'])
+        if (unfollCount <= manifestObj.UnFoll16DaysEngage ):
 
-        try:
-            follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-            sleepTime = randrange(2,7)
-            log.info('pulling user details for unfollow for ' + foll['FollowedSocialUsername'].strip() + ' sleep for ' +  str(sleepTime)  )
-            time.sleep(sleepTime)
-            
-        except ClientError as e:
-            print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
-            follUserRes = None
+            try:
+                follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
+                sleepTime = randrange(2,7)
+                log.info('Pulling user details to unfollow for ' + foll['FollowedSocialUsername'].strip() + ', Sleep for ' +  str(sleepTime)  )
+                time.sleep(sleepTime)
+                
+            except ClientError as e:
+                print('ClientError {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response))
+                follUserRes = None
 
-        if follUserRes is not None:
-            locMediaUsers.append([str(follUserRes['user']['username']),'',str(follUserRes['user']['pk']),str(follUserRes['user']['username']),str(follUserRes["user"]["full_name"]), '' ])
-        else:
-            locMediaUsers.append(['delete_not_found','','',foll['FollowedSocialUsername'],'', '' ])
+            if follUserRes is not None:
+                locMediaUsers.append([str(follUserRes['user']['username']),'',str(follUserRes['user']['pk']),str(follUserRes['user']['username']),str(follUserRes["user"]["full_name"]), '' ])
+            else:
+                locMediaUsers.append(['delete_not_found','','',foll['FollowedSocialUsername'],'', '' ])
+            unfollCount = unfollCount + 1
   
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
@@ -672,7 +675,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
                     storyviewsCount = storyviewsCount + 1
                 sleepTime = randrange(5,15)
-                log.info('pulling story feed for view ' + str(reel_user['user']['username']) + ' sleep for ' +  str(sleepTime)  )
+                log.info('Pulling story feed to view for ' + str(reel_user['user']['username']) + ', Sleep for ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
         
   

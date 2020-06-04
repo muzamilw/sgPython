@@ -36,6 +36,8 @@ from kivymd.uix.bottomsheet import MDCustomBottomSheet
 import customFunctions as cf
 
 
+
+
 class Ready(Screen):
 
     t = None
@@ -101,7 +103,8 @@ class Ready(Screen):
             self.ids['lblAutoStart'].text = "Autostart at : " + app.gVars.manifestObj.starttime
 
             if self.RunScheduled == False:
-                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
+                # schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
+                schedule.every().day.at("03:54").do(self.printMSG)
                 self.RunScheduled = True
             
             
@@ -127,6 +130,10 @@ class Ready(Screen):
         #         Client, ClientError, ClientLoginError,
         #         ClientCookieExpiredError, ClientLoginRequiredError,
         #         __version__ as client_version)
+
+    def printMSG(self):
+        print('schduler challa')
+
 
    
 

@@ -11,6 +11,9 @@ from instagram_private_api import (
 
 #user_info(user_id)
 
+
+
+
 #api Wrappers
 def getSelfTimeline(api): #feed_timeline(**kwargs)
     return api.getTimeline()
@@ -105,7 +108,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_tok
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
         sleepTime = randrange(5,10)
-        log.info('pulling hashtag feed for ' + hashTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + str(len(tag_results)) + ' of ' + str(maxCountToGet) )
+        log.info('Pulling hashtag feed for ' + hashTag + ', Sleep for ' +  str(sleepTime) + ',  Fetching ' + str(len(tag_results)) + ' of ' + str(maxCountToGet) )
         time.sleep(sleepTime)
 
     return tag_results
@@ -137,7 +140,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
             next_max_id = results.get('next_max_id')
             
             sleepTime = randrange(5,10)
-            log.info('pulling location ranked feed for ' + locationTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
+            log.info('Pulling location ranked feed for ' + locationTag + ', Sleep for ' +  str(sleepTime) + ', Fetching ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
         #loading recents if target not met
@@ -156,7 +159,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
             sleepTime = randrange(5,10)
-            log.info('pulling location non ranked feed for ' + locationTag + ' sleep for ' +  str(sleepTime) + ' current count = ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
+            log.info('Pulling location non ranked feed for ' + locationTag + ', Sleep for ' +  str(sleepTime) + ' Fetching ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
         return location_results
@@ -207,7 +210,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log):
                     has_more = results.get('more_available')
                     next_max_id = results.get('next_max_id')
                     sleepTime = randrange(5,10)
-                    log.info('pulling user following feed for ' + userName + ' sleep for ' +  str(sleepTime) + ' current count = ' + str(len(follFeed_results)) + ' of ' + str(maxCountToGet) )
+                    log.info('Pulling user following feed for ' + userName + ', Sleep for ' +  str(sleepTime) + ', Fetching ' + str(len(follFeed_results)) + ' of ' + str(maxCountToGet) )
                     time.sleep(sleepTime)
 
 
