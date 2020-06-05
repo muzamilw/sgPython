@@ -63,7 +63,8 @@ class Ready(Screen):
             label.opacity = 0
 
     
-    
+    def processjobs(self,dt):
+        schedule.run_pending()
     
     def on_enter(self):
         app = App.get_running_app()
@@ -103,9 +104,9 @@ class Ready(Screen):
             self.ids['lblAutoStart'].text = "Autostart at : " + app.gVars.manifestObj.starttime
 
             if self.RunScheduled == False:
-                # schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
-                schedule.every().day.at("03:54").do(self.printMSG)
+                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
                 self.RunScheduled = True
+                Clock.schedule_interval(self.processjobs, 1)
             
             
         
