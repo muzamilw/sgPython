@@ -12,6 +12,7 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from alert import Alert
 import os
+from pathlib import Path
 import logging
 import threading
 import requests
@@ -27,6 +28,7 @@ import re
 import requests
 import json
 import gzip
+import platform
 
 from io import BytesIO
 from urllib.parse import urlparse
@@ -237,8 +239,15 @@ class IGLogin(Screen):
         try:
 
             # settings_file = 'userdata\\'+ loginText +'_login.json'
-            settings_file = 'userdata//'+loginText+'_login.json'
-            if not os.path.isfile(os.path.join('userdata',loginText+'_login.json')):
+
+            if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", loginText+'_login.json')
+            else:
+                settings_file = Path("userdata") / loginText+'_login.json'
+
+            
+            if not os.path.isfile(settings_file):
                 # settings file does not exist
                 print('Unable to find login.json file: {0!s}'.format(settings_file))
                
@@ -282,7 +291,7 @@ class IGLogin(Screen):
             #(ClientError)
             print('Unexpected ClientCheckpointRequiredError: {0!s}'.format(e))
             print('Challenge url = ' + e.challenge_url)
-            exit()
+            
             return (None, e.challenge_url)
 
 

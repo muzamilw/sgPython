@@ -245,7 +245,7 @@ class Bot():
 
                             if gVars.GlobalTodo is None:
                                 gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
-                                gVars.GlobalTodo.to_csv('GlobData.csv')
+                                #gVars.GlobalTodo.to_csv('GlobData.csv')
                                 log.info('GlobalTodo merged')
 
                             gVars.TotFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Follow') & (gVars.GlobalTodo['UserId'] != '')])
@@ -419,8 +419,13 @@ class Bot():
                                     self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                                     self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
+                                    if (platform.system() == "Darwin"):
+                                        Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                                        file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                                    else:
+                                        file_to_open = Path("userdata") / "glob.vars"
 
-                                    with open('glob.Vars', 'wb') as gVarFile:
+                                    with open(file_to_open, 'wb') as gVarFile:
                                         pickle.dump(gVars, gVarFile)
 
                             if self.botStop.is_set() != True :  #do not perform cleanup and send email if stop signal is sent.. 
@@ -428,14 +433,20 @@ class Bot():
                                 gVars.RunEndTime = datetime.datetime.now()
                                 log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
                                 #writing log to file
+
+                                if (platform.system() == "Darwin"):
+                                    Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                                    file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "GlobalTodo.html")
+                                else:
+                                    file_to_open = Path("userdata") / "GlobalTodo.html"
                                 
-                                with open("dataframe_GlobalTodo.html", "w", encoding="utf-8") as file:
+                                with open(file_to_open, "w", encoding="utf-8") as file:
                                     file.writelines('<meta charset="UTF-8">\n')
                                     file.write(gVars.GlobalTodo.to_html())
 
                                 log.info('Action List saved for Email' )
                                 
-                                cf.SendEmail('muzamilw@gmail.com','dataframe_GlobalTodo.html',gVars.SGusername,'')
+                                cf.SendEmail('muzamilw@gmail.com',file_to_open,gVars.SGusername,'')
                                 log.info('Email sent' )
 
                                 app.ResetGlobalVars()

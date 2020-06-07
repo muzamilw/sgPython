@@ -1,6 +1,8 @@
 pyinstaller mac.spec -i FILE.exe -w --onedir --noconsole --windowed --icon data/ml.ico --osx-bundle-identifier com.socialplanner.growth.socialplannerpro
+pyinstaller mac2.spec --onefile --windowed --icon=ml.icns
 
-codesign -s "SocialPlannerPro" SocialPlannerPro
+
+codesign -s "SocialPlannerPro" start
 
 
 £verify
@@ -9,3 +11,9 @@ codesign -dv --verbose=4  SocialPlannerPro
 pushd dist
 hdiutil create ./SocialPlannerPro.dmg -srcfolder SocialPlannerPro -ov
 popd
+
+
+
+
+---------------------------------------------------------------------------------------------
+codesign -s "SocialPlannerPro" /Users/JanatFarooq/Documents/GitHub/sgPython/dist/SocialPlannerPro.app/Contents/MacOS/libsqlite3.0.dylib

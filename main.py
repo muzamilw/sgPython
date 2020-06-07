@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 import datetime, pytz
 import dateutil.tz
 from pathlib import Path
+import platform
 #import sys
 
 
@@ -230,16 +231,24 @@ class LoginApp(MDApp):
         return manager
 
     def on_stop(self):
-        data_folder = Path("userdata")
-        file_to_open = data_folder / "glob.vars"
+        if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+        else:
+                file_to_open = Path("userdata") / "glob.vars"
+
         self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at Stop')
             pickle.dump(self.gVars, gVarFile)
 
     def on_pause(self):
-        data_folder = Path("userdata")
-        file_to_open = data_folder / "glob.vars"
+        if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+        else:
+                file_to_open = Path("userdata") / "glob.vars"
+
         self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at pause')
@@ -260,8 +269,13 @@ class LoginApp(MDApp):
 
     def loadGlobalConfig(self):
         try:
-            data_folder = Path("userdata")
-            file_to_open = data_folder / "glob.vars"
+            if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+            else:
+                file_to_open = Path("userdata") / "glob.vars"
+
+            
             with open(file_to_open, 'rb') as gVarFile:
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
@@ -327,9 +341,12 @@ class LoginApp(MDApp):
 
             self.gVars = gVars
             print('Loading New Defaults')
-            data_folder = Path("userdata")
-            Path("userdata").mkdir(parents=True, exist_ok=True)
-            file_to_open = data_folder / "glob.vars"
+            if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+            else:
+                file_to_open = Path("userdata") / "glob.vars"
+
             with open(file_to_open, 'wb') as gVarFile:
                 pickle.dump(gVars, gVarFile)
         
@@ -354,8 +371,14 @@ class LoginApp(MDApp):
         device_id = None
         try:
 
-            settings_file = 'userdata//'+username+'_login.json'
-            if not os.path.isfile(os.path.join('userdata',username+'_login.json')):
+            if (platform.system() == "Darwin"):
+                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", username+'_login.json')
+            else:
+                settings_file = Path("userdata") / username+'_login.json'
+
+            
+            if not os.path.isfile(settings_file):
                 # settings file does not exist
                 print('Unable to find login.json: {0!s}'.format(settings_file))
                 api = None
@@ -461,10 +484,22 @@ class LoginApp(MDApp):
         self.ResetGlobalVars()    
         app.gVars.loginResult = None
         app.api = None
-        data_folder = Path("userdata")
-        settings_file = 'userdata//'+igusername+'_login.json'
+
+        if (platform.system() == "Darwin"):
+            Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+            settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", igusername+'_login.json')
+        else:
+            settings_file = Path("userdata") / igusername+'_login.json'
+
+        
         os.remove(settings_file)
-        file_to_open = data_folder / "glob.vars"
+
+        if (platform.system() == "Darwin"):
+            Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+            file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+        else:
+            file_to_open = Path("userdata") / "glob.vars"
+
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
@@ -472,5 +507,5 @@ class LoginApp(MDApp):
     
 
 if __name__ == '__main__':
-   
+    print(platform.system())
     LoginApp().run()
