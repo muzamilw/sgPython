@@ -204,6 +204,11 @@ class IGLogin(Screen):
         app.gVars.IGpassword = passwordText
 
         if api is None:
+
+            if ( loginRes[1]) != "":
+                Client.login_challenge(loginRes[1])
+            return
+
             self.Login_alert_dialog = MDDialog(
                 title="Instagram Login Error!",
                 text="There was error in performing login on Instagram, please try again",
@@ -314,3 +319,4 @@ class IGLogin(Screen):
             print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
         return (api,None)
+

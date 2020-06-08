@@ -51,7 +51,8 @@ from ready import Ready
 from iglogin import IGLogin
 from login import Login
 from alert import Alert
-from instagram_private_api import Client, ClientCompatPatch
+from instagram_private_api import Client
+from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
 import SPButton
 from home import Home
 from kivymd.app import MDApp
@@ -135,6 +136,37 @@ class Client(Client):
             data['target_reel_author_id'] = str(user_id)
         res = self._call_api(endpoint, data)
         return res
+
+    def login_challenge(self, checkpoint_url):
+
+        try:
+            headers = self.default_headers
+            print('redirecting to ..', checkpoint_url)
+            headers['X-CSRFToken'] = self.csrftoken
+            headers['Referer'] = checkpoint_url
+            
+            mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
+            challenge_data = {'choice': mode}
+            data = compat_urllib_parse.urlencode(challenge_data).encode('ascii')
+            
+            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
+            response = self.opener.open(req, timeout=self.timeout)
+
+            code = input('Enter code received: ')
+            code_data = {'security_code': code}
+            data = compat_urllib_parse.urlencode(code_data).encode('ascii')
+
+            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
+            response = self.opener.open(req, timeout=self.timeout)
+
+            if response.info().get('Content-Encoding') == 'gzip':
+                buf = BytesIO(response.read())
+                res = gzip.GzipFile(fileobj=buf).read().decode('utf8')
+            else:
+                res = response.read().decode('utf8')
+    
+        except compat_urllib_error.HTTPError as e:
+            print('unhandled exception', e)
 
 
 #reading api file if already exists.

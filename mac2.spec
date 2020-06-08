@@ -18,7 +18,7 @@ hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_re
 # assets
 kivy_assets_toc = Tree(kivy_data_dir, prefix=join('kivy_install', 'data'))
 source_assets_toc = Tree('data', prefix='data')
-source_assets2_toc = Tree('userdata', prefix='userdata')
+#source_assets2_toc = Tree('userdata', prefix='userdata')
 assets_toc = [kivy_assets_toc, source_assets_toc]
 
 tocs =  assets_toc #+ bin_tocs
@@ -46,13 +46,13 @@ exe = EXE(pyz,
           a.datas,
           [],
           name='start',
-          debug=True,
+          debug=False,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True )
+          console=False )
 
 coll = COLLECT(exe,Tree('/Users/JanatFarooq/Documents/GitHub/Notesx/'),
                a.binaries,
@@ -60,7 +60,7 @@ coll = COLLECT(exe,Tree('/Users/JanatFarooq/Documents/GitHub/Notesx/'),
                a.datas,
                *tocs,
                strip=False,
-               upx=False,
+               upx=True,
                name=app_name)
 
 app = BUNDLE(exe,
