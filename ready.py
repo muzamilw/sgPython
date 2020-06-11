@@ -85,6 +85,7 @@ class Ready(Screen):
             self.lblFollowExchange =  self.ids['lblFollowExchange']
             self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
+            self.lblETATime =  self.ids['lblETATime']
 
             if hasattr(app.gVars, 'SequenceRunning'):
                 if app.gVars.SequenceRunning is None:

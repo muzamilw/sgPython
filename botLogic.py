@@ -19,6 +19,7 @@ import logging
 import ctypes 
 import traceback
 import sys
+import os
 import platform
 from pathlib import Path
 from instagram_private_api import (
@@ -161,15 +162,16 @@ class Bot():
                             if gVars.manifestObj is None:
                                 log.info('loading manifest')
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
-                                gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
-                                gVars.ReqUnFollow = gVars.manifestObj.UnFoll16DaysEngage
-                                gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
-                                gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
-                                gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
 
-                                gVars.ReqExComments = len(gVars.manifestObj.FollowersToComment)
-                                gVars.ReqExFollow = len(gVars.manifestObj.FollowList)
-                                gVars.ReqExLikes  = len(gVars.manifestObj.LikeList)
+                            gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
+                            gVars.ReqUnFollow = gVars.manifestObj.UnFoll16DaysEngage
+                            gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
+                            gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
+                            gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
+
+                            gVars.ReqExComments = len(gVars.manifestObj.FollowersToComment)
+                            gVars.ReqExFollow = len(gVars.manifestObj.FollowList)
+                            gVars.ReqExLikes  = len(gVars.manifestObj.LikeList)
                             
                             self.ui.lblFollow.text = str(gVars.CurrentFollowDone) +'/'+ str(gVars.TotFollow) +'/'+ str(gVars.ReqFollow)
                             self.ui.lblUnFollow.text = str(gVars.CurrentUnFollowDone) +'/'+str(gVars.TotUnFollow ) +'/'+ str( gVars.ReqUnFollow)
@@ -180,7 +182,11 @@ class Bot():
                             self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                             self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
-                            
+                            runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExComments + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
+                            runTimeComputation += gVars.manifestObj.totalActions  * 10
+
+                            self.ui.lblETATime.text = str(datetime.timedelta(seconds= int(runTimeComputation))) 
+
 
                             if gVars.Todo is None:
                                 gVars.Todo = cf.SetupGlobalTodo(gVars.manifestObj)

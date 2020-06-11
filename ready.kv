@@ -74,6 +74,7 @@
                         MDLabel:
                             text: "Auto Start at"
                             id :lblAutoStart
+                            font_size: 30
 
                         MDRaisedButton:
                             text: "Start"
@@ -84,9 +85,21 @@
                         
                         
                         
-                        MDLabel:
-                            id: lblTotalTime
-                            text: "0:00"
+                        GridLayout: 
+                            orientation:'horizontal'
+                            cols:3
+                            MDLabel:
+                                id: lblTotalTime
+                                text: "0:00:00"
+                                font_size: 30
+                            MDLabel:
+                                text: " of "
+                                font_size: 30
+                                halign : 'center'
+                            MDLabel:
+                                id: lblETATime
+                                text: "0:00:00"
+                                font_size: 30
 
                         MDRaisedButton:
                             text: "Stop"
