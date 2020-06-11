@@ -1,5 +1,5 @@
 pyinstaller mac.spec -i FILE.exe -w --onedir --noconsole --windowed --icon data/ml.ico --osx-bundle-identifier com.socialplanner.growth.socialplannerpro
-pyinstaller mac2.spec --onefile --windowed --icon=ml.icns -y
+pyinstaller mac2.spec --onefile --windowed --icon=ml.icns -y --runtime-tmpdir /var/user/
 
 
 codesign -s "SocialPlannerPro" start

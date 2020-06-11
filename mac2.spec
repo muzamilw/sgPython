@@ -46,13 +46,13 @@ exe = EXE(pyz,
           a.datas,
           [],
           name='start',
-          debug=False,
+          debug=True,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False )
+          console=True )
 
 coll = COLLECT(exe,Tree('/Users/JanatFarooq/Documents/GitHub/Notesx/'),
                a.binaries,
