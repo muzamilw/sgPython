@@ -19,12 +19,18 @@ import logging
 import ctypes 
 import traceback
 import sys
+import platform
+from pathlib import Path
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
+        ClientSentryBlockError, ClientChallengeRequiredError, ClientCheckpointRequiredError,ClientConnectionError,
         __version__ as client_version)
 
 from kivy.app import App
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import OneLineAvatarIconListItem
 
 class Actions(Enum):
     Follow = 60
@@ -57,25 +63,24 @@ class Bot():
         self.log = log
         self.botStop = botStop
         self.logControl = logControl
+        self.dialog = None
 
-    def ShowErrorMessage(self, Error):
+    def ShowErrorMessage(self, ErrorMsg):
         app = App.get_running_app()
         self.dialog = MDDialog(
-                title="Error!",
-                text="Error",
-                type = "simple",
+                title="Critical Error!",
+                text=ErrorMsg,
+                
                 buttons=[
-                   
-                    MDFlatButton(
-                        text="OK",
-                        text_color=app.theme_cls.primary_color,
-                        on_release=self.dismiss_callback
-                    ),
-                ],
+                        MDFlatButton(
+                            text="Ok",
+                            text_color=app.theme_cls.primary_color,
+                        ),
+                    ],
             )
 
         # self.Logout_alert_dialog.buttons.append ("Close me!",action=lambda *x: self.dismiss_callback())
-        self.dialog.set_normal_height()
+        # self.dialog.set_normal_height()
         self.dialog.open()
 
     def dismiss_callback(self, *args):
@@ -148,7 +153,7 @@ class Bot():
                             
 
                             if gVars.manifestJson is None:
-                                log.info('getting manifest from SGServer')
+                                log.info('getting manifest')
                                 gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
                             
@@ -490,7 +495,7 @@ class Bot():
                            
                             raise e
 
-                        except:# ClientError:
+                        except e:# ClientError:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Exception occurred in main sequence action loop, restarting")
                             log.info(traceback.format_exc())
@@ -511,6 +516,7 @@ class Bot():
                 # restart main loop
                 # self.logControl.text = ""
                 log.info('An Exception happened, Restarting Session in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
+                log.info(str(traceback.format_exc()))
                 log.info('###################################################################')
                 log.info('Retry #'+str(RetryCount)+' \n')
                 

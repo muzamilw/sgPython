@@ -249,7 +249,7 @@ class IGLogin(Screen):
                 Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
                 settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", loginText+'_login.json')
             else:
-                settings_file = Path("userdata") / loginText+'_login.json'
+                settings_file = Path("userdata") / str(loginText +'_login.json')
 
             
             if not os.path.isfile(settings_file):

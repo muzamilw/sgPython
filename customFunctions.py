@@ -192,6 +192,8 @@ def LoadManifest(manifest):
     
     manifestObj.FollowList = manifest["MobileJsonRootObject"]["FollowList"]
     manifestObj.LikeList = manifest["MobileJsonRootObject"]["LikeList"]
+
+    manifestObj.AllFollowedAccounts = manifest["MobileJsonRootObject"]["AllFollowedAccounts"]
     
     
     
@@ -233,13 +235,20 @@ def LoadManifest(manifest):
     
     return manifestObj
 
+def checkUsernameinFollowedList(json_object, name):
+    result = [obj for obj in json_object if obj['FollowedSocialUsername']==name]
+    if len(result) == 0:
+        return True
+    else:
+        return False
+
     
 def LoadHashtagsTodo(api, manifestObj ,Client,log):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -301,7 +310,7 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -370,7 +379,7 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -447,7 +456,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                 suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
                 if suggUsers is not None and len(suggUsers) > 0:
                             for user in suggUsers:
-                                if user["is_private"] == False and iguserCount <= manifestObj.totalActionsIGUsers :
+                                if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
                                     ufeed = api.user_feed(user['pk'])
                                     if ufeed is not None and len(ufeed['items']) > 0 :
                                         if ufeed['items'][0]['has_liked'] == False:
@@ -698,6 +707,9 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
         
             
     return usersdf
+
+def checkUsernameinFollowedList(self,json_object, name):
+        return [obj for obj in json_object if obj['FollowedSocialUsername']==name]
 
 
 def SetupGlobalTodo(manifestObj):

@@ -79,9 +79,14 @@ def ViewStory(api, itemids, timestamps):  #post_like(media_id, module_name='feed
         api.media_seen({str(i): [str(timestamps[iIndex])]})
         #api.media_seen({"2284544142979976553_145316263_145316263": ['1586558904_'+str(calendar.timegm(time.gmtime()))]})
     
-   
+def checkUsernameinFollowedList(json_object, name):
+    result = [obj for obj in json_object if obj['FollowedSocialUsername']==name]
+    if len(result) == 0:
+        return True
+    else:
+        return False
 
-def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_token, **kwargs)
+def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj):   #feed_tag(tag, rank_token, **kwargs)
     
     rank_token = Client.generate_uuid()
     has_more = True
@@ -91,6 +96,9 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_tok
     #         hashTag, rank_token)
     # tag_results.extend(results.get('ranked_items', []))
     # tag_results.extend(results.get('items', []))
+
+          
+
     
     while has_more and rank_token and next_max_id and len(tag_results) < maxCountToGet:
         if next_max_id is True:
@@ -102,8 +110,8 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_tok
 
         #tag_results.extend(results.get('ranked_items', []))
         #tag_results.extend(results.get('items', []))
-        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
-        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) ]   )
+        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))] )
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
@@ -114,7 +122,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log):   #feed_tag(tag, rank_tok
     return tag_results
         
 
-def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
+def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj):
     rank_token = Client.generate_uuid()
     has_more = True
     location_results = []
@@ -134,7 +142,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))])
             
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
@@ -153,7 +161,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) ])
             
 
             has_more = results.get('more_available')
@@ -168,7 +176,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log):
     else:
         return None
     
-def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log):
+def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj):
     try:
     
         follUserRes = None
@@ -199,7 +207,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log):
                             if user["is_private"] == False and len(follFeed_results) <= maxCountToGet:
                                 ufeed = api.user_feed(user['pk'])
                                 if ufeed is not None and len(ufeed['items']) > 0 :
-                                    if ufeed['items'][0]['has_liked'] == False:
+                                    if ufeed['items'][0]['has_liked'] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])):
                                         follFeed_results.extend([ufeed['items'][0]])
 
                     #tag_results.extend(results.get('ranked_items', []))

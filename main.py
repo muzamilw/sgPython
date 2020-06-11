@@ -63,48 +63,6 @@ class GlobalVars:
 
 
 
-
-##login code
-
-def login_challenge(self, checkpoint_url):
-    BASE_URL = 'https://www.instagram.com/'
-    self.s.headers.update({'Referer': BASE_URL})
-    req = self.s.get(BASE_URL[:-1] + checkpoint_url)
-    self.s.headers.update({'X-CSRFToken': req.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
-    self.s.headers.update({'Referer': BASE_URL[:-1] + checkpoint_url})
-    mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
-    challenge_data = {'choice': mode}
-    challenge = self.s.post(BASE_URL[:-1] + checkpoint_url, data=challenge_data, allow_redirects=True)
-    self.s.headers.update({'X-CSRFToken': challenge.cookies['csrftoken'], 'X-Instagram-AJAX': '1'})
-
-    code = input('Enter code received: ').strip()
-    code_data = {'security_code': code}
-    code = self.s.post(BASE_URL[:-1] + checkpoint_url, data=code_data, allow_redirects=True)
-    self.s.headers.update({'X-CSRFToken': code.cookies['csrftoken']})
-    self.cookies = code.cookies
-    code_text = json.loads(code.text)
-    if code_text.get('status') == 'ok':
-        self.authenticated = True
-        self.logged_in = True
-    elif 'errors' in code.text:
-        for count, error in enumerate(code_text['challenge']['errors']):
-            count += 1
-            logging.error('Session error %(count)s: "%(error)s"' % locals())
-    else:
-        logging.error(json.dumps(code_text))
-
-# def IGLogin():
-#     InstagramAPI.ver = login_challenge
-#     api = InstagramAPI("nevillekmiec", "!_LKvXc1")
-#     api.login()
-#     try:
-#         link = api.LastJson['challenge']['api_path']
-#         api.ver(link)
-#         api.login()
-#     except:
-#         pass
-#     return api
-
 try:
     from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -405,9 +363,9 @@ class LoginApp(MDApp):
 
             if (platform.system() == "Darwin"):
                 Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", username+'_login.json')
+                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", username + '_login.json')
             else:
-                settings_file = Path("userdata") / username+'_login.json'
+                settings_file = Path("userdata") / str(username + '_login.json')
 
             
             if not os.path.isfile(settings_file):
@@ -521,7 +479,7 @@ class LoginApp(MDApp):
             Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
             settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", igusername+'_login.json')
         else:
-            settings_file = Path("userdata") / igusername+'_login.json'
+            settings_file = Path("userdata") / str(igusername + '_login.json')
 
         
         os.remove(settings_file)
