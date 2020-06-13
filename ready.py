@@ -34,6 +34,7 @@ from kivymd.uix.list import OneLineAvatarIconListItem
 from kivymd.uix.bottomsheet import MDListBottomSheet
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
 import customFunctions as cf
+from progressbar import CircularProgressBar
 
 
 
@@ -47,6 +48,8 @@ class Ready(Screen):
     Logout_alert_dialog = None
     log = None
     RunScheduled = False
+    TotalTime = 0
+    ElapsedTime = 0
     
 
     # def __init__(self, **kwargs):
@@ -65,6 +68,13 @@ class Ready(Screen):
     
     def processjobs(self,dt):
         schedule.run_pending()
+
+    def animate(self, dt):
+        bar = self.ids['pbar']
+        if bar.value < bar.max:
+            bar.value += 1
+        else:
+            bar.value = bar.min
     
     def on_enter(self):
         app = App.get_running_app()
@@ -73,6 +83,7 @@ class Ready(Screen):
             
             lblusername.text = app.api.username
             # app.api.feed_timeline()
+            # Clock.schedule_interval(self.animate, 0.05)
 
             label = self.ids['logLabel'] #Label(text="showing the log here")
 
@@ -85,7 +96,8 @@ class Ready(Screen):
             self.lblFollowExchange =  self.ids['lblFollowExchange']
             self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
-            self.lblETATime =  self.ids['lblETATime']
+            
+            
 
             if hasattr(app.gVars, 'SequenceRunning'):
                 if app.gVars.SequenceRunning is None:
@@ -121,40 +133,22 @@ class Ready(Screen):
         except ClientError as e:
             Alert(title='Error', text='General Client error. , full error : ' + str(e))
 
-        # try:
-        #     from instagram_private_api import (
-        #         Client, ClientError, ClientLoginError,
-        #         ClientCookieExpiredError, ClientLoginRequiredError,
-        #         __version__ as client_version)
-        # except ImportError:
-        #     import sys
-        #     sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-        #     from instagram_private_api import (
-        #         Client, ClientError, ClientLoginError,
-        #         ClientCookieExpiredError, ClientLoginRequiredError,
-        #         __version__ as client_version)
-
-    def printMSG(self):
-        print('schduler challa')
-
-
-   
-
     def startBot(self):
         app = App.get_running_app()
+        self.ElapsedTime = app.gVars.ElapsedTime
 
         if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
             oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
             self.botThread = Thread(target=oBot.RunBot)
             self.botThread.start()
-            self.StartTime = datetime.datetime.now()
+            
             Clock.schedule_interval(self.updateTime, 1)
 
             self.ids['btnStart'].text = "Sequence Running"
             self.ids['btnStart'].disabled = True
             self.ids['btnStop'].disabled = False
             
-            self.ids['spinner'].active = True
+            # Clock.schedule_interval(self.animate, 0.05)
         else:
             self.log.info("Sequence is already running, skipping re-launch")
 
@@ -165,9 +159,34 @@ class Ready(Screen):
         # t.start()
 
     def updateTime(self,dt):
+        app = App.get_running_app()
 
-        secs = (datetime.datetime.now()-self.StartTime).total_seconds()
-        self.lblTotalTime.text = str(datetime.timedelta(seconds= int(secs)))
+        bar = self.ids['pbar']
+        
+        
+        if app.gVars.TotalActionsLoaded != 0 or app.gVars.RequiredActionPerformed  != 0:
+            loadingProgress = (app.gVars.ActionLoaded / app.gVars.TotalActionsLoaded) * 100
+            loadingWeight = app.gVars.TotalActionsLoaded / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
+
+            actionProgress = (app.gVars.ActionPerformed / app.gVars.RequiredActionPerformed ) * 100
+            actionsWeight = app.gVars.RequiredActionPerformed / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
+            
+            bar.value = int((loadingProgress * loadingWeight) + (actionProgress * actionsWeight))
+        else:
+            bar.value = 1
+        
+        # secs = (datetime.datetime.now()-self.StartTime).total_seconds()
+        # self.lblTotalTime.text = str(datetime.timedelta(seconds= int(secs)))
+        self.ElapsedTime = self.ElapsedTime + 1
+        app.gVars.ElapsedTime = self.ElapsedTime
+
+        secsleft = self.TotalTime - self.ElapsedTime
+        if self.TotalTime != 0:
+            self.lblTotalTime.text = "Time Left : " + str(datetime.timedelta(seconds= int(secsleft)))
+        else:
+            self.lblTotalTime.text = "Calculating ..."
+
+
 
     def my_thread(self,log):
 
@@ -187,7 +206,9 @@ class Ready(Screen):
         self.ids['btnStart'].disabled = False
         self.ids['btnStop'].disabled = True
         self.log.info("Stop Signal Sent")
-        self.ids['spinner'].active = False
+        
+        
+        Clock.unschedule(self.updateTime)
         #self.t.join()
         #self.manager.transition = SlideTransition(direction="right")
         # app = App.get_running_app()
@@ -237,7 +258,7 @@ class Ready(Screen):
         self.ids['btnStart'].disabled = False
         self.ids['btnStop'].disabled = True
         self.log.info("Logging out")
-        self.ids['spinner'].active = False
+        # self.ids['spinner'].active = False
         #self.t.join()
         #self.manager.transition = SlideTransition(direction="right")
         # app = App.get_running_app()

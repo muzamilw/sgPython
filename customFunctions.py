@@ -243,12 +243,12 @@ def checkUsernameinFollowedList(json_object, name):
         return False
 
     
-def LoadHashtagsTodo(api, manifestObj ,Client,log):
+def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -305,12 +305,12 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
+def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -374,12 +374,12 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log):
+def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars):
     
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::

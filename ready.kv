@@ -1,6 +1,6 @@
 #:kivy 1.9.0
 #:import get_color_from_hex kivy.utils.get_color_from_hex
-
+#import progressbar
 
 <Ready>:
     canvas:
@@ -35,18 +35,18 @@
             orientation:'horizontal'
         
         
-            BoxLayout:
+            BoxLayout: # ig logo and label
                 orientation: 'horizontal' 
-                size_hint: 0.6, None           
+                size_hint: 0.5, None           
 
                 Image:
                     source: "data//iglogo.png"
                     size_hint: 0.3, None
-                    size: dp(100), dp(100)
+                    size: dp(60), dp(60)
                     pos_hint: {"center_y": .5}
 
                 MDLabel:
-                    font_style: 'H3'
+                    font_style: 'H5'
                     theme_text_color: 'Primary'
                     size_hint: 0.7, None
                     text: ""
@@ -54,19 +54,28 @@
                     valign : 'center'
                     id: lblusername
            
-            BoxLayout:
+            BoxLayout: #labels and start button
                 orientation:'horizontal'
-                size_hint: 0.4, None           
+                size_hint: 0.5, None    
+                    
                 
 
-                GridLayout:
-                    size_hint: 1, None
+                MDGridLayout:
+                    size_hint: 0.5, None
                     orientation:'horizontal'
                     cols : 2
+                    # canvas:
+                    #     Color:
+                    #         rgb: 1, 1, 1
+                    #     BorderImage
+                    #         pos: self.pos
+                    #         size: self.size
+                    #         source: 'myimage.png'
+                    # md_bg_color: app.theme_cls.primary_color
 
             
-                    GridLayout:
-                        size_hint: 0.95, None
+                    MDGridLayout:
+                        size_hint: 0.75, None
                         orientation:'horizontal'
                         cols : 2
                         spacing:10
@@ -74,55 +83,62 @@
                         MDLabel:
                             text: "Auto Start at"
                             id :lblAutoStart
-                            font_size: 30
+                            font_size: 25
+                            size_hint: 0.6, 1
+                            halign:"right"
 
                         MDRaisedButton:
                             text: "Start"
                             on_release: root.startBot()
                             id: btnStart
-                            size_hint: 1, 0.05
+                            size_hint: 0.4, 0.05
                             os_hint: {'center_x': .5, 'center_y': .5}
                         
                         
                         
-                        GridLayout: 
-                            orientation:'horizontal'
-                            cols:3
-                            MDLabel:
-                                id: lblTotalTime
-                                text: "0:00:00"
-                                font_size: 30
-                            MDLabel:
-                                text: " of "
-                                font_size: 30
-                                halign : 'center'
-                            MDLabel:
-                                id: lblETATime
-                                text: "0:00:00"
-                                font_size: 30
+                        
+
+                        MDLabel:
+                            id: lblTotalTime
+                            text: "Time Remaining :  0:00:00"
+                            font_size: 25
+                            size_hint: 0.6, 1
+                            halign:"right"
+                           
 
                         MDRaisedButton:
                             text: "Stop"
                             on_release: root.stop()
                             id : btnStop
-                            size_hint: 1, 0.1
+                            size_hint: 0.4, 0.1
                             pos_hint: {"center_x": .5}
                             md_bg_color: get_color_from_hex("#FF0000")
                             disabled : True
 
                     
 
-                    GridLayout:
-                        size_hint: 0.05, None
+                    MDGridLayout:
+                        size_hint: 0.25, None
                         orientation:'horizontal'
                         cols : 2
+                        spacing_left:20
+        
+                        MDLabel:
+                            text : " "
+                            size_hint: 0.2, None
+
+                        CircularProgressBar:
+                            # pos: 400, 100
+                            id:pbar
+                            widget_size: 110
+        
         MDLabel:
            #spacer
             text: " "
             size_hint: 1, 0.1
             halign : 'center'
 
-        GridLayout:
+        MDGridLayout:
             cols: 4
             orientation: 'horizontal'
             padding: 20
@@ -133,24 +149,25 @@
                 text: "0 / 0"
                 size_hint: 1, 0.8
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
             MDLabel:
                 id: lblUnFollow
                 text: "0 / 0"
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
                
             MDLabel:
                 id: lblLike
                 text: "0 / 0"
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
             MDLabel:
                 id: lblStoryView
                 text: "0 / 0"
                 halign : 'center'
-                font_style: 'H4'
-
+                font_style: 'H5'
+        
+            
             MDLabel:
                 text: "F"
                 size_hint: 1, 0.8
@@ -177,25 +194,25 @@
                 id: lblComments
                 text: "0 / 0"
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblLikeExchange
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
             MDLabel:
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 id: lblFollowExchange
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
             MDLabel:
                 id: lblCommentExchange
                 text: " 0 / 0 "
                 size_hint: 1, 0.8
                 halign : 'center'
-                font_style: 'H4'
+                font_style: 'H5'
 
             MDLabel:
                 text: "C"
@@ -225,12 +242,7 @@
             #     width:1
                 # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
 
-            MDSpinner:
-                id: spinner
-                size_hint: None, None
-                size: dp(20), dp(20)
-                pos_hint: {'center_x': .5, 'center_y': .5}
-                active: False
+            
         
 
         MDTextFieldRect:

@@ -192,8 +192,9 @@ class Client(Client):
 
 class LoginApp(MDApp):
     Config.set('graphics', 'resizable', '0')
-    Config.set('graphics', 'width', '500')
+    Config.set('graphics', 'width', '700')
     Config.set('graphics', 'height', '500')
+    Window.size = (1000, 600)
     gVars = None
     api = None
     username = StringProperty(None)
@@ -270,6 +271,7 @@ class LoginApp(MDApp):
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
+                self.gVars.ActionLoaded = 0
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
@@ -277,6 +279,7 @@ class LoginApp(MDApp):
             gVars.RunStartTime = None
             gVars.RunEndTime = None
             gVars.TotalSessionTime = 0
+            gVars.ElapsedTime = 0
             gVars.manifestJson = None
             gVars.manifestObj = None
             gVars.loginResult = None
@@ -326,6 +329,13 @@ class LoginApp(MDApp):
             gVars.ReqExComments = 0
 
             gVars.SequenceRunning = False
+
+            gVars.TotalActionsLoaded = 0
+            gVars.ActionLoaded = 0
+            
+            gVars.RequiredActionPerformed = 0
+            gVars.ActionPerformed = 0
+
 
             gVars.API_BaseURL = "https://socialplannerpro.com/API"
 
@@ -421,6 +431,7 @@ class LoginApp(MDApp):
         gVars.TotalSessionTime = 0
         gVars.manifestJson = None
         gVars.manifestObj = None
+        gVars.ElapsedTime = 0 
         
         gVars.hashtagActions = None
         gVars.locationActions = None
@@ -465,7 +476,11 @@ class LoginApp(MDApp):
         gVars.ReqExComments = 0
         gVars.SequenceRunning = False
 
-   
+        gVars.TotalActionsLoaded = 0
+        gVars.ActionLoaded = 0
+        
+        gVars.RequiredActionPerformed = 0
+        gVars.ActionPerformed = 0
         
 
     def AppLogout(self):
@@ -497,5 +512,5 @@ class LoginApp(MDApp):
     
 
 if __name__ == '__main__':
-    print(platform.system())
+    
     LoginApp().run()

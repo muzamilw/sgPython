@@ -183,9 +183,11 @@ class Bot():
                             self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
                             runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExComments + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
+                            gVars.TotalActionsLoaded = gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExComments + gVars.ReqExFollow + gVars.ReqExLikes
                             runTimeComputation += gVars.manifestObj.totalActions  * 10
+                            gVars.RequiredActionPerformed = gVars.manifestObj.totalActions
 
-                            self.ui.lblETATime.text = str(datetime.timedelta(seconds= int(runTimeComputation))) 
+                            self.ui.TotalTime = int(runTimeComputation)
 
 
                             if gVars.Todo is None:
@@ -196,7 +198,7 @@ class Bot():
                             if gVars.hashtagActions is None:
                                 log.info('Getting Feeds of Hashtags and creating action list')
                                 hashstart = datetime.datetime.now()
-                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log)
+                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars)
                                 LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                                 log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
@@ -205,7 +207,7 @@ class Bot():
                             if gVars.locationActions is None:
                                 log.info('Getting Feeds of Location and creating action list')
                                 locationtart = datetime.datetime.now()
-                                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log)
+                                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars)
                                 LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
                                 log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
@@ -216,7 +218,7 @@ class Bot():
                                 log.info('Getting Feeds of Competitors and creating action list')
                                 DCstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
-                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log)
+                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars)
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                                 log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
@@ -430,6 +432,8 @@ class Bot():
                                     self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                                     self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
+                                    gVars.ActionPerformed += 1 
+
                                     if (platform.system() == "Darwin"):
                                         Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
                                         file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
