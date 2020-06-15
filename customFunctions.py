@@ -43,7 +43,7 @@ def SendEmail(you,filename,SocialProfileName, Header):
     
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'Bot Run Report for ' + SocialProfileName   #The subject line
+    message['Subject'] = 'Daily Sequence Run Report for ' + SocialProfileName   #The subject line
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
@@ -113,7 +113,7 @@ def SendAction(gVars,SocialProfileId, Action, TargetSocialUserName,Message):
             'TargetSocialUserName':TargetSocialUserName,
             'Message':Message
            }]
-    r = json.loads(requests.post(url = API_Login, json=data).text) 
+    r = json.loads(requests.post(url = API_Login, json=data,timeout=150).text) 
     if r is not None:
         return True
     else:
@@ -445,7 +445,7 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
+def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
     try:
         locMediaUsers = []
 
@@ -466,6 +466,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                                     log.info('Pulling suggested user feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                                     time.sleep(sleepTime)
                                     iguserCount = iguserCount + 1
+                                    gVars.ActionLoaded += 1
                             
                             
         except:
@@ -495,6 +496,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                             sleepTime = randrange(5,10)
                             log.info('Pulling Follow exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
+                            gVars.ActionLoaded += 1
         except Exception as e:
             print('exception in FollowList for user' + folluser)
             raise
@@ -520,6 +522,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                             sleepTime = randrange(5,10)
                             log.info('Pulling like exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
+                            gVars.ActionLoaded += 1
         except:
             print('exception in LikeList')
             raise
@@ -545,6 +548,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
                             sleepTime = randrange(5,10)
                             log.info('Pulling comment exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
+                            gVars.ActionLoaded += 1
         except:
             print('exception in FollowersToComment')
             raise
@@ -623,7 +627,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log):
         print(print(sys.exc_info()))
         return None
 
-def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
+def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log,gVars):
     
     locMediaUsers = []
     unfollCount = 0
@@ -645,6 +649,7 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
 
             if follUserRes is not None:
                 locMediaUsers.append([str(follUserRes['user']['username']),'',str(follUserRes['user']['pk']),str(follUserRes['user']['username']),str(follUserRes["user"]["full_name"]), '' ])
+                gVars.ActionLoaded += 1
             else:
                 locMediaUsers.append(['delete_not_found','','',foll['FollowedSocialUsername'],'', '' ])
             unfollCount = unfollCount + 1
@@ -669,7 +674,7 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log):
             
     return usersdf
 
-def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
+def LoadStoryTodo(api, manifestObj, SubActionWeights,log,gVars):
     
     reelMediaUsers = []
     storyviewsCount = 0
@@ -683,6 +688,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
                 if user_reel_media is not None and len(user_reel_media['items']) > 0:
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
                     storyviewsCount = storyviewsCount + 1
+                    gVars.ActionLoaded += 1
                 sleepTime = randrange(5,15)
                 log.info('Pulling story feed to view for ' + str(reel_user['user']['username']) + ', Sleep for ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
@@ -708,8 +714,6 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log):
             
     return usersdf
 
-def checkUsernameinFollowedList(self,json_object, name):
-        return [obj for obj in json_object if obj['FollowedSocialUsername']==name]
 
 
 def SetupGlobalTodo(manifestObj):

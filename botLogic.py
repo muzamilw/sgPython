@@ -51,6 +51,7 @@ class Actions(Enum):
     LikeExchange = 74
     BotError = 80
     BadHashtag = 86
+    ping = 99
 
     dialog = None
 
@@ -164,7 +165,10 @@ class Bot():
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
 
                             gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
-                            gVars.ReqUnFollow = gVars.manifestObj.UnFoll16DaysEngage
+                            
+                            gVars.ReqUnFollow = len(gVars.manifestObj.FollowersToUnFollow) #gVars.manifestObj.UnFoll16DaysEngage
+                            gVars.TotUnFollow = len(gVars.manifestObj.FollowersToUnFollow)
+
                             gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
                             gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
                             gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
@@ -202,6 +206,7 @@ class Bot():
                                 LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                                 log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
                             
                                 
                             if gVars.locationActions is None:
@@ -211,6 +216,7 @@ class Bot():
                                 LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
                                 log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             
                                 
@@ -222,6 +228,7 @@ class Bot():
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                                 log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             if gVars.SuggestFollowers is None:
                                 log.info('Getting Feeds of Suggested Users and creating action list')
@@ -231,27 +238,30 @@ class Bot():
                                     SeqNos = SeqNos + gVars.DCActions.groupby(['Action'])['Seq'].count()
                                 
 
-                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log)
+                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars)
                                 LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
                                 log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                                 
-                            if gVars.UnFollowActions is None and gVars.manifestObj.UnFollFollowersAfterMinDays:
+                            if gVars.UnFollowActions is not None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
                                 log.info('Getting Feeds of UnFollow and creating action list')
                                 UnFollstart = datetime.datetime.now()
-                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log)
+                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
                                 LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
                                 log.info('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             if gVars.StoryViewActions is None and gVars.manifestObj.AfterFollViewUserStory == 1:
                                 log.info('Getting Feeds of StoryViews and creating action list')
                                 Storystart = datetime.datetime.now()
-                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log)
+                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
                                 LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
                                 log.info('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
                             actions = pd.concat(frames)
@@ -262,7 +272,7 @@ class Bot():
                                 log.info('GlobalTodo merged')
 
                             gVars.TotFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Follow') & (gVars.GlobalTodo['UserId'] != '')])
-                            gVars.TotUnFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'UnFollow') & (gVars.GlobalTodo['UserId'] != '')])
+                            gVars.TotUnFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'UnFollow') & (gVars.GlobalTodo['UserId'].isnull() == False)])
                             gVars.TotLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Like') & (gVars.GlobalTodo['UserId'] != '')])
                             gVars.TotStoryViews = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'StoryView') & (gVars.GlobalTodo['UserId'] != '')])
                             gVars.TotComments = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Comment') & (gVars.GlobalTodo['UserId'] != '')])
@@ -286,6 +296,15 @@ class Bot():
                             
                             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
                             log.info("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
+
+                            #debugging file
+                            file_to_open = ""
+                            if (platform.system() == "Darwin"):
+                                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
+                                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "GlobData.csv")
+                            else:
+                                file_to_open = Path("userdata") / "GlobData.csv"
+                            gVars.GlobalTodo.to_csv(file_to_open)
 
                         except (ClientLoginError, ClientLoginRequiredError, ClientCookieExpiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
@@ -446,6 +465,7 @@ class Bot():
                             if self.botStop.is_set() != True :  #do not perform cleanup and send email if stop signal is sent.. 
                                 #Run Ending
                                 gVars.RunEndTime = datetime.datetime.now()
+                                gVars.LastSuccessfulSequenceRunDate = datetime.datetime.today() 
                                 log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
                                 #writing log to file
 
@@ -463,6 +483,7 @@ class Bot():
                                 
                                 cf.SendEmail('muzamilw@gmail.com',file_to_open,gVars.SGusername,'')
                                 log.info('Email sent' )
+                                
 
                                 app.ResetGlobalVars()
                                 log.info('Cleanup performed exiting main thread')
@@ -505,7 +526,7 @@ class Bot():
                            
                             raise e
 
-                        except e:# ClientError:
+                        except Exception as e:# ClientError:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Exception occurred in main sequence action loop, restarting")
                             log.info(traceback.format_exc())

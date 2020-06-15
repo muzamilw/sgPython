@@ -10,6 +10,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.clock import Clock
+import kivy.utils as util
 import traceback
 import sys
 import os
@@ -137,21 +138,24 @@ class Ready(Screen):
         app = App.get_running_app()
         self.ElapsedTime = app.gVars.ElapsedTime
 
-        if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
-            oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
-            self.botThread = Thread(target=oBot.RunBot)
-            self.botThread.start()
-            
-            Clock.schedule_interval(self.updateTime, 1)
+        if app.gVars.LastSuccessfulSequenceRunDate is None or app.gVars.LastSuccessfulSequenceRunDate != datetime.datetime.today() :
+            if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
+                oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
+                self.botThread = Thread(target=oBot.RunBot)
+                self.botThread.start()
+                
+                Clock.schedule_interval(self.updateTime, 1)
 
-            self.ids['btnStart'].text = "Sequence Running"
-            self.ids['btnStart'].disabled = True
-            self.ids['btnStop'].disabled = False
-            
-            # Clock.schedule_interval(self.animate, 0.05)
+                self.ids['btnStart'].text = "Sequence Running"
+                self.ids['btnStart'].disabled = True
+                self.ids['btnStart'].text_color = util.get_color_from_hex("##16D39A")
+                self.ids['btnStop'].disabled = False
+                
+                # Clock.schedule_interval(self.animate, 0.05)
+            else:
+                self.log.info("Sequence is already running, skipping re-launch")
         else:
-            self.log.info("Sequence is already running, skipping re-launch")
-
+            self.log.info("Sequence has been completed successfully for today. Next run is possible tomorrow.")
         
         
         # t = threading.Thread(target=self.my_thread, args=(log,))
@@ -166,12 +170,16 @@ class Ready(Screen):
         
         if app.gVars.TotalActionsLoaded != 0 or app.gVars.RequiredActionPerformed  != 0:
             loadingProgress = (app.gVars.ActionLoaded / app.gVars.TotalActionsLoaded) * 100
-            loadingWeight = app.gVars.TotalActionsLoaded / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
+            loadingWeight = 10 / (10 + 30) #app.gVars.TotalActionsLoaded / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
 
             actionProgress = (app.gVars.ActionPerformed / app.gVars.RequiredActionPerformed ) * 100
-            actionsWeight = app.gVars.RequiredActionPerformed / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
+            actionsWeight = 30 / (10 + 30)#app.gVars.RequiredActionPerformed / ( app.gVars.TotalActionsLoaded + app.gVars.RequiredActionPerformed)
             
-            bar.value = int((loadingProgress * loadingWeight) + (actionProgress * actionsWeight))
+            bvalue = int((loadingProgress * loadingWeight) + (actionProgress * actionsWeight))
+            if bvalue > 100:
+                bvalue = 100 
+
+            bar.value = bvalue
         else:
             bar.value = 1
         

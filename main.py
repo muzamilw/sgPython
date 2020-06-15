@@ -271,7 +271,7 @@ class LoginApp(MDApp):
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
-                self.gVars.ActionLoaded = 0
+                
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
@@ -335,6 +335,7 @@ class LoginApp(MDApp):
             
             gVars.RequiredActionPerformed = 0
             gVars.ActionPerformed = 0
+            gVars.LastSuccessfulSequenceRunDate = None
 
 
             gVars.API_BaseURL = "https://socialplannerpro.com/API"
@@ -481,6 +482,7 @@ class LoginApp(MDApp):
         
         gVars.RequiredActionPerformed = 0
         gVars.ActionPerformed = 0
+
         
 
     def AppLogout(self):
