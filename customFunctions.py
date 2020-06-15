@@ -113,7 +113,7 @@ def SendAction(gVars,SocialProfileId, Action, TargetSocialUserName,Message):
             'TargetSocialUserName':TargetSocialUserName,
             'Message':Message
            }]
-    r = json.loads(requests.post(url = API_Login, json=data,timeout=150).text) 
+    r = json.loads(requests.post(url = API_Login, json=data,timeout=(15, 40)).text) 
     if r is not None:
         return True
     else:

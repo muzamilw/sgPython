@@ -1,0 +1,53 @@
+2020-06-15T15:59:43,795 Non-user install because user site-packages disabled
+2020-06-15T15:59:43,808 Created temporary directory: C:\Users\muzam\AppData\Local\Temp\pip-ephem-wheel-cache-0zcobyrk
+2020-06-15T15:59:43,809 Created temporary directory: C:\Users\muzam\AppData\Local\Temp\pip-req-tracker-0qp9b998
+2020-06-15T15:59:43,810 Initialized build tracking at C:\Users\muzam\AppData\Local\Temp\pip-req-tracker-0qp9b998
+2020-06-15T15:59:43,810 Created build tracker: C:\Users\muzam\AppData\Local\Temp\pip-req-tracker-0qp9b998
+2020-06-15T15:59:43,810 Entered build tracker: C:\Users\muzam\AppData\Local\Temp\pip-req-tracker-0qp9b998
+2020-06-15T15:59:43,811 Created temporary directory: C:\Users\muzam\AppData\Local\Temp\pip-install-zwwv2im5
+2020-06-15T15:59:43,816 Obtaining file:///C:/Development/instagram_private_api
+2020-06-15T15:59:43,818   Added file:///C:/Development/instagram_private_api to build tracker 'C:\\Users\\muzam\\AppData\\Local\\Temp\\pip-req-tracker-0qp9b998'
+2020-06-15T15:59:43,818     Running setup.py (path:C:\Development\instagram_private_api\setup.py) egg_info for package from file:///C:/Development/instagram_private_api
+2020-06-15T15:59:43,818     Created temporary directory: C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7
+2020-06-15T15:59:43,819     Running command python setup.py egg_info
+2020-06-15T15:59:44,184     running egg_info
+2020-06-15T15:59:44,185     creating C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info
+2020-06-15T15:59:44,186     writing C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\PKG-INFO
+2020-06-15T15:59:44,187     writing dependency_links to C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\dependency_links.txt
+2020-06-15T15:59:44,187     writing top-level names to C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\top_level.txt
+2020-06-15T15:59:44,192     writing manifest file 'C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\SOURCES.txt'
+2020-06-15T15:59:44,222     reading manifest file 'C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\SOURCES.txt'
+2020-06-15T15:59:44,224     writing manifest file 'C:\Users\muzam\AppData\Local\Temp\pip-pip-egg-info-zv3wbow7\instagram_private_api.egg-info\SOURCES.txt'
+2020-06-15T15:59:44,225     C:\Users\muzam\AppData\Local\Programs\Python\Python38\lib\distutils\dist.py:274: UserWarning: Unknown distribution option: 'test_requires'
+2020-06-15T15:59:44,225       warnings.warn(msg)
+2020-06-15T15:59:44,274   Source in c:\development\instagram_private_api has version 1.6.0, which satisfies requirement instagram-private-api==1.6.0 from file:///C:/Development/instagram_private_api
+2020-06-15T15:59:44,275   Removed instagram-private-api==1.6.0 from file:///C:/Development/instagram_private_api from build tracker 'C:\\Users\\muzam\\AppData\\Local\\Temp\\pip-req-tracker-0qp9b998'
+2020-06-15T15:59:44,366 Installing collected packages: instagram-private-api
+2020-06-15T15:59:44,416   Running setup.py develop for instagram-private-api
+2020-06-15T15:59:44,417     Running command 'c:\development\igbot\env\scripts\python.exe' -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'C:\\Development\\instagram_private_api\\setup.py'"'"'; __file__='"'"'C:\\Development\\instagram_private_api\\setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' develop --no-deps
+2020-06-15T15:59:44,892     running develop
+2020-06-15T15:59:45,008     running egg_info
+2020-06-15T15:59:45,008     writing instagram_private_api.egg-info\PKG-INFO
+2020-06-15T15:59:45,010     writing dependency_links to instagram_private_api.egg-info\dependency_links.txt
+2020-06-15T15:59:45,011     writing top-level names to instagram_private_api.egg-info\top_level.txt
+2020-06-15T15:59:45,056     reading manifest file 'instagram_private_api.egg-info\SOURCES.txt'
+2020-06-15T15:59:45,062     writing manifest file 'instagram_private_api.egg-info\SOURCES.txt'
+2020-06-15T15:59:48,267 ERROR: Command errored out with exit status 3221225477: 'c:\development\igbot\env\scripts\python.exe' -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'C:\\Development\\instagram_private_api\\setup.py'"'"'; __file__='"'"'C:\\Development\\instagram_private_api\\setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' develop --no-deps Check the logs for full command output.
+2020-06-15T15:59:48,292 Exception information:
+2020-06-15T15:59:48,292 Traceback (most recent call last):
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\cli\base_command.py", line 188, in _main
+2020-06-15T15:59:48,292     status = self.run(options, args)
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\cli\req_command.py", line 185, in wrapper
+2020-06-15T15:59:48,292     return func(self, options, args)
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\commands\install.py", line 398, in run
+2020-06-15T15:59:48,292     installed = install_given_reqs(
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\req\__init__.py", line 67, in install_given_reqs
+2020-06-15T15:59:48,292     requirement.install(
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\req\req_install.py", line 780, in install
+2020-06-15T15:59:48,292     install_editable_legacy(
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\operations\install\editable_legacy.py", line 49, in install_editable
+2020-06-15T15:59:48,292     call_subprocess(
+2020-06-15T15:59:48,292   File "c:\development\igbot\env\lib\site-packages\pip\_internal\utils\subprocess.py", line 241, in call_subprocess
+2020-06-15T15:59:48,292     raise InstallationError(exc_msg)
+2020-06-15T15:59:48,292 pip._internal.exceptions.InstallationError: Command errored out with exit status 3221225477: 'c:\development\igbot\env\scripts\python.exe' -c 'import sys, setuptools, tokenize; sys.argv[0] = '"'"'C:\\Development\\instagram_private_api\\setup.py'"'"'; __file__='"'"'C:\\Development\\instagram_private_api\\setup.py'"'"';f=getattr(tokenize, '"'"'open'"'"', open)(__file__);code=f.read().replace('"'"'\r\n'"'"', '"'"'\n'"'"');f.close();exec(compile(code, __file__, '"'"'exec'"'"'))' develop --no-deps Check the logs for full command output.
+2020-06-15T15:59:48,428 Removed build tracker: 'C:\\Users\\muzam\\AppData\\Local\\Temp\\pip-req-tracker-0qp9b998'
