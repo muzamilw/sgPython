@@ -1,28 +1,13 @@
 pyinstaller win.spec -i data\ml.ico -w --noconsole --clean
 
-
-pyinstaller mac.spec --onefile --windowed
-
-pyinstaller main.py --onedir --windowed --log-level=debug --debug -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
-
-
-pyinstaller main.py --onedir --windowed --log-level=DEBUG --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
-
-pyinstaller main.py --onedir --console --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
-
-pyinstaller mzapp.spec --onefile --windowed
-
-pyinstaller mzapp.spec --onefile --windowed --noconsole --clean 
-
 codesign --force --sign "SocialPlannerPro" mzapp.dmg
 
-
-
+#steps
 1 - delete folders
-env
-git
-vscode
-build
+    env
+    git
+    vscode
+    build
 2- delte all py files
 
 3 - pyarmor obfuscate foo.py  - dp we need it ?
@@ -38,5 +23,21 @@ Path C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86
 CD DIST
 SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerPro.exe
 
+Run setup packager
+
 #sign the setup
 SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerProSetup.exe
+
+
+#install the api from the following location
+pip install git+https://github.com/muzamilw/instagram_private_api.git --upgrade --force-reinstall
+
+
+###############################################
+pyinstaller mac.spec --onefile --windowed
+pyinstaller main.py --onedir --windowed --log-level=debug --debug -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+pyinstaller main.py --onedir --windowed --log-level=DEBUG --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+pyinstaller main.py --onedir --console --debug all -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
+pyinstaller mzapp.spec --onefile --windowed
+pyinstaller mzapp.spec --onefile --windowed --noconsole --clean 
+###############################################

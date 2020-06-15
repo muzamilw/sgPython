@@ -97,6 +97,7 @@ class Ready(Screen):
             self.lblFollowExchange =  self.ids['lblFollowExchange']
             self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
+            self.tbar =  self.ids['tbar']
             
             
 
@@ -112,10 +113,12 @@ class Ready(Screen):
                 log.addHandler(MyLabelHandler(label, logging.DEBUG))
                 self.log = log
 
-            if app.gVars.manifestObj is None:
+            if app.gVars.manifestObj is not None:
                 app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
                 app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
+
             
+            self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
             self.ids['lblAutoStart'].text = "Autostart at : " + app.gVars.manifestObj.starttime
 
             if self.RunScheduled == False:
@@ -136,6 +139,11 @@ class Ready(Screen):
 
     def startBot(self):
         app = App.get_running_app()
+
+        if app.gVars.manifestObj.PaymentPlanId is None or app.gVars.manifestObj.PaymentPlanId == 1:
+            self.ShowErrorMessage("Please upgrade your subscription to start the sequence")
+            return
+
         self.ElapsedTime = app.gVars.ElapsedTime
 
         if app.gVars.LastSuccessfulSequenceRunDate is None or app.gVars.LastSuccessfulSequenceRunDate != datetime.datetime.today() :
@@ -223,6 +231,27 @@ class Ready(Screen):
         # app.AppLogout()
         # self.manager.current = 'login'
         # self.manager.get_screen('login').resetForm()
+
+    def ShowErrorMessage(self, ErrorMsg):
+        app = App.get_running_app()
+        self.dialog = MDDialog(
+                title="Error!",
+                text=ErrorMsg,
+                
+                buttons=[
+                        MDFlatButton(
+                            text="Ok",
+                            text_color=app.theme_cls.primary_color,
+                        ),
+                    ],
+            )
+
+        # self.Logout_alert_dialog.buttons.append ("Close me!",action=lambda *x: self.dismiss_callback())
+        # self.dialog.set_normal_height()
+        self.dialog.open()
+
+    # def dismiss_callback(self, *args):
+    #     self.dialog.dismiss()
 
     def logoutConfirm(self):
         app = App.get_running_app()

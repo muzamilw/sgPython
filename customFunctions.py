@@ -159,6 +159,9 @@ def LoadManifest(manifest):
     
     manifestObj = Manifest()
 
+    manifestObj.PaymentPlanId = manifest["MobileJsonRootObject"]["CurrentPlan"]["PaymentPlanId"]
+    manifestObj.PlanName = manifest["MobileJsonRootObject"]["CurrentPlan"]["PlanName"]
+
     manifestObj.FollowOn = manifest["MobileJsonRootObject"]["TargetInformation"]["FollowOn"]
     manifestObj.AfterFollLikeuserPosts = manifest["MobileJsonRootObject"]["TargetInformation"]["AfterFollLikeuserPosts"]
     manifestObj.AfterFollCommentUserPosts = manifest["MobileJsonRootObject"]["TargetInformation"]["AfterFollCommentUserPosts"]
