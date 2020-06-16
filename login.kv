@@ -41,14 +41,14 @@
                 MDLabel:
                     text: 'Enter Instagram username and SPPro PIN code'
                     pos_hint: {"center_x": .5}
-                    size_hint: 0.5, 0.1
-                    font_style: 'H5'
+                    size_hint: 0.8, 0.1
+                    font_size : "30dp"
                     halign : 'center'
 
                 MDTextFieldRound:
                     id: login
-                    # normal_color: [0, 0, 0, 0.2]
-                    # active_color: [0, 0, 0, 0.2]
+                    normal_color: [1, 1, 1, 0]
+                    color_active: [0.8, 0.8, 0.8, 0]
                     icon_type: "left"
                     size_hint: .5, 0.2
                     pos_hint: {"center_x": .5}
@@ -57,13 +57,15 @@
                     required: True
                     write_tab: False
                     font_size:"28dp"
+                    # color_mode: 'accent'
+
                     
 
                 MDTextFieldRound:
                     id: password
                     password: True
-                    # normal_color: [0, 0, 0, 0.2]
-                    # active_color: [0, 0, 0, 0.2]
+                    normal_color: [1, 1, 1, 0]
+                    color_active: [0.8, 0.8, 0.8, 0]
                     icon_type: "left"
                     icon_left: "lock"
                     size_hint: .5, 0.2

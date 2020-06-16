@@ -113,7 +113,7 @@ class Ready(Screen):
                 log.addHandler(MyLabelHandler(label, logging.DEBUG))
                 self.log = log
 
-            if app.gVars.manifestObj is not None:
+            if app.gVars.manifestObj is None:
                 app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
                 app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
 

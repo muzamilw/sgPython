@@ -171,8 +171,8 @@ class IGLogin(Screen):
 
         if app.gVars.IGpassword is not None and app.gVars.IGpassword != "":
             self.ids['password'].text = app.gVars.IGpassword
-        else:
-            self.ids['password'].text = '!_LKvXc1'
+        # else:
+        #     self.ids['password'].text = '!_LKvXc1'
 
         Clock.schedule_once(self.show_keyboard)
     
