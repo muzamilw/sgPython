@@ -86,7 +86,14 @@ def checkUsernameinFollowedList(json_object, name):
     else:
         return False
 
-def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars):   #feed_tag(tag, rank_token, **kwargs)
+def checkInList(json_object,blacklist, name):
+    result = [obj for obj in json_object if obj==name]
+    if len(result) == 0:
+        return True
+    else:
+        return False
+
+def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist):   #feed_tag(tag, rank_token, **kwargs)
     
     rank_token = Client.generate_uuid()
     has_more = True
@@ -110,8 +117,8 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars):   #feed
         prev = len(tag_results) 
         #tag_results.extend(results.get('ranked_items', []))
         #tag_results.extend(results.get('items', []))
-        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) ]   )
-        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))] )
+        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ]   )
+        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ] )
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
@@ -127,7 +134,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars):   #feed
     return tag_results
         
 
-def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars):
+def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist):
     rank_token = Client.generate_uuid()
     has_more = True
     location_results = []
@@ -147,7 +154,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars)
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             prev = len(location_results)
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]) ) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"]))  ])
             
             if maxCountToGet > len(location_results):
                 gVars.ActionLoaded +=  (len(location_results) - prev)
@@ -171,7 +178,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars)
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             prev = len(location_results)
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) ])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))  if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ])
             
 
             if maxCountToGet > len(location_results):
@@ -191,7 +198,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars)
     else:
         return None
     
-def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVars):
+def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVars,blacklist):
     try:
     
         follUserRes = None
@@ -222,7 +229,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
                             if user["is_private"] == False and len(follFeed_results) <= maxCountToGet:
                                 ufeed = api.user_feed(user['pk'])
                                 if ufeed is not None and len(ufeed['items']) > 0 :
-                                    if ufeed['items'][0]['has_liked'] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])):
+                                    if ufeed['items'][0]['has_liked'] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])) and  checkInList(manifestObj.BlackListUsers,blacklist, str(ufeed['items'][0]['user']["username"])):
                                         prev = len(follFeed_results) 
                                         follFeed_results.extend([ufeed['items'][0]])
                                         if maxCountToGet > len(follFeed_results):

@@ -315,8 +315,11 @@ class IGLogin(Screen):
 
         # Show when login expires
         if (api is not None):
-            cookie_expiry = api.cookie_jar.auth_expires
-            print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+            if api.cookie_jar.auth_expires is None:
+                print('Cookie Expiry is null')
+            else:
+                cookie_expiry = api.cookie_jar.auth_expires
+                print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
         return (api,None)
 

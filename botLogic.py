@@ -113,14 +113,17 @@ class Bot():
         RetryTimeSeconds = 30
         IsApiClientError = False
 
+        blacklist = pd.read_csv(Path("data") / "blacklist.csv")
+
         gVars = app.gVars
+        gVars.RunStartTime = datetime.datetime.now()
 
         while True and self.botStop.is_set() == False and RetryCount <= MaxRetryCount and IsApiClientError == False:
             try:
                 RetryCount = RetryCount + 1
                 log.info("Starting Sequence")
                 # return
-                gVars.RunStartTime = datetime.datetime.now()
+                
                 gVars.SequenceRunning = True
                 
                 
@@ -202,7 +205,7 @@ class Bot():
                             if gVars.hashtagActions is None:
                                 log.info('Getting Feeds of Hashtags and creating action list')
                                 hashstart = datetime.datetime.now()
-                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars)
+                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars,blacklist)
                                 LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                                 log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
@@ -212,7 +215,7 @@ class Bot():
                             if gVars.locationActions is None:
                                 log.info('Getting Feeds of Location and creating action list')
                                 locationtart = datetime.datetime.now()
-                                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars)
+                                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars,blacklist)
                                 LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
                                 log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
@@ -224,7 +227,7 @@ class Bot():
                                 log.info('Getting Feeds of Competitors and creating action list')
                                 DCstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
-                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars)
+                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                                 log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
@@ -238,17 +241,17 @@ class Bot():
                                     SeqNos = SeqNos + gVars.DCActions.groupby(['Action'])['Seq'].count()
                                 
 
-                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars)
+                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
                                 LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
                                 log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                                 
-                            if gVars.UnFollowActions is not None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
+                            if gVars.UnFollowActions is None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
                                 log.info('Getting Feeds of UnFollow and creating action list')
                                 UnFollstart = datetime.datetime.now()
-                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
+                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars,blacklist)
                                 LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
                                 log.info('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
@@ -257,7 +260,7 @@ class Bot():
                             if gVars.StoryViewActions is None and gVars.manifestObj.AfterFollViewUserStory == 1:
                                 log.info('Getting Feeds of StoryViews and creating action list')
                                 Storystart = datetime.datetime.now()
-                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
+                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars,blacklist)
                                 LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
                                 log.info('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
@@ -376,7 +379,14 @@ class Bot():
 
                                     if row['Action'] == 'Follow' and gVars.manifestObj.FollowOn == 1 and (gVars.CurrentFollowDone < gVars.manifestObj.FollAccSearchTags or gVars.CurrentExFollowDone < gVars.ReqExFollow) :
                                         apiW.FollowUser(api,row['UserId'])
-                                        api.mute_unmute(row['UserId'])
+
+                                        try:
+                                            api.mute_unmute(row['UserId'])
+                                        except ClientError as e:
+                                            log.info('Mute IG Error  {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'You cant mute users you are not following  ' + str(row['Username']))
+                                            gVars.GlobalTodo.loc[i,'Data'] = 'You cant mute users you are not following'
+                                       
                                         cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
                                         log.info('Follow action : ' + row['Username'] + ', Sleeping for : ' + str(waitTime))
                                         gVars.GlobalTodo.loc[i,'Status'] = 2
@@ -487,6 +497,7 @@ class Bot():
 
                                 app.ResetGlobalVars()
                                 log.info('Cleanup performed exiting main thread')
+                                self.ui.stop()
 
                             # log.info("Action sequence running")
 

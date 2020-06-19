@@ -197,8 +197,22 @@ def LoadManifest(manifest):
     manifestObj.LikeList = manifest["MobileJsonRootObject"]["LikeList"]
 
     manifestObj.AllFollowedAccounts = manifest["MobileJsonRootObject"]["AllFollowedAccounts"]
+
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["WhistListManualUsers"] is not None:
+        manifestObj.WhistListUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["WhistListManualUsers"].strip().split(",")
     
-    
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListUsers"] is not None:
+        manifestObj.BlackListUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListUsers"].strip().split(",")
+
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"] is not None:
+        manifestObj.BlackListLocations = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"].strip().split(",")
+        
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"] is not None:
+        manifestObj.BlackListHashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"].strip().split(",")
+
+    if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"] is not None:
+        manifestObj.BlackListWordsManual = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"].strip().split(",")
+            
     
     manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
     manifestObj.UnFoll16DaysEngage = int(intervals[0]["UnFoll16DaysEngage"])
@@ -246,12 +260,12 @@ def checkUsernameinFollowedList(json_object, name):
         return False
 
     
-def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars):
+def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):

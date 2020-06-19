@@ -29,7 +29,7 @@
             title: "Instagram Status"
             elevation: 10
             type: "top"
-            right_action_items: [["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
+            right_action_items: [["ray-start-arrow", lambda x: root.startBot()],["reload", lambda x: root.RefreshManifest()],["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
 
         
         BoxLayout:
@@ -62,76 +62,108 @@
                 
 
                 MDGridLayout:
-                    size_hint: 0.5, None
+                    id: pnlNotStarted
+                    size_hint: 1, None
                     orientation:'horizontal'
-                    cols : 2
-                    # canvas:
-                    #     Color:
-                    #         rgb: 1, 1, 1
-                    #     BorderImage
-                    #         pos: self.pos
-                    #         size: self.size
-                    #         source: 'myimage.png'
-                    # md_bg_color: app.theme_cls.primary_color
+                    cols : 1
+                    # md_bg_color: app.theme_cls.primary_dark   
 
             
                     MDGridLayout:
-                        size_hint: 0.75, None
+                        size_hint: 1, None
                         orientation:'horizontal'
                         cols : 2
-                        spacing:10
+                        
 
                         MDLabel:
-                            text: "Auto Start at"
+                            text: "Next growth session will start today at : "
+                            id :lblAutoStartLabel
+                            font_size: '20dp'
+                            size_hint: 0.8, 1
+                            halign:"right"
+
+                        MDLabel:
+                            text: ""
                             id :lblAutoStart
-                            font_size: '15dp'
-                            size_hint: 0.6, 1
-                            halign:"right"
+                            font_size: '22dp'
+                            size_hint: 0.2, 1
+                            halign:"left"
+                            text_color: get_color_from_hex("#23bd08")
+                            theme_text_color: "Custom"
+                            
 
-                        MDRaisedButton:
-                            text: "Start"
-                            on_release: root.startBot()
-                            id: btnStart
-                            size_hint: 0.4, 0.05
-                            os_hint: {'center_x': .5, 'center_y': .5}
-                        
-                        
-                        
                         
 
-                        MDLabel:
-                            id: lblTotalTime
-                            text: "Time Remaining :  0:00:00"
-                            font_size: '15dp'
-                            size_hint: 0.6, 1
-                            halign:"right"
-                           
+                MDGridLayout:
+                    id:pnlStarted
+                    size_hint: 1, None
+                    orientation:'horizontal'
+                    cols : 4
+                    # md_bg_color: app.theme_cls.primary_color
+                    
+                    MDLabel:
+                        text: "Growth Session Started on"
+                        font_size: '17dp'
+                        size_hint: 0.3, 0.4
+                        halign:"left"
+                        valign:"top"
 
-                        MDRaisedButton:
-                            text: "Stop"
-                            on_release: root.stop()
-                            id : btnStop
-                            size_hint: 0.4, 0.1
-                            pos_hint: {"center_x": .5}
-                            md_bg_color: get_color_from_hex("#FF0000")
-                            disabled : True
+                    CircularProgressBar:
+                        # pos: 400, 100
+                        id:pbar
+                        widget_size: 80
+                        value : 1
+                        size_hint: 0.2, None
+                        thickness:5
+                        progress_colour:(0, 1, 0, 1)
+    
+                    MDLabel:
+                        
+                        text: "Estimated time remaining for this session to complete all actions :"
+                        font_size: '17dp'
+                        size_hint: 0.4, 0.5
+                        halign:"left"
+                        valign:"top"
+
+                    MDLabel:
+                        text: " "
+                        font_size: '15dp'
+                        size_hint: 0.1, 0.4
+                        halign:"left"
+
+
+                    MDLabel:
+                        id: lblStartTime
+                        text: "03:33"
+                        font_size: '20dp'
+                        size_hint: 0.3, 0.6
+                        halign:"left"
+                        text_color: get_color_from_hex("#23bd08")
+                        theme_text_color: "Custom"
+                        valign:"top"
+                    MDLabel:
+                        
+                        text: " "
+                        font_size: '15dp'
+                        size_hint: 0.2, 0.5
+                        halign:"left"
+                    
+                    MDLabel:
+                        id: lblTotalTime
+                        text: "1:33"
+                        font_size: '20dp'
+                        size_hint: 0.4, 0.5
+                        halign:"left"
+                        text_color: get_color_from_hex("#23bd08")
+                        theme_text_color: "Custom"
+                        valign:"top"
+                    MDLabel:
+                        text: " "
+                        font_size: '15dp'
+                        size_hint: 0.1, 0.5
+                        halign:"left"
 
                     
-
-                    MDGridLayout:
-                        size_hint: 0.25, None
-                        orientation:'horizontal'
-                        cols : 2
-                        spacing_left:20
-        
-                        MDLabel:
-                            text : " "
-                            size_hint: 0.2, None
-
-                        CircularProgressBar:
-                            # pos: 400, 100
-                            id:pbar
-                            widget_size: 100
         
         MDLabel:
            #spacer
@@ -251,6 +283,28 @@
             text: ""
             font_size: 16
             multiline:True
-            opacity:0
+
+        MDBoxLayout:
+            id:bLabel
+            orientation:'vertical'
+            md_bg_color: app.theme_cls.primary_color
+            size_hint_x : 1
+            MDLabel:
+                theme_text_color: "Custom"
+                text: "Real Growth, Real Engagement"
+                text_color: get_color_from_hex("#FFFFFF")
+                halign:"center"
+                font_style: 'H5'
+
+            MDLabel:
+                theme_text_color: "Custom"
+                text: "Your target filters, growth charts, and much more available \nat socialplannerpro.com"
+                text_color: get_color_from_hex("#FFFFFF")
+                halign:"center"
+                size_hint : 1,None
+                font_size: "20dp"
+                
+           
+            
         
    

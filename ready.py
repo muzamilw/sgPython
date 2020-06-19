@@ -38,8 +38,6 @@ import customFunctions as cf
 from progressbar import CircularProgressBar
 
 
-
-
 class Ready(Screen):
 
     t = None
@@ -51,20 +49,36 @@ class Ready(Screen):
     RunScheduled = False
     TotalTime = 0
     ElapsedTime = 0
+    processJobEvent = None
     
 
     # def __init__(self, **kwargs):
     #     self.ids['btnStop'].disabled = True
 
-    
+    def hide_widget(self,wid, dohide=True):
+        if hasattr(wid, 'saved_attrs'):
+            if not dohide:
+                wid.height, wid.size_hint_y, wid.opacity, wid.disabled,wid.width, wid.size_hint_x = wid.saved_attrs
+                del wid.saved_attrs
+        elif dohide:
+            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled, wid.width, wid.size_hint_x
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled,wid.width, wid.size_hint_x = 0, None, 0, True,0,0
 
     def showLog(self):
         label = self.ids['logLabel']
-        if label.opacity == 0 :
-            label.opacity = 1
+        bLabel = self.ids['bLabel']
+        
+        # if label.opacity == 0 :
+        #     label.opacity = 1
             
+        # else:
+        #     label.opacity = 0
+        if label.height == 0:
+            self.hide_widget(label,False)
+            self.hide_widget(bLabel)
         else:
-            label.opacity = 0
+            self.hide_widget(label)
+            self.hide_widget(bLabel,False)
 
     
     def processjobs(self,dt):
@@ -86,8 +100,10 @@ class Ready(Screen):
             # app.api.feed_timeline()
             # Clock.schedule_interval(self.animate, 0.05)
 
-            label = self.ids['logLabel'] #Label(text="showing the log here")
+            
 
+            label = self.ids['logLabel'] #Label(text="showing the log here")
+            self.hide_widget(label)
             self.lblFollow =  self.ids['lblFollow']
             self.lblUnFollow =  self.ids['lblUnFollow']
             self.lblLike =  self.ids['lblLike']
@@ -98,8 +114,20 @@ class Ready(Screen):
             self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
             self.tbar =  self.ids['tbar']
+            self.pnlNotStarted =  self.ids['pnlNotStarted']
+            self.pnlStarted =  self.ids['pnlStarted']
+            self.lblAutoStartLabel =  self.ids['lblAutoStartLabel']
+            self.lblStartTime =  self.ids['lblStartTime']
             
-            
+
+            if app.gVars.SequenceRunning == True:
+                self.hide_widget(self.pnlNotStarted)
+                self.hide_widget(self.pnlStarted,False)
+                
+            else:
+                self.hide_widget(self.pnlNotStarted, False)
+                self.hide_widget(self.pnlStarted)
+                
 
             if hasattr(app.gVars, 'SequenceRunning'):
                 if app.gVars.SequenceRunning is None:
@@ -119,12 +147,18 @@ class Ready(Screen):
 
             
             self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
-            self.ids['lblAutoStart'].text = "Autostart at : " + app.gVars.manifestObj.starttime
+            self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
+
+
+            if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
+                self.lblAutoStartLabel.text = "Next growth session will start today at : "
+            else:
+                self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
 
             if self.RunScheduled == False:
-                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot)
+                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
                 self.RunScheduled = True
-                Clock.schedule_interval(self.processjobs, 1)
+                self.processJobEvent = Clock.schedule_interval(self.processjobs, 1)
             
             
         
@@ -135,7 +169,34 @@ class Ready(Screen):
         except ClientLoginRequiredError as e:
              Alert(title='Error', text='Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
         except ClientError as e:
-            Alert(title='Error', text='General Client error. , full error : ' + str(e))
+            Alert(title='Error', text='General  error. , full error : ' + str(e))
+
+    def RefreshManifest(self):
+        
+        app = App.get_running_app()
+
+        if app.gVars.SequenceRunning != True:
+
+            app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
+            app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
+                
+            self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
+            self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
+
+            if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
+                self.lblAutoStartLabel.text = "Next growth session will start today at : "
+            else:
+                self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
+
+            self.processJobEvent.cancel()
+            schedule.clear('daily-run')
+
+            schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
+            self.RunScheduled = True
+            Clock.schedule_interval(self.processjobs, 1)
+        else:
+            self.ShowErrorMessage("Growth Session is already running, cannot refresh!.")
+
 
     def startBot(self):
         app = App.get_running_app()
@@ -147,21 +208,26 @@ class Ready(Screen):
         self.ElapsedTime = app.gVars.ElapsedTime
 
         if app.gVars.LastSuccessfulSequenceRunDate is None or app.gVars.LastSuccessfulSequenceRunDate != datetime.datetime.today() :
-            if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
+            # if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
                 oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
                 self.botThread = Thread(target=oBot.RunBot)
                 self.botThread.start()
+
+                if app.gVars.SequenceRunning == True:
+                    self.hide_widget(self.pnlNotStarted)
+                    self.hide_widget(self.pnlStarted,False)
+                    
+                else:
+                    self.hide_widget(self.pnlNotStarted, False)
+                    self.hide_widget(self.pnlStarted)
                 
                 Clock.schedule_interval(self.updateTime, 1)
 
-                self.ids['btnStart'].text = "Sequence Running"
-                self.ids['btnStart'].disabled = True
-                self.ids['btnStart'].text_color = util.get_color_from_hex("##16D39A")
-                self.ids['btnStop'].disabled = False
+               
                 
                 # Clock.schedule_interval(self.animate, 0.05)
-            else:
-                self.log.info("Sequence is already running, skipping re-launch")
+            # else:
+            #     self.log.info("Sequence is already running, skipping re-launch")
         else:
             self.log.info("Sequence has been completed successfully for today. Next run is possible tomorrow.")
         
@@ -198,9 +264,11 @@ class Ready(Screen):
 
         secsleft = self.TotalTime - self.ElapsedTime
         if self.TotalTime != 0:
-            self.lblTotalTime.text = "Time Left : " + str(datetime.timedelta(seconds= int(secsleft)))
+            self.lblTotalTime.text = str(datetime.timedelta(seconds= int(secsleft)))
         else:
             self.lblTotalTime.text = "Calculating ..."
+
+        self.lblStartTime.text = app.gVars.RunStartTime.strftime("%b %d %Y %H:%M")
 
 
 
@@ -215,22 +283,20 @@ class Ready(Screen):
 
 
     def stop(self):
-        #self.botThread.join()
+        app = App.get_running_app()
         Clock.unschedule(self.updateTime)
         self.botStop_event.set()
-        self.ids['btnStart'].text = "Start Sequence"
-        self.ids['btnStart'].disabled = False
-        self.ids['btnStop'].disabled = True
-        self.log.info("Stop Signal Sent")
+
+        app.gVars.SequenceRunning = False
+
+        if app.gVars.SequenceRunning == True:
+            self.hide_widget(self.pnlNotStarted)
+            self.hide_widget(self.pnlStarted,False)
+            
+        else:
+            self.hide_widget(self.pnlNotStarted, False)
+            self.hide_widget(self.pnlStarted)
         
-        
-        Clock.unschedule(self.updateTime)
-        #self.t.join()
-        #self.manager.transition = SlideTransition(direction="right")
-        # app = App.get_running_app()
-        # app.AppLogout()
-        # self.manager.current = 'login'
-        # self.manager.get_screen('login').resetForm()
 
     def ShowErrorMessage(self, ErrorMsg):
         app = App.get_running_app()
