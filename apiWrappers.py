@@ -87,8 +87,11 @@ def checkUsernameinFollowedList(json_object, name):
         return False
 
 def checkInList(json_object,blacklist, name):
-    result = [obj for obj in json_object if obj==name]
-    if len(result) == 0:
+    result = [obj for obj in json_object if name in obj]
+
+    result2 = [obj for obj in blacklist if name in obj]
+
+    if len(result) == 0 and len(result2) == 0:
         return True
     else:
         return False
@@ -128,7 +131,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist
         else:
             gVars.ActionLoaded +=  maxCountToGet
 
-        log.info('Pulling hashtag feed for ' + hashTag + ', Sleep for ' +  str(sleepTime) + ',  Fetching ' + str(len(tag_results)) + ' of ' + str(maxCountToGet) )
+        log.info('Fetching hashtag feed : ' + hashTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(tag_results)) + ' of ' + str(maxCountToGet) )
         time.sleep(sleepTime)
 
     return tag_results
@@ -165,7 +168,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             next_max_id = results.get('next_max_id')
             
             sleepTime = randrange(5,10)
-            log.info('Pulling location ranked feed for ' + locationTag + ', Sleep for ' +  str(sleepTime) + ', Fetching ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
+            log.info('Fetching location : ' + locationTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
         #loading recents if target not met
@@ -189,7 +192,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
             sleepTime = randrange(5,10)
-            log.info('Pulling location non ranked feed for ' + locationTag + ', Sleep for ' +  str(sleepTime) + ' Fetching ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
+            log.info('Fetching location : ' + locationTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
         return location_results
@@ -245,7 +248,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
                     has_more = results.get('more_available')
                     next_max_id = results.get('next_max_id')
                     sleepTime = randrange(5,10)
-                    log.info('Pulling user following feed for ' + userName + ', Sleep for ' +  str(sleepTime) + ', Fetching ' + str(len(follFeed_results)) + ' of ' + str(maxCountToGet) )
+                    log.info('Fetching user : ' + userName + ' - Wait :  ' +  str(sleepTime) + ' - Count :  ' + str(len(follFeed_results)) + ' of ' + str(maxCountToGet) )
                     time.sleep(sleepTime)
 
 

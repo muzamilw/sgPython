@@ -140,40 +140,49 @@ class Bot():
 
                                 user_info = api.user_info(api.authenticated_user_id)
                                 cf.UpdateInitialStatsToServer(gVars.SocialProfileId,user_info['user']['follower_count'],user_info['user']['following_count'],user_info['user']['media_count'],gVars)
-                                log.info('Int followers : ' + str(user_info['user']['follower_count']))
+                                log.info('Init followers : ' + str(user_info['user']['follower_count']))
                                 log.info('Init Following : ' +str(user_info['user']['following_count']))
-                                log.info('InitPosts : ' + str(user_info['user']['media_count']))
+                                log.info('Init Posts : ' + str(user_info['user']['media_count']))
                             else:
-                                log.info('Initial stats already sent')
+                                log.info('Initial info already sent')
 
                             #sending daily stats
                             if gVars.DailyStatsSent == False and gVars.DailyStatsSentDate != datetime.datetime.today:
                                 user_info = api.user_info(api.authenticated_user_id)
-                                log.info('Sending Daily Stats')
+                                log.info('Sending Today Stats')
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.FollowersCountUpdate,'self','{\"InitialFollowings\":\"'+str(user_info['user']['following_count'])+'\",\"InitialFollowers\":\"'+ str(user_info['user']['follower_count']) +'\",\"InitialPosts\":\"'+str(user_info['user']['media_count'])+'\",\"SocialProfileId\":'+str(gVars.SocialProfileId)+'}')
                                 gVars.DailyStatsSent = True
                                 gVars.DailyStatsSentDate = datetime.datetime.today
                             else:
-                                log.info('Daily Stats already sent for today')
+                                log.info('Today Stats already sent')
                             
 
-                            if gVars.manifestJson is None:
-                                log.info('getting manifest')
+                            if gVars.manifestJson is None and (app.ManifestRefreshed is None) :
+                                log.info('Getting manifest from server')
                                 gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
                             
 
-                            if gVars.manifestObj is None:
-                                log.info('loading manifest')
+                            if gVars.manifestObj is None and (app.ManifestRefreshed is None):
+                                log.info('Processing manifest')
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
 
                             gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
                             
-                            gVars.ReqUnFollow = len(gVars.manifestObj.FollowersToUnFollow) #gVars.manifestObj.UnFoll16DaysEngage
-                            gVars.TotUnFollow = len(gVars.manifestObj.FollowersToUnFollow)
+                            if gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
+                                gVars.ReqUnFollow = len(gVars.manifestObj.FollowersToUnFollow) #gVars.manifestObj.UnFoll16DaysEngage
+                                gVars.TotUnFollow = len(gVars.manifestObj.FollowersToUnFollow)
+                            else:
+                                gVars.ReqUnFollow = 0
+                                gVars.TotUnFollow = 0
+
 
                             gVars.ReqLikes = gVars.manifestObj.LikeFollowingPosts
-                            gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
+                            if gVars.manifestObj.AfterFollViewUserStory == 1 :
+                                gVars.ReqStoryViews = gVars.manifestObj.VwStoriesFollowing
+                            else:
+                                gVars.ReqStoryViews = 0
+
                             gVars.ReqComments = gVars.manifestObj.CommFollowingPosts
 
                             gVars.ReqExComments = len(gVars.manifestObj.FollowersToComment)
@@ -197,44 +206,44 @@ class Bot():
                             self.ui.TotalTime = int(runTimeComputation)
 
 
-                            if gVars.Todo is None:
+                            if gVars.Todo is None and (app.ManifestRefreshed is None):
                                 gVars.Todo = cf.SetupGlobalTodo(gVars.manifestObj)
-                                log.info('Creating Empty Global todo')
+                                log.info('Creating list')
                             
 
-                            if gVars.hashtagActions is None:
-                                log.info('Getting Feeds of Hashtags and creating action list')
+                            if gVars.hashtagActions is None and (app.ManifestRefreshed is None):
+                                log.info('Fetching feed for Hashtags')
                                 hashstart = datetime.datetime.now()
                                 gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars,blacklist)
                                 LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
-                                log.info('Hashtag Feed Done in seconds : ' + str(LoadtimeHashtagsTodo))
+                                log.info('Hashtags feed done : ' + str(LoadtimeHashtagsTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
                             
                                 
-                            if gVars.locationActions is None:
-                                log.info('Getting Feeds of Location and creating action list')
+                            if gVars.locationActions is None and (app.ManifestRefreshed is None):
+                                log.info('Fetching feed for Locations')
                                 locationtart = datetime.datetime.now()
                                 gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars,blacklist)
                                 LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
-                                log.info('Location Feed Done in seconds : ' + str(LoadtimeLocTodo))
+                                log.info('Locations feed done : ' + str(LoadtimeLocTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             
                                 
-                            if gVars.DCActions is None:
-                                log.info('Getting Feeds of Competitors and creating action list')
+                            if gVars.DCActions is None and (app.ManifestRefreshed is None):
+                                log.info('Fetching feed for Competitors')
                                 DCstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
                                 gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
-                                log.info('Competitors Feed Done in seconds : ' + str(LoadtimeDCTodo))
+                                log.info('Competitors feed done : ' + str(LoadtimeDCTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if gVars.SuggestFollowers is None:
-                                log.info('Getting Feeds of Suggested Users and creating action list')
+                            if gVars.SuggestFollowers is None and (app.ManifestRefreshed is None):
+                                log.info('Fetching Feed of Suggested Users')
                                 Suggestedstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
                                 if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
@@ -243,36 +252,36 @@ class Bot():
 
                                 gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
                                 LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
-                                log.info('Suggested Users Feed Done in seconds : ' + str(LoadtimeSuggestedTodo))
+                                log.info('Suggested Users feed done : ' + str(LoadtimeSuggestedTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                                 
-                            if gVars.UnFollowActions is None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
-                                log.info('Getting Feeds of UnFollow and creating action list')
+                            if gVars.UnFollowActions is None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1 and (app.ManifestRefreshed is None):
+                                log.info('Fetching feed for UnFollow')
                                 UnFollstart = datetime.datetime.now()
-                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars,blacklist)
+                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
                                 LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
-                                log.info('UnFollow Feed Done in seconds : ' + str(LoadtimeUnFollTodo))
+                                log.info('UnFollow feed fone : ' + str(LoadtimeUnFollTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if gVars.StoryViewActions is None and gVars.manifestObj.AfterFollViewUserStory == 1:
-                                log.info('Getting Feeds of StoryViews and creating action list')
+                            if gVars.StoryViewActions is None and gVars.manifestObj.AfterFollViewUserStory == 1 and (app.ManifestRefreshed is None):
+                                log.info('Fetching feeds for StoryViews')
                                 Storystart = datetime.datetime.now()
-                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars,blacklist)
+                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
                                 LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
-                                log.info('StoryViews Feed Done in seconds : ' + str(LoadtimeStoryTodo))
+                                log.info('StoryViews feed done : ' + str(LoadtimeStoryTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
                             actions = pd.concat(frames)
 
-                            if gVars.GlobalTodo is None:
+                            if gVars.GlobalTodo is None and (app.ManifestRefreshed is None):
                                 gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
                                 #gVars.GlobalTodo.to_csv('GlobData.csv')
-                                log.info('GlobalTodo merged')
+                                log.info('Actions Ready')
 
                             gVars.TotFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'Follow') & (gVars.GlobalTodo['UserId'] != '')])
                             gVars.TotUnFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['Action'] == 'UnFollow') & (gVars.GlobalTodo['UserId'].isnull() == False)])
@@ -298,7 +307,7 @@ class Bot():
 
                             
                             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
-                            log.info("Total Seconds to Build Action Todo " + str(LoadtimeTodo))
+                            log.info("Total time in fetching : " + str(LoadtimeTodo))
 
                             #debugging file
                             file_to_open = ""
@@ -311,10 +320,10 @@ class Bot():
 
                         except (ClientLoginError, ClientLoginRequiredError, ClientCookieExpiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Initial feed : Instagram Login occurred, Please sign off and relogin to continue")
+                            log.info("Initial feed : Instagram Login error occurred, Please sign off and relogin to continue")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
-                            self.ShowErrorMessage("Initial feed : Instagram Login occurred,Stopping Sequence. Please sign off and relogin to continue")
+                            self.ShowErrorMessage("Initial feed : Instagram Login error occurred,Stopping Sequence. Please sign off and relogin to continue")
                             IsApiClientError = True
                             return
 
@@ -347,7 +356,7 @@ class Bot():
                             for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
                             
                                 if (self.botStop.is_set() == True):
-                                    print('Stopping Sequence')
+                                    print('Stopping Session ')
                                     break
 
                                 if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])) and str(row['MediaId']) != 'nan':
@@ -357,11 +366,11 @@ class Bot():
                                     
                                     if row['Action'] == 'Like' and gVars.manifestObj.AfterFollLikeuserPosts == 1 and ( gVars.CurrentLikeDone < gVars.manifestObj.LikeFollowingPosts or gVars.CurrentExLikeDone < gVars.ReqExLikes):
                                         try:
-                                            log.info('like action : ' + row['MediaId'] + ', Sleeping for : ' + str(waitTime))
+                                            log.info('Liking : ' + row['MediaId'] + ' - Wait : ' + str(waitTime))
                                             apiW.LikeMedia(api,row['MediaId'])
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.Like,row['Username'],row['MediaId'])
                                         except ClientError as e:
-                                            log.info('Like IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                            log.info('Error :  Media deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while liking : ' + str(row['MediaId']))
                                             gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while liking'
 
@@ -383,12 +392,12 @@ class Bot():
                                         try:
                                             api.mute_unmute(row['UserId'])
                                         except ClientError as e:
-                                            log.info('Mute IG Error  {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                            log.info('Error : Mute  {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'You cant mute users you are not following  ' + str(row['Username']))
                                             gVars.GlobalTodo.loc[i,'Data'] = 'You cant mute users you are not following'
                                        
                                         cf.SendAction(gVars,gVars.SocialProfileId,Actions.Follow,row['Username'],'')
-                                        log.info('Follow action : ' + row['Username'] + ', Sleeping for : ' + str(waitTime))
+                                        log.info('Following : ' + row['Username'] + ' - Wait : ' + str(waitTime))
                                         gVars.GlobalTodo.loc[i,'Status'] = 2
                                         gVars.GlobalTodo.loc[i,'ActionDateTime'] = datetime.datetime.now()
                                         
@@ -402,12 +411,12 @@ class Bot():
                                     if row['Action'] == 'Comment' and gVars.manifestObj.AfterFollCommentUserPosts == 1 and (gVars.CurrentCommentsDone < gVars.manifestObj.CommFollowingPosts or  gVars.CurrentExCommentsDone < gVars.ReqExComments):
                                         comm = random.choice(Comments)
                                         try:
-                                            log.info('Comment action : ' + row['MediaId'] + ', Sleeping for : ' + str(waitTime))
+                                            log.info('Commenting : ' + row['MediaId'] + ' - Wait : ' + str(waitTime))
                                             apiW.CommentOnMedia(api,row['MediaId'],comm)
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.Comment,row['Username'],row['Username'] + 'Comment added : ' + comm)
                                             gVars.GlobalTodo.loc[i,'Data'] = 'Comment added : ' + comm
                                         except ClientError as e:
-                                            log.info('Comment IG Error MediaId deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
+                                            log.info('Error : Comment media deleted {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['MediaId']))
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while Commenting : ' + str(row['MediaId']))
                                             gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while Commenting'
 
@@ -423,7 +432,7 @@ class Bot():
                                         time.sleep(waitTime) 
                                                 
                                     if row['Action'] == 'UnFollow' and gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
-                                        log.info('UnFollow action : ' + row['Username'] +  ', Sleeping for : ' + str(waitTime))
+                                        log.info('UnFollow : ' + row['Username'] +  ' - Wait : ' + str(waitTime))
                                         if row['Tag'] == 'delete_not_found':  ##ignore the IG action and send it anyways
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'delete_not_found')
                                         else:
@@ -431,7 +440,7 @@ class Bot():
                                                 apiW.UnFollowUser(api,row['UserId'])
                                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'')
                                             except ClientError as e:
-                                                log.info('UnFollow api action error {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['Username']))
+                                                log.info('Error : UnFollow {3!s}  {0!s} (Code: {1:d}, Response: {2!s})'.format(e.msg, e.code, e.error_response, row['Username']))
                                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.UnFollow,row['Username'],'delete_not_found')
                                             
                                         gVars.GlobalTodo.loc[i,'Status'] = 2
@@ -441,7 +450,7 @@ class Bot():
                                         time.sleep(waitTime) 
 
                                     if row['Action'] == 'StoryView' and gVars.manifestObj.AfterFollViewUserStory == 1 and gVars.CurrentStoryViewDone < gVars.manifestObj.VwStoriesFollowing :
-                                        log.info('StoryView action : ' + row['Username'] +  ', Sleeping for : ' + str(waitTime))
+                                        log.info('Story View : ' + row['Username'] +  ' - Wait : ' + str(waitTime))
                                         apiW.ViewStory(api,row['MediaId'],row['FriendShipStatus'])
                                         cf.SendAction(gVars,gVars.SocialProfileId,Actions.StoryView,row['Username'],'story pages : ' + str(len(row['MediaId'])))
                                         
@@ -476,7 +485,8 @@ class Bot():
                                 #Run Ending
                                 gVars.RunEndTime = datetime.datetime.now()
                                 gVars.LastSuccessfulSequenceRunDate = datetime.datetime.today() 
-                                log.info('Sequence has completed at : ' + str(gVars.RunEndTime) )
+                                app.gVars.SequenceRunning == False
+                                log.info('Session completed at : ' + str(gVars.RunEndTime) )
                                 #writing log to file
 
                                 if (platform.system() == "Darwin"):
@@ -489,14 +499,11 @@ class Bot():
                                     file.writelines('<meta charset="UTF-8">\n')
                                     file.write(gVars.GlobalTodo.to_html())
 
-                                log.info('Action List saved for Email' )
                                 
                                 cf.SendEmail('muzamilw@gmail.com',file_to_open,gVars.SGusername,'')
-                                log.info('Email sent' )
-                                
 
                                 app.ResetGlobalVars()
-                                log.info('Cleanup performed exiting main thread')
+                                log.info('Cleanup done for Session')
                                 self.ui.stop()
 
                             # log.info("Action sequence running")
@@ -513,7 +520,7 @@ class Bot():
 
                         except (ClientLoginError, ClientLoginRequiredError, ClientCookieExpiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Instagram Login occurred, Please sign off and relogin to continue")
+                            log.info("Fatal Error : Instagram Login occurred, Please sign off and relogin to continue")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Instagram Login occurred,Stopping Sequence. Please sign off and relogin to continue")
@@ -522,7 +529,7 @@ class Bot():
 
                         except (ClientSentryBlockError, ClientChallengeRequiredError, ClientCheckpointRequiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
+                            log.info("Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
@@ -531,7 +538,7 @@ class Bot():
 
                         except (ClientError,ClientConnectionError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Api Client or Network Error occurred, Restarting")
+                            log.info("Error : Api Client or Network Error occurred, Restarting")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                            
@@ -539,7 +546,7 @@ class Bot():
 
                         except Exception as e:# ClientError:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Exception occurred in main sequence action loop, restarting")
+                            log.info("Error : Exception occurred in actions, restarting")
                             log.info(traceback.format_exc())
                             cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             raise e
@@ -551,16 +558,18 @@ class Bot():
                         #return gVars
                     else:
                         #perform login
-                        log.info('IG user is not logged in.')
+                        log.info('Fatal Error : IG user is not logged in.')
                 else:
-                    log.info('Error logging onto SG Server')
+                    log.info('Fatal Error : Error logging onto SPPro Server')
             except:
                 # restart main loop
                 # self.logControl.text = ""
-                log.info('An Exception happened, Restarting Session in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
-                log.info(str(traceback.format_exc()))
                 log.info('###################################################################')
+                log.info(str(traceback.format_exc()))
+                log.info('Error : Retrying in ' + str(RetryTimeSeconds * RetryCount) +  ' seconds')
                 log.info('Retry #'+str(RetryCount)+' \n')
+                log.info('###################################################################')
+                
                 
                 time.sleep(RetryTimeSeconds * RetryCount) 
                 pass
@@ -569,4 +578,4 @@ class Bot():
                 pass
 
         gVars.SequenceRunning = False
-        log.info('Ending')
+        log.info('Ending Session')

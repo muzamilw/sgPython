@@ -97,10 +97,6 @@ class Ready(Screen):
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
             
             lblusername.text = app.api.username
-            # app.api.feed_timeline()
-            # Clock.schedule_interval(self.animate, 0.05)
-
-            
 
             label = self.ids['logLabel'] #Label(text="showing the log here")
             self.hide_widget(label)
@@ -177,6 +173,10 @@ class Ready(Screen):
 
         if app.gVars.SequenceRunning != True:
 
+            app.ManifestRefreshed = True
+            app.gVars.ElapsedTime = 0
+            self.ElapsedTime = 0
+
             app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
             app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
                 
@@ -213,13 +213,13 @@ class Ready(Screen):
                 self.botThread = Thread(target=oBot.RunBot)
                 self.botThread.start()
 
-                if app.gVars.SequenceRunning == True:
-                    self.hide_widget(self.pnlNotStarted)
-                    self.hide_widget(self.pnlStarted,False)
+                # if app.gVars.SequenceRunning == True:
+                self.hide_widget(self.pnlNotStarted)
+                self.hide_widget(self.pnlStarted,False)
                     
-                else:
-                    self.hide_widget(self.pnlNotStarted, False)
-                    self.hide_widget(self.pnlStarted)
+                # else:
+                # self.hide_widget(self.pnlNotStarted, False)
+                # self.hide_widget(self.pnlStarted)
                 
                 Clock.schedule_interval(self.updateTime, 1)
 

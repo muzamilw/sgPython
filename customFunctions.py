@@ -253,8 +253,19 @@ def LoadManifest(manifest):
     return manifestObj
 
 def checkUsernameinFollowedList(json_object, name):
-    result = [obj for obj in json_object if obj['FollowedSocialUsername']==name]
+    result = [obj for obj in json_object if name in obj['FollowedSocialUsername'] ]
+
     if len(result) == 0:
+        return True
+    else:
+        return False
+
+def checkInList(json_object,blacklist, name):
+    result = [obj for obj in json_object if name in obj]
+
+    result2 = [obj for obj in blacklist if name in obj]
+
+    if len(result) == 0 and len(result2) == 0:
         return True
     else:
         return False
@@ -322,12 +333,12 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars):
+def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars,blacklist)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -391,12 +402,12 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars):
+def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
     
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars,blacklist) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -462,7 +473,7 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
+def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
     try:
         locMediaUsers = []
 
@@ -473,14 +484,14 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
                 suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
                 if suggUsers is not None and len(suggUsers) > 0:
                             for user in suggUsers:
-                                if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
+                                if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
                                     ufeed = api.user_feed(user['pk'])
                                     if ufeed is not None and len(ufeed['items']) > 0 :
                                         if ufeed['items'][0]['has_liked'] == False:
                                             # follFeed_results.extend([ufeed['items'][0]])
                                             locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                                     sleepTime = randrange(5,10)
-                                    log.info('Pulling suggested user feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
+                                    log.info('Fetching suggested user : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                                     time.sleep(sleepTime)
                                     iguserCount = iguserCount + 1
                                     gVars.ActionLoaded += 1
@@ -511,11 +522,11 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
                             sleepTime = randrange(5,10)
-                            log.info('Pulling Follow exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
+                            log.info('Fetching follow exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
         except Exception as e:
-            print('exception in FollowList for user' + folluser)
+            print('Error follow exchange : ' + folluser)
             raise
 
         #server Like list
@@ -537,7 +548,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
                             sleepTime = randrange(5,10)
-                            log.info('Pulling like exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
+                            log.info('Fetching like exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
         except:
@@ -563,7 +574,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars):
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
                             sleepTime = randrange(5,10)
-                            log.info('Pulling comment exchange feed for ' + user['username'] + ', Sleep for ' +  str(sleepTime)  )
+                            log.info('Fetching comment exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
         except:
@@ -657,7 +668,7 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log,gVars):
             try:
                 follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
                 sleepTime = randrange(2,7)
-                log.info('Pulling user details to unfollow for ' + foll['FollowedSocialUsername'].strip() + ', Sleep for ' +  str(sleepTime)  )
+                log.info('Fetching user to unfollow : ' + foll['FollowedSocialUsername'].strip() + ' - Wait :  ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
                 
             except ClientError as e:
@@ -707,7 +718,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log,gVars):
                     storyviewsCount = storyviewsCount + 1
                     gVars.ActionLoaded += 1
                 sleepTime = randrange(5,15)
-                log.info('Pulling story feed to view for ' + str(reel_user['user']['username']) + ', Sleep for ' +  str(sleepTime)  )
+                log.info('Fetching story feed : ' + str(reel_user['user']['username']) + ' - Wait :  ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
         
   

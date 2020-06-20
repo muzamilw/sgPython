@@ -219,7 +219,22 @@
             MDLabel:
                 text: "S"
                 halign : 'center'
+
+            MDLabel:
+                text: ""
+                halign : 'center'
+
+            MDLabel:
+                text: ""
+                halign : 'center'
                 
+            MDLabel:
+                text: ""
+                halign : 'center'
+
+            MDLabel:
+                text: ""
+                halign : 'center'
            
            
             
@@ -298,11 +313,15 @@
 
             MDLabel:
                 theme_text_color: "Custom"
-                text: "Your target filters, growth charts, and much more available \nat socialplannerpro.com"
+                text: "Your target filters, growth charts, and much more available \nat [u][ref=google.com]socialplannerpro.com[/ref][/u]"
                 text_color: get_color_from_hex("#FFFFFF")
                 halign:"center"
                 size_hint : 1,None
                 font_size: "20dp"
+                markup:True
+                on_ref_press:
+                    import webbrowser
+                    webbrowser.open("https://socialplannerpro.com/account/login/")
                 
            
             
