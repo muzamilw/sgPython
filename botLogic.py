@@ -235,7 +235,7 @@ class Bot():
                             if gVars.DCActions is None or app.ManifestRefreshed == True:
                                 log.info('Fetching feed for Competitors')
                                 DCstart = datetime.datetime.now()
-                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
                                 gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
                                 LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
                                 log.info('Competitors feed done : ' + str(LoadtimeDCTodo))
@@ -245,9 +245,9 @@ class Bot():
                             if gVars.SuggestFollowers is None or app.ManifestRefreshed == True:
                                 log.info('Fetching Feed of Suggested Users')
                                 Suggestedstart = datetime.datetime.now()
-                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
+                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
                                 if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
-                                    SeqNos = SeqNos + gVars.DCActions.groupby(['Action'])['Seq'].count()
+                                    SeqNos = SeqNos.add(gVars.DCActions.groupby(['Action'])['Seq'].count(),fill_value=0)
                                 
 
                                 gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
@@ -322,7 +322,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Initial feed : Instagram Login error occurred, Please sign off and relogin to continue")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Initial feed : Instagram Login error occurred,Stopping Sequence. Please sign off and relogin to continue")
                             IsApiClientError = True
                             return
@@ -331,7 +331,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Initial feed : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Initial feed : Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             IsApiClientError = True
                             return
@@ -340,13 +340,13 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Initial feed : Api Client or Network Error occurred, Restarting")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                            
                             raise e
                             
                         except Exception as e: ## try catch block for the 
                             log.info('Unexpected Exception in initial feed loads, restarting : {0!s}'.format(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
                             raise e
                             
                         Comments = ['😀','👍','💓','🤩','🥰']
@@ -500,7 +500,7 @@ class Bot():
                                     file.write(gVars.GlobalTodo.to_html())
 
                                 
-                                cf.SendEmail('muzamilw@gmail.com',file_to_open,gVars.SGusername,'')
+                                cf.SendEmail('info@socialplannerpro.com',file_to_open,gVars.SGusername,'')
 
                                 app.ResetGlobalVars()
                                 log.info('Cleanup done for Session')
@@ -522,7 +522,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Fatal Error : Instagram Login occurred, Please sign off and relogin to continue")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Instagram Login occurred,Stopping Sequence. Please sign off and relogin to continue")
                             IsApiClientError = True
                             return
@@ -531,7 +531,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             IsApiClientError = True
                             return
@@ -540,7 +540,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Error : Api Client or Network Error occurred, Restarting")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                            
                             raise e
 
@@ -548,7 +548,7 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Error : Exception occurred in actions, restarting")
                             log.info(traceback.format_exc())
-                            cf.SendError('muzamilw@gmail.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             raise e
 
                         #gVars.GlobalTodo.to_csv('GlobData.csv')
