@@ -126,14 +126,15 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
         sleepTime = randrange(5,10)
-        if maxCountToGet > len(tag_results):
-            gVars.ActionLoaded +=  (len(tag_results) - prev)
-        else:
-            gVars.ActionLoaded +=  maxCountToGet
+        # if maxCountToGet > len(tag_results):
+        #     gVars.ActionLoaded +=  (len(tag_results) - prev)
+        # else:
+        #     gVars.ActionLoaded +=  maxCountToGet
 
         log.info('Fetching hashtag feed : ' + hashTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(tag_results)) + ' of ' + str(maxCountToGet) )
         time.sleep(sleepTime)
 
+    gVars.ActionLoaded +=  maxCountToGet
     return tag_results
         
 
@@ -159,10 +160,10 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
             location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]) ) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"]))  ])
             
-            if maxCountToGet > len(location_results):
-                gVars.ActionLoaded +=  (len(location_results) - prev)
-            else:
-                gVars.ActionLoaded +=  maxCountToGet
+            # if maxCountToGet > len(location_results):
+            #     gVars.ActionLoaded +=  (len(location_results) - prev)
+            # else:
+            #     gVars.ActionLoaded +=  maxCountToGet
 
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
@@ -184,10 +185,10 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))  if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ])
             
 
-            if maxCountToGet > len(location_results):
-                gVars.ActionLoaded +=  len(location_results) - prev
-            else:
-                gVars.ActionLoaded +=  maxCountToGet
+            # if maxCountToGet > len(location_results):
+            #     gVars.ActionLoaded +=  len(location_results) - prev
+            # else:
+            #     gVars.ActionLoaded +=  maxCountToGet
 
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
@@ -195,6 +196,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             log.info('Fetching location : ' + locationTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
+        gVars.ActionLoaded +=  maxCountToGet
         return location_results
         #res = api.getLocationFeed(locastionSearchResult[0]["location"]["pk"])
         #return api.LastJson["items"],api.LastJson["ranked_items"]
@@ -235,10 +237,10 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
                                     if ufeed['items'][0]['has_liked'] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])) and  checkInList(manifestObj.BlackListUsers,blacklist, str(ufeed['items'][0]['user']["username"])):
                                         prev = len(follFeed_results) 
                                         follFeed_results.extend([ufeed['items'][0]])
-                                        if maxCountToGet > len(follFeed_results):
-                                            gVars.ActionLoaded +=  len(follFeed_results) - prev
-                                        else:
-                                            gVars.ActionLoaded +=  maxCountToGet
+                                        # if maxCountToGet > len(follFeed_results):
+                                        #     gVars.ActionLoaded +=  len(follFeed_results) - prev
+                                        # else:
+                                        #     gVars.ActionLoaded +=  maxCountToGet
 
                     #tag_results.extend(results.get('ranked_items', []))
                     #tag_results.extend(results.get('items', []))
@@ -267,6 +269,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
             #                     #items.extend([{**api.LastJson['items'][0],**user} ])
             #                     items.extend([api.LastJson['items'][0]])
             
+            gVars.ActionLoaded +=  maxCountToGet
             return follFeed_results
                 
         else:  # followers list is empty

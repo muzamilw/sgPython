@@ -157,21 +157,21 @@ class Bot():
                                 log.info('Today Stats already sent')
                             
 
-                            if gVars.manifestJson is None and (app.ManifestRefreshed is None) :
+                            if gVars.manifestJson is None or app.ManifestRefreshed == True :
                                 log.info('Getting manifest from server')
                                 gVars.manifestJson = cf.GetManifest(gVars.SocialProfileId,gVars)
 
                             
 
-                            if gVars.manifestObj is None and (app.ManifestRefreshed is None):
+                            if gVars.manifestObj is None or app.ManifestRefreshed == True:
                                 log.info('Processing manifest')
                                 gVars.manifestObj = cf.LoadManifest(gVars.manifestJson)
 
                             gVars.ReqFollow = gVars.manifestObj.FollAccSearchTags
                             
                             if gVars.manifestObj.UnFollFollowersAfterMinDays == 1:
-                                gVars.ReqUnFollow = len(gVars.manifestObj.FollowersToUnFollow) #gVars.manifestObj.UnFoll16DaysEngage
-                                gVars.TotUnFollow = len(gVars.manifestObj.FollowersToUnFollow)
+                                gVars.ReqUnFollow = gVars.manifestObj.UnFoll16DaysEngage if gVars.manifestObj.UnFoll16DaysEngage <= len(gVars.manifestObj.FollowersToUnFollow) else len(gVars.manifestObj.FollowersToUnFollow) #len(gVars.manifestObj.FollowersToUnFollow) #gVars.manifestObj.UnFoll16DaysEngage
+                                gVars.TotUnFollow = gVars.manifestObj.UnFoll16DaysEngage if gVars.manifestObj.UnFoll16DaysEngage <= len(gVars.manifestObj.FollowersToUnFollow) else len(gVars.manifestObj.FollowersToUnFollow)
                             else:
                                 gVars.ReqUnFollow = 0
                                 gVars.TotUnFollow = 0
@@ -198,20 +198,20 @@ class Bot():
                             self.ui.lblFollowExchange.text = str(gVars.CurrentExFollowDone) +'/'+ str(gVars.TotExFollow ) +'/'+ str( gVars.ReqExFollow)
                             self.ui.lblCommentExchange.text = str(gVars.CurrentExCommentsDone) +'/'+str(gVars.TotExComments ) +'/'+ str( gVars.ReqExComments)
                             
-                            runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExComments + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
-                            gVars.TotalActionsLoaded = gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExComments + gVars.ReqExFollow + gVars.ReqExLikes
+                            runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments  + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
+                            gVars.TotalActionsLoaded = gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExFollow + gVars.ReqExLikes
                             runTimeComputation += gVars.manifestObj.totalActions  * 10
                             gVars.RequiredActionPerformed = gVars.manifestObj.totalActions
 
                             self.ui.TotalTime = int(runTimeComputation)
 
 
-                            if gVars.Todo is None and (app.ManifestRefreshed is None):
+                            if gVars.Todo is None or app.ManifestRefreshed == True:
                                 gVars.Todo = cf.SetupGlobalTodo(gVars.manifestObj)
                                 log.info('Creating list')
                             
 
-                            if gVars.hashtagActions is None and (app.ManifestRefreshed is None):
+                            if gVars.hashtagActions is None or app.ManifestRefreshed == True:
                                 log.info('Fetching feed for Hashtags')
                                 hashstart = datetime.datetime.now()
                                 gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars,blacklist)
@@ -221,7 +221,7 @@ class Bot():
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
                             
                                 
-                            if gVars.locationActions is None and (app.ManifestRefreshed is None):
+                            if gVars.locationActions is None or app.ManifestRefreshed == True:
                                 log.info('Fetching feed for Locations')
                                 locationtart = datetime.datetime.now()
                                 gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars,blacklist)
@@ -232,7 +232,7 @@ class Bot():
 
                             
                                 
-                            if gVars.DCActions is None and (app.ManifestRefreshed is None):
+                            if gVars.DCActions is None or app.ManifestRefreshed == True:
                                 log.info('Fetching feed for Competitors')
                                 DCstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
@@ -242,7 +242,7 @@ class Bot():
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if gVars.SuggestFollowers is None and (app.ManifestRefreshed is None):
+                            if gVars.SuggestFollowers is None or app.ManifestRefreshed == True:
                                 log.info('Fetching Feed of Suggested Users')
                                 Suggestedstart = datetime.datetime.now()
                                 SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count() + gVars.hashtagActions.groupby(['Action'])['Seq'].count()
@@ -257,7 +257,7 @@ class Bot():
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                                 
-                            if gVars.UnFollowActions is None and gVars.manifestObj.UnFollFollowersAfterMinDays == 1 and (app.ManifestRefreshed is None):
+                            if (gVars.UnFollowActions is None or app.ManifestRefreshed == True) and gVars.manifestObj.UnFollFollowersAfterMinDays == 1 :
                                 log.info('Fetching feed for UnFollow')
                                 UnFollstart = datetime.datetime.now()
                                 gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
@@ -266,7 +266,7 @@ class Bot():
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if gVars.StoryViewActions is None and gVars.manifestObj.AfterFollViewUserStory == 1 and (app.ManifestRefreshed is None):
+                            if (gVars.StoryViewActions is None or app.ManifestRefreshed == True ) and gVars.manifestObj.AfterFollViewUserStory == 1 :
                                 log.info('Fetching feeds for StoryViews')
                                 Storystart = datetime.datetime.now()
                                 gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
@@ -278,7 +278,7 @@ class Bot():
                             frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
                             actions = pd.concat(frames)
 
-                            if gVars.GlobalTodo is None and (app.ManifestRefreshed is None):
+                            if gVars.GlobalTodo is None or app.ManifestRefreshed == True:
                                 gVars.GlobalTodo = gVars.Todo.merge(actions,how='left', left_on=['Seq','Action'], right_on=['Seq','Action'])
                                 #gVars.GlobalTodo.to_csv('GlobData.csv')
                                 log.info('Actions Ready')
@@ -485,7 +485,7 @@ class Bot():
                                 #Run Ending
                                 gVars.RunEndTime = datetime.datetime.now()
                                 gVars.LastSuccessfulSequenceRunDate = datetime.datetime.today() 
-                                app.gVars.SequenceRunning == False
+                                
                                 log.info('Session completed at : ' + str(gVars.RunEndTime) )
                                 #writing log to file
 

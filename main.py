@@ -200,6 +200,7 @@ class LoginApp(MDApp):
     username = StringProperty(None)
     password = StringProperty(None)
     icon = 'data//ml.ico'
+    ManifestRefreshed = False
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -482,6 +483,9 @@ class LoginApp(MDApp):
         
         gVars.RequiredActionPerformed = 0
         gVars.ActionPerformed = 0
+
+        
+
 
         
 

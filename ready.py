@@ -174,7 +174,7 @@ class Ready(Screen):
         if app.gVars.SequenceRunning != True:
 
             app.ManifestRefreshed = True
-            app.gVars.ElapsedTime = 0
+            app.ResetGlobalVars()
             self.ElapsedTime = 0
 
             app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
