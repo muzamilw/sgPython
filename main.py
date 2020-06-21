@@ -502,8 +502,11 @@ class LoginApp(MDApp):
         else:
             settings_file = Path("userdata") / str(igusername + '_login.json')
 
-        
-        os.remove(settings_file)
+        try:
+            os.remove(settings_file)
+        except:
+            print("Error while deleting file ", settings_file)
+
 
         if (platform.system() == "Darwin"):
             Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)

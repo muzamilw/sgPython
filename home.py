@@ -50,6 +50,10 @@ class Home(Screen):
         else:
             # manager.current = 'login'
             # self.ids['btnIG'].text = 'Today\'s Status'
+            self.ids['btnIG'].text = 'Connect'
+            self.ids['btnIG'].md_bg_color = app.theme_cls.primary_color
+                
+            self.ids['lblstatusIG'].text = " "
             pass
 
     def btnIG_released(self):

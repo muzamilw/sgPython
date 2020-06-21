@@ -357,9 +357,9 @@ class Ready(Screen):
         #self.botThread.join()
         Clock.unschedule(self.updateTime)
         self.botStop_event.set()
-        self.ids['btnStart'].text = "Start Sequence"
-        self.ids['btnStart'].disabled = False
-        self.ids['btnStop'].disabled = True
+        # self.ids['btnStart'].text = "Start Sequence"
+        # self.ids['btnStart'].disabled = False
+        # self.ids['btnStop'].disabled = True
         self.log.info("Logging out")
         # self.ids['spinner'].active = False
         #self.t.join()
