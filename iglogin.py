@@ -203,11 +203,11 @@ class IGLogin(Screen):
         app.gVars.IGusername = loginText
         app.gVars.IGpassword = passwordText
 
-        if api is None:
+        if api is None or api.authenticated_user_id is None:
 
-            if ( loginRes[1]) != "":
-                Client.login_challenge(loginRes[1])
-            return
+            # if ( loginRes[1]) != "":
+            #     Client.login_challenge(loginRes[1])
+            # return
 
             self.Login_alert_dialog = MDDialog(
                 title="Instagram Login Error!",

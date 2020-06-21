@@ -87,9 +87,9 @@ def checkUsernameinFollowedList(json_object, name):
         return False
 
 def checkInList(json_object,blacklist, name):
-    result = [obj for obj in json_object if name in obj]
+    result = [obj for obj in json_object if name == str(obj)]
 
-    result2 = [obj for obj in blacklist if name in obj]
+    result2 = [obj for obj in blacklist if name == str(obj)]
 
     if len(result) == 0 and len(result2) == 0:
         return True

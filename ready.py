@@ -268,7 +268,8 @@ class Ready(Screen):
         else:
             self.lblTotalTime.text = "Calculating ..."
 
-        self.lblStartTime.text = app.gVars.RunStartTime.strftime("%b %d %Y %H:%M")
+        if app.gVars.RunStartTime is not None:
+            self.lblStartTime.text = app.gVars.RunStartTime.strftime("%b %d %Y %H:%M")
 
 
 

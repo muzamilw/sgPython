@@ -206,12 +206,19 @@ def LoadManifest(manifest):
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"] is not None:
         manifestObj.BlackListLocations = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"].strip().split(",")
+    else:
+        manifestObj.BlackListLocations = [""]
         
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"] is not None:
         manifestObj.BlackListHashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"].strip().split(",")
+    else:
+        manifestObj.BlackListHashtags = [""]
+
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"] is not None:
         manifestObj.BlackListWordsManual = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"].strip().split(",")
+    else:
+        manifestObj.BlackListWordsManual = [""]
             
     
     manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
