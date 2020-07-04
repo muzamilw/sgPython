@@ -319,6 +319,7 @@ class Bot():
                             
                             LoadtimeTodo = (datetime.datetime.now()-gVars.RunStartTime).total_seconds()
                             log.info("Total time in fetching : " + str(LoadtimeTodo))
+                            app.ManifestRefreshed == False
 
                             #debugging file
                             file_to_open = ""
