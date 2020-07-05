@@ -32,64 +32,60 @@
             right_action_items: [["ray-start-arrow", lambda x: root.startBot()],["reload", lambda x: root.RefreshManifest()],["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
             # 
         
-        BoxLayout:
-            orientation:'horizontal'
+        MDBoxLayout:
+            orientation:'vertical'
+            md_bg_color: app.theme_cls.primary_light 
+            size_hint: 1, 1  
         
         
-            BoxLayout: # ig logo and label
+            MDBoxLayout: # ig logo and label
                 orientation: 'horizontal' 
-                size_hint: 0.5, None           
+                size_hint: 0.8, None  
+                
 
                 Image:
                     source: "data//iglogo.png"
-                    size_hint: 0.3, None
-                    size: dp(60), dp(60)
+                    size_hint: 0.2, None
+                    size: dp(50), dp(50)
                     pos_hint: {"center_y": .5}
 
                 MDLabel:
                     font_style: 'H5'
                     theme_text_color: 'Primary'
-                    size_hint: 0.7, None
+                    size_hint: 0.8, None
                     text: ""
                     halign: 'left'
                     valign : 'center'
                     id: lblusername
            
-            BoxLayout: #labels and start button
-                orientation:'horizontal'
-                size_hint: 0.5, None    
-                    
-                
+            MDBoxLayout: #labels and start button
+                orientation:'vertical'
+                size_hint: 1, None   
+                md_bg_color: app.theme_cls.primary_dark   
 
-                MDGridLayout:
+                MDBoxLayout:
                     id: pnlNotStarted
-                    size_hint: 1, None
+                    size_hint: 0.8, None
                     orientation:'horizontal'
-                    cols : 1
-                    # md_bg_color: app.theme_cls.primary_dark   
+                    
+                    MDLabel:
+                        size_hint: 0.2, 1
 
-            
-                    MDGridLayout:
-                        size_hint: 1, None
-                        orientation:'horizontal'
-                        cols : 2
-                        
+                    MDLabel:
+                        text: "Next growth session will start today at : "
+                        id :lblAutoStartLabel
+                        font_size: '20dp'
+                        size_hint: 0.6, 1
+                        halign:"left"
 
-                        MDLabel:
-                            text: "Next growth session will start today at : "
-                            id :lblAutoStartLabel
-                            font_size: '20dp'
-                            size_hint: 0.8, 1
-                            halign:"right"
-
-                        MDLabel:
-                            text: ""
-                            id :lblAutoStart
-                            font_size: '22dp'
-                            size_hint: 0.2, 1
-                            halign:"left"
-                            text_color: get_color_from_hex("#23bd08")
-                            theme_text_color: "Custom"
+                    MDLabel:
+                        text: ""
+                        id :lblAutoStart
+                        font_size: '22dp'
+                        size_hint: 0.2, 1
+                        halign:"left"
+                        text_color: get_color_from_hex("#23bd08")
+                        theme_text_color: "Custom"
                             
 
                         
@@ -99,13 +95,27 @@
                     size_hint: 1, None
                     orientation:'horizontal'
                     cols : 4
-                    # md_bg_color: app.theme_cls.primary_color
-                    
+                    # md_bg_color: get_color_from_hex("#23bd08")
+
+                    MDLabel:
+                        size_hint: 0.2, 0.5
+
                     MDLabel:
                         text: "Growth Session Started on"
                         font_size: '17dp'
-                        size_hint: 0.3, 0.4
+                        size_hint: 0.6, 0.5
                         halign:"left"
+                        valign:"top"
+                        
+                    
+                    MDLabel:
+                        id: lblStartTime
+                        text: "03:33"
+                        font_size: '20dp'
+                        size_hint: 0.2, 0.5
+                        halign:"left"
+                        text_color: get_color_from_hex("#23bd08")
+                        theme_text_color: "Custom"
                         valign:"top"
 
                     CircularProgressBar:
@@ -116,182 +126,65 @@
                         size_hint: 0.2, None
                         thickness:5
                         progress_colour:(0, 1, 0, 1)
+                    
+                    MDLabel:
+                        size_hint: 0.2, 0.5
     
                     MDLabel:
                         
                         text: "Estimated time remaining for this session to complete all actions :"
                         font_size: '17dp'
-                        size_hint: 0.4, 0.5
+                        size_hint: 0.6, 0.5
                         halign:"left"
                         valign:"top"
 
-                    MDLabel:
-                        text: " "
-                        font_size: '15dp'
-                        size_hint: 0.1, 0.4
-                        halign:"left"
-
-
-                    MDLabel:
-                        id: lblStartTime
-                        text: "03:33"
-                        font_size: '20dp'
-                        size_hint: 0.3, 0.6
-                        halign:"left"
-                        text_color: get_color_from_hex("#23bd08")
-                        theme_text_color: "Custom"
-                        valign:"top"
-                    MDLabel:
-                        
-                        text: " "
-                        font_size: '15dp'
-                        size_hint: 0.2, 0.5
-                        halign:"left"
-                    
                     MDLabel:
                         id: lblTotalTime
                         text: "1:33"
                         font_size: '20dp'
-                        size_hint: 0.4, 0.5
+                        size_hint: 0.2, 0.5
                         halign:"left"
                         text_color: get_color_from_hex("#23bd08")
                         theme_text_color: "Custom"
                         valign:"top"
+
                     MDLabel:
                         text: " "
                         font_size: '15dp'
                         size_hint: 0.1, 0.5
                         halign:"left"
 
+
+                    
+                    
+
                     
         
-        MDLabel:
-           #spacer
-            text: " "
-            size_hint: 1, 0.1
-            halign : 'center'
-
-        MDGridLayout:
-            cols: 4
-            orientation: 'horizontal'
-            padding: 20
-            spacing: 10
-            
-            MDLabel:
-                id: lblFollow
-                text: "0 / 0"
-                size_hint: 1, 0.8
-                halign : 'center'
-                font_style: 'H5'
-            MDLabel:
-                id: lblUnFollow
-                text: "0 / 0"
-                halign : 'center'
-                font_style: 'H5'
-               
-            MDLabel:
-                id: lblLike
-                text: "0 / 0"
-                halign : 'center'
-                font_style: 'H5'
-            MDLabel:
-                id: lblStoryView
-                text: "0 / 0"
-                halign : 'center'
-                font_style: 'H5'
         
-            
-            MDLabel:
-                text: "F"
-                size_hint: 1, 0.8
-                halign : 'center'
-               
-            MDLabel:
-                text: "U"
-                halign : 'center'
-                
-                
-            MDLabel:
-                text: "L"
-                halign : 'center'
-                
-                
-            MDLabel:
-                text: "S"
-                halign : 'center'
 
-            MDLabel:
-                text: ""
-                halign : 'center'
+        MDBoxLayout:
+            id:graphContainer
+            orientation:'horizontal'
+            size_hint: 1, 1
+            md_bg_color: app.theme_cls.primary_color
 
-            MDLabel:
-                text: ""
-                halign : 'center'
-                
-            MDLabel:
-                text: ""
-                halign : 'center'
+            BoxLayout:
+                id:graphContainerMain
+                orientation:'horizontal'
+                size_hint: 0.6, 0.8
 
-            MDLabel:
-                text: ""
-                halign : 'center'
-           
-           
-            
-            MDLabel:
-                id: lblComments
-                text: "0 / 0"
-                halign : 'center'
-                font_style: 'H5'
-            MDLabel:
-                text: " 0 / 0 "
-                size_hint: 1, 0.8
-                id: lblLikeExchange
-                halign : 'center'
-                font_style: 'H5'
-            MDLabel:
-                text: " 0 / 0 "
-                size_hint: 1, 0.8
-                id: lblFollowExchange
-                halign : 'center'
-                font_style: 'H5'
-            MDLabel:
-                id: lblCommentExchange
-                text: " 0 / 0 "
-                size_hint: 1, 0.8
-                halign : 'center'
-                font_style: 'H5'
-
-            MDLabel:
-                text: "C"
-                halign : 'center'
+            BoxLayout:
+                id:graphContainerSecondary
+                orientation:'horizontal'
+                size_hint: 0.4, 0.8
                 
-
-            MDLabel:
-                text: "LX"
-                size_hint: 1, 0.8
-                halign : 'center'
-                
-            MDLabel:
-                text: "FX"
-                halign : 'center'
-                
-                
-            MDLabel:
-                text: "CX"
-                halign : 'center'
-                
-                
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: 1, 0.2
-            spacing:5
-            # Line:
-            #     width:1
-                # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
-
-            
-        
+        # BoxLayout:
+        #     orientation: 'vertical'
+        #     size_hint: 1, 0.2
+        #     spacing:5
+        #     # Line:
+        #     #     width:1
+        #         # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
 
         MDTextFieldRect:
             id:logLabel
@@ -304,6 +197,9 @@
             orientation:'vertical'
             md_bg_color: app.theme_cls.primary_color
             size_hint_x : 1
+            MDLabel:
+                text : " "
+                font_style: 'H4'
             MDLabel:
                 theme_text_color: "Custom"
                 text: "Real Growth, Real Engagement"
@@ -322,6 +218,8 @@
                 on_ref_press:
                     import webbrowser
                     webbrowser.open("https://socialplannerpro.com/account/login/")
+           
+                
                 
            
             

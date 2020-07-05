@@ -34,8 +34,11 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
 from kivymd.uix.bottomsheet import MDListBottomSheet
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
+from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 import customFunctions as cf
 from progressbar import CircularProgressBar
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 class Ready(Screen):
@@ -50,6 +53,17 @@ class Ready(Screen):
     TotalTime = 0
     ElapsedTime = 0
     processJobEvent = None
+    graph = None
+    graph2 = None
+    xval = 1
+
+    fig1 = None
+    ax1 = None
+    figRen = None
+
+    fig2 = None
+    ax2= None
+    figRenSec = None
     
 
     # def __init__(self, **kwargs):
@@ -80,16 +94,108 @@ class Ready(Screen):
             self.hide_widget(label)
             self.hide_widget(bLabel,False)
 
+    def drawGraphMain(self,Req = None,Loaded = None,Done = None):
+
+        if (self.figRen is not None):
+            plt.close(self.figRen)
+            
+        plt.rcParams.update({
+                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                    })
+
+        x = ['F', 'U', 'L', 'S','C']
+        if Req is None:
+            Req = [100, 200, 350, 100, 200]
+        if Loaded is None:
+            Loaded = [90, 4, 2, 20,80 ]
+        if Done is None:
+            Done = [5, 3, 5, 5,5 ]
+
+        self.fig1 , self.ax1 = plt.subplots()
+
+        plt.fill_between(x, Req, color="#a5a5a5",
+                        alpha=1, label='Done')
+      
+        plt.fill_between(x, Loaded, color="#55cadd",
+                        alpha=1, label='Loaded')
+
+        plt.fill_between(x, Done, color="#006ad8",
+                        alpha=1, label='Required')
+       
+       
+        self.ax1.spines['top'].set_visible(False)
+        self.ax1.spines['right'].set_visible(False)
+        self.ax1.spines['bottom'].set_visible(False)
+        self.ax1.spines['left'].set_visible(False)
+        self.ax1.patch.set_alpha(0)
+
+        if ( self.graph is None):
+            self.figRen = plt.gcf()
+            self.graph = FigureCanvasKivyAgg(self.figRen)
+            self.graphContainerMain.add_widget(self.graph)
+        else:
+            self.graphContainerMain.remove_widget(self.graph)
+            self.figRen = plt.gcf()
+            self.graph = FigureCanvasKivyAgg(self.figRen)
+            self.graphContainerMain.add_widget(self.graph)
+
+    def drawGraphSecondary(self,Req = None,Loaded = None,Done = None):
+
+        if (self.figRenSec is not None):
+            plt.close(self.figRenSec)
+            
+        plt.rcParams.update({
+                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                    })
+
+        x = ['LX', 'FX', 'CX']
+        if Req is None:
+            Req = [100, 1, 2 ]
+        if Loaded is None:
+            Loaded = [90, 4, 2 ]
+        if Done is None:
+            Done = [5, 3, 5 ]
+
+        self.fig2 , self.ax2 = plt.subplots()
+        
+        plt.fill_between(x, Req, color="#a5a5a5",
+                        alpha=1, label='Done')
+        
+        plt.fill_between(x, Loaded, color="#7edcad",
+                        alpha=1, label='Loaded')
+
+        plt.fill_between(x, Done, color="#009856",
+                        alpha=1, label='Required')
+    
+        self.ax2.spines['top'].set_visible(False)
+        self.ax2.spines['right'].set_visible(False)
+        self.ax2.spines['bottom'].set_visible(False)
+        self.ax2.spines['left'].set_visible(False)
+        self.ax2.patch.set_alpha(0)
+
+        if ( self.graph2 is None):
+            self.figRenSec = plt.gcf()
+            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+            self.graphContainerSecondary.add_widget(self.graph2)
+        else:
+            self.graphContainerSecondary.remove_widget(self.graph2)
+            self.figRenSec = plt.gcf()
+            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+            self.graphContainerSecondary.add_widget(self.graph2)
     
     def processjobs(self,dt):
         schedule.run_pending()
 
     def animate(self, dt):
-        bar = self.ids['pbar']
-        if bar.value < bar.max:
-            bar.value += 1
-        else:
-            bar.value = bar.min
+        # bar = self.ids['pbar']
+        # if bar.value < bar.max:
+        #     bar.value += 1
+        # else:
+        #     bar.value = bar.min
+        self.xval  += 5
+        Done = [self.xval, 3, 5, 5,7 ]
+        self.drawGraphMain(Done = Done)
+
     
     def on_enter(self):
         app = App.get_running_app()
@@ -98,16 +204,26 @@ class Ready(Screen):
             
             lblusername.text = app.api.username
 
+            self.graphContainerMain =  self.ids['graphContainerMain']
+            self.graphContainerSecondary =  self.ids['graphContainerSecondary']
+            
+            self.drawGraphMain()
+            self.drawGraphSecondary()
+
+            # Clock.schedule_interval(self.animate, 1)
+            bar = self.ids['pbar']
+            bar.value = 10
+
             label = self.ids['logLabel'] #Label(text="showing the log here")
             self.hide_widget(label)
-            self.lblFollow =  self.ids['lblFollow']
-            self.lblUnFollow =  self.ids['lblUnFollow']
-            self.lblLike =  self.ids['lblLike']
-            self.lblStoryView =  self.ids['lblStoryView']
-            self.lblComments =  self.ids['lblComments']
-            self.lblLikeExchange =  self.ids['lblLikeExchange']
-            self.lblFollowExchange =  self.ids['lblFollowExchange']
-            self.lblCommentExchange =  self.ids['lblCommentExchange']
+            # self.lblFollow =  self.ids['lblFollow']
+            # self.lblUnFollow =  self.ids['lblUnFollow']
+            # self.lblLike =  self.ids['lblLike']
+            # self.lblStoryView =  self.ids['lblStoryView']
+            # self.lblComments =  self.ids['lblComments']
+            # self.lblLikeExchange =  self.ids['lblLikeExchange']
+            # self.lblFollowExchange =  self.ids['lblFollowExchange']
+            # self.lblCommentExchange =  self.ids['lblCommentExchange']
             self.lblTotalTime =  self.ids['lblTotalTime']
             self.tbar =  self.ids['tbar']
             self.pnlNotStarted =  self.ids['pnlNotStarted']
@@ -116,7 +232,7 @@ class Ready(Screen):
             self.lblStartTime =  self.ids['lblStartTime']
             
 
-            if app.gVars.SequenceRunning == True:
+            if app.gVars.SequenceRunning != True:
                 self.hide_widget(self.pnlNotStarted)
                 self.hide_widget(self.pnlStarted,False)
                 
