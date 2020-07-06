@@ -123,19 +123,19 @@
                     MDLabel:
                         text: "Estimated time remaining for session to complete all actions :"
                         font_size: '17dp'
-                        size_hint: 0.7, 0.3
+                        size_hint: 0.7, 0.5
                         halign:"left"
-                        padding_y:0
+                        padding_y:10
                        
                     MDLabel:
                         id: lblTotalTime
                         text: "1:33"
                         font_size: '20dp'
-                        size_hint: 0.3, 0.3
+                        size_hint: 0.3, 0.5
                         halign:"left"
                         text_color: get_color_from_hex("#23bd08")
                         theme_text_color: "Custom"
-                        padding_y:0
+                        padding_y:10
                         
 
             MDStackLayout: 
@@ -144,7 +144,7 @@
 
                 MDLabel:
                     text : ''
-                    size_hint: 1, 0.1
+                    size_hint: 1, 0.2
 
                 CircularProgressBar:
                     # pos: 400, 100
@@ -195,20 +195,23 @@
             font_size: 16
             multiline:True
 
-        MDBoxLayout:
+        MDStackLayout: 
+            orientation:'lr-tb'
             id:bLabel
-            orientation:'vertical'
+            
             md_bg_color: app.theme_cls.primary_color
             size_hint_x : 1
             MDLabel:
                 text : " "
                 font_style: 'H4'
+                size_hint: 1, 0.2
             MDLabel:
                 theme_text_color: "Custom"
                 text: "Real Growth, Real Engagement"
                 text_color: get_color_from_hex("#FFFFFF")
                 halign:"center"
                 font_style: 'H5'
+                size_hint: 1, 0.3
 
             MDLabel:
                 theme_text_color: "Custom"
@@ -218,9 +221,14 @@
                 size_hint : 1,None
                 font_size: "20dp"
                 markup:True
+                size_hint: 1, 0.4
                 on_ref_press:
                     import webbrowser
                     webbrowser.open("https://socialplannerpro.com/account/login/")
+            MDLabel:
+                text : " "
+                font_style: 'H4'
+                size_hint: 1, 0.1
            
                 
                 

@@ -14,6 +14,7 @@ import kivy.utils as util
 import traceback
 import sys
 import os
+import platform
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from threading import Thread
 import logging
@@ -221,6 +222,9 @@ class Ready(Screen):
 
             # Clock.schedule_interval(self.animate, 1)
             bar = self.ids['pbar']
+            
+            if (platform.system() == "Darwin"):
+                bar.widget_size = 120
             bar.value = 10
 
             label = self.ids['logLabel'] #Label(text="showing the log here")
