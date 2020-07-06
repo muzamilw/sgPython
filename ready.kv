@@ -32,130 +32,131 @@
             right_action_items: [["ray-start-arrow", lambda x: root.startBot()],["reload", lambda x: root.RefreshManifest()],["details", lambda x: root.showLog()],["home-outline", lambda x: root.navToHome()],["logout", lambda x: root.logoutConfirm()]]
             # 
         
-        MDBoxLayout:
-            orientation:'vertical'
-            md_bg_color: app.theme_cls.primary_light 
-            size_hint: 1, 1  
+        MDGridLayout:
+            orientation:'horizontal'
+            # md_bg_color: app.theme_cls.primary_light 
+            size_hint: 1, 0.8
+            cols:3
+            valgin:'top'
         
         
-            MDBoxLayout: # ig logo and label
-                orientation: 'horizontal' 
-                size_hint: 0.8, None  
+            MDStackLayout: #username, messeges
+                orientation:'lr-tb'
+                size_hint: 0.2, 1   
                 
+
+                MDLabel:
+                    text : ''
+                    size_hint: 1, 0.1
 
                 Image:
                     source: "data//iglogo.png"
-                    size_hint: 0.2, None
+                    size_hint: 1, None
                     size: dp(50), dp(50)
-                    pos_hint: {"center_y": .5}
+                    pos_hint: {"center_y": 0}
+                    valgin:'top'
+                
+                MDLabel:
+                    text : ''
+                    size_hint: 1, 0.75
+
+
+            MDStackLayout: #username, messeges
+                orientation:'lr-tb'
+                size_hint: 1, 1   
 
                 MDLabel:
                     font_style: 'H5'
                     theme_text_color: 'Primary'
-                    size_hint: 0.8, None
+                    size_hint: 1, 0.5
                     text: ""
                     halign: 'left'
-                    valign : 'center'
                     id: lblusername
-           
-            MDBoxLayout: #labels and start button
-                orientation:'vertical'
-                size_hint: 1, None   
-                md_bg_color: app.theme_cls.primary_dark   
-
+                    
                 MDBoxLayout:
                     id: pnlNotStarted
-                    size_hint: 0.8, None
+                    size_hint: 1, 0.25
                     orientation:'horizontal'
+                    # md_bg_color: app.theme_cls.primary_dark   
                     
-                    MDLabel:
-                        size_hint: 0.2, 1
-
                     MDLabel:
                         text: "Next growth session will start today at : "
                         id :lblAutoStartLabel
                         font_size: '20dp'
-                        size_hint: 0.6, 1
+                        size_hint: 0.8, 0.5
                         halign:"left"
 
                     MDLabel:
                         text: ""
                         id :lblAutoStart
                         font_size: '22dp'
-                        size_hint: 0.2, 1
+                        size_hint: 0.2, 0.5
                         halign:"left"
                         text_color: get_color_from_hex("#23bd08")
                         theme_text_color: "Custom"
                             
 
-                        
-
-                MDGridLayout:
+                MDStackLayout:
                     id:pnlStarted
                     size_hint: 1, None
-                    orientation:'horizontal'
-                    cols : 4
+                    orientation:'lr-tb'
+                    cols : 2
                     # md_bg_color: get_color_from_hex("#23bd08")
-
-                    MDLabel:
-                        size_hint: 0.2, 0.5
 
                     MDLabel:
                         text: "Growth Session Started on"
                         font_size: '17dp'
-                        size_hint: 0.6, 0.5
+                        size_hint: 0.7, 0.3
                         halign:"left"
-                        valign:"top"
-                        
+                        padding_y:0
                     
                     MDLabel:
                         id: lblStartTime
                         text: "03:33"
                         font_size: '20dp'
-                        size_hint: 0.2, 0.5
+                        size_hint: 0.3, 0.3
                         halign:"left"
                         text_color: get_color_from_hex("#23bd08")
                         theme_text_color: "Custom"
-                        valign:"top"
-
-                    CircularProgressBar:
-                        # pos: 400, 100
-                        id:pbar
-                        widget_size: 80
-                        value : 1
-                        size_hint: 0.2, None
-                        thickness:5
-                        progress_colour:(0, 1, 0, 1)
-                    
-                    MDLabel:
-                        size_hint: 0.2, 0.5
-    
-                    MDLabel:
+                        padding_y:0
                         
-                        text: "Estimated time remaining for this session to complete all actions :"
+                    MDLabel:
+                        text: "Estimated time remaining for session to complete all actions :"
                         font_size: '17dp'
-                        size_hint: 0.6, 0.5
+                        size_hint: 0.7, 0.3
                         halign:"left"
-                        valign:"top"
-
+                        padding_y:0
+                       
                     MDLabel:
                         id: lblTotalTime
                         text: "1:33"
                         font_size: '20dp'
-                        size_hint: 0.2, 0.5
+                        size_hint: 0.3, 0.3
                         halign:"left"
                         text_color: get_color_from_hex("#23bd08")
                         theme_text_color: "Custom"
-                        valign:"top"
+                        padding_y:0
+                        
 
-                    MDLabel:
-                        text: " "
-                        font_size: '15dp'
-                        size_hint: 0.1, 0.5
-                        halign:"left"
+            MDStackLayout: 
+                orientation:'lr-tb'
+                size_hint: 0.2, 1   
 
+                MDLabel:
+                    text : ''
+                    size_hint: 1, 0.1
 
-                    
+                CircularProgressBar:
+                    # pos: 400, 100
+                    id:pbar
+                    widget_size: 80
+                    value : 1
+                    size_hint: 0.2, None
+                    thickness:5
+                    progress_colour:(0, 1, 0, 1)  
+                MDLabel:
+                    text : ''
+                    size_hint: 1, 0.75
                     
 
                     
@@ -166,25 +167,27 @@
             id:graphContainer
             orientation:'horizontal'
             size_hint: 1, 1
-            md_bg_color: app.theme_cls.primary_color
-
+            # md_bg_color: app.theme_cls.primary_color
+          
             BoxLayout:
                 id:graphContainerMain
                 orientation:'horizontal'
-                size_hint: 0.6, 0.8
+                size_hint: 0.6, 1
+               
 
             BoxLayout:
                 id:graphContainerSecondary
                 orientation:'horizontal'
-                size_hint: 0.4, 0.8
+                size_hint: 0.4, 1
+            
                 
-        # BoxLayout:
-        #     orientation: 'vertical'
-        #     size_hint: 1, 0.2
-        #     spacing:5
-        #     # Line:
-        #     #     width:1
-        #         # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint: 1, 0.08
+            spacing:5
+            # Line:
+            #     width:1
+                # rounded_rectangle: (self.pos[0] + 4, self.pos[1], self.width - 6, self.height - 4, 2)
 
         MDTextFieldRect:
             id:logLabel

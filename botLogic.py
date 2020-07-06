@@ -200,16 +200,16 @@ class Bot():
                             gVars.ReqExFollow = len(gVars.manifestObj.FollowList)
                             gVars.ReqExLikes  = len(gVars.manifestObj.LikeList)
                             
-                            #updating graph
-                            Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
-                            Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
-                            Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
-                            self.ui.drawGraphMain(Req,Loaded,Done)
-                            # LX FX CX
-                            Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
-                            Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
-                            Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
-                            self.ui.drawGraphSecondary(Req,Loaded,Done)
+                            # #updating graph
+                            # Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
+                            # Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
+                            # Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
+                            # self.ui.drawGraphMain(Req,Loaded,Done)
+                            # # LX FX CX
+                            # Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
+                            # Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
+                            # Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
+                            # self.ui.drawGraphSecondary(Req,Loaded,Done)
                     
                             runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments  + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
                             gVars.TotalActionsLoaded = gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExFollow + gVars.ReqExLikes
@@ -306,15 +306,15 @@ class Bot():
                             gVars.TotExLikes = len(gVars.GlobalTodo[(gVars.GlobalTodo['FriendShipStatus'] == 'MustLike') & (gVars.GlobalTodo['UserId'] != '')])
                             gVars.TotExFollow = len(gVars.GlobalTodo[(gVars.GlobalTodo['FriendShipStatus'] == 'MustFollow') & (gVars.GlobalTodo['UserId'] != '')])
                             
-                            Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
-                            Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
-                            Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
-                            self.ui.drawGraphMain(Req,Loaded,Done)
-                            # LX FX CX
-                            Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
-                            Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
-                            Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
-                            self.ui.drawGraphSecondary(Req,Loaded,Done)
+                            # Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
+                            # Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
+                            # Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
+                            # self.ui.drawGraphMain(Req,Loaded,Done)
+                            # # LX FX CX
+                            # Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
+                            # Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
+                            # Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
+                            # self.ui.drawGraphSecondary(Req,Loaded,Done)
                     
                             
 
@@ -476,15 +476,15 @@ class Bot():
                                         time.sleep(waitTime)
 
                                     #  F U L S C
-                                    Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
-                                    Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
-                                    Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
-                                    self.ui.drawGraphMain(Req,Loaded,Done)
-                                    # LX FX CX
-                                    Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
-                                    Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
-                                    Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
-                                    self.ui.drawGraphSecondary(Req,Loaded,Done)
+                                    # Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
+                                    # Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
+                                    # Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
+                                    # self.ui.drawGraphMain(Req,Loaded,Done)
+                                    # # LX FX CX
+                                    # Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
+                                    # Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
+                                    # Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
+                                    # self.ui.drawGraphSecondary(Req,Loaded,Done)
 
 
 

@@ -78,6 +78,15 @@ class Ready(Screen):
             wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled, wid.width, wid.size_hint_x
             wid.height, wid.size_hint_y, wid.opacity, wid.disabled,wid.width, wid.size_hint_x = 0, None, 0, True,0,0
 
+    def hide_widgetGraph(self,wid, dohide=True):
+        if hasattr(wid, 'saved_attrs'):
+            if not dohide:
+                wid.height, wid.size_hint_y, wid.opacity, wid.disabled,wid.width, wid.size_hint_x = wid.saved_attrs
+                del wid.saved_attrs
+        elif dohide:
+            wid.saved_attrs = wid.height, wid.size_hint_y, wid.opacity, wid.disabled, wid.width, wid.size_hint_x
+            wid.height, wid.size_hint_y, wid.opacity, wid.disabled,wid.width, wid.size_hint_x = 1, 1, 0, True,1,1
+
     def showLog(self):
         label = self.ids['logLabel']
         bLabel = self.ids['bLabel']
@@ -105,11 +114,11 @@ class Ready(Screen):
 
         x = ['F', 'U', 'L', 'S','C']
         if Req is None:
-            Req = [100, 200, 350, 100, 200]
+            Req = [300, 330, 150, 100, 100]
         if Loaded is None:
-            Loaded = [90, 4, 2, 20,80 ]
+            Loaded = [290, 310, 140, 90,80 ]
         if Done is None:
-            Done = [5, 3, 5, 5,5 ]
+            Done = [1, 1, 1, 1,1 ]
 
         self.fig1 , self.ax1 = plt.subplots()
 
@@ -150,11 +159,11 @@ class Ready(Screen):
 
         x = ['LX', 'FX', 'CX']
         if Req is None:
-            Req = [100, 1, 2 ]
+            Req = [15, 15, 15 ]
         if Loaded is None:
-            Loaded = [90, 4, 2 ]
+            Loaded = [13, 12, 10 ]
         if Done is None:
-            Done = [5, 3, 5 ]
+            Done = [1, 1, 1 ]
 
         self.fig2 , self.ax2 = plt.subplots()
         
@@ -216,29 +225,29 @@ class Ready(Screen):
 
             label = self.ids['logLabel'] #Label(text="showing the log here")
             self.hide_widget(label)
-            # self.lblFollow =  self.ids['lblFollow']
-            # self.lblUnFollow =  self.ids['lblUnFollow']
-            # self.lblLike =  self.ids['lblLike']
-            # self.lblStoryView =  self.ids['lblStoryView']
-            # self.lblComments =  self.ids['lblComments']
-            # self.lblLikeExchange =  self.ids['lblLikeExchange']
-            # self.lblFollowExchange =  self.ids['lblFollowExchange']
-            # self.lblCommentExchange =  self.ids['lblCommentExchange']
+           
             self.lblTotalTime =  self.ids['lblTotalTime']
             self.tbar =  self.ids['tbar']
             self.pnlNotStarted =  self.ids['pnlNotStarted']
             self.pnlStarted =  self.ids['pnlStarted']
             self.lblAutoStartLabel =  self.ids['lblAutoStartLabel']
             self.lblStartTime =  self.ids['lblStartTime']
+            self.pbar = self.ids['pbar']
+            self.graphContainer = self.ids['graphContainer']
+            
             
 
-            if app.gVars.SequenceRunning != True:
+            if app.gVars.SequenceRunning == True:
                 self.hide_widget(self.pnlNotStarted)
                 self.hide_widget(self.pnlStarted,False)
+                self.hide_widget(self.pbar,False)
+                self.hide_widgetGraph(self.graphContainer,False)
                 
             else:
                 self.hide_widget(self.pnlNotStarted, False)
                 self.hide_widget(self.pnlStarted)
+                self.hide_widget(self.pbar)
+                self.hide_widgetGraph(self.graphContainer)
                 
 
             if hasattr(app.gVars, 'SequenceRunning'):
@@ -310,6 +319,7 @@ class Ready(Screen):
             schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
             self.RunScheduled = True
             Clock.schedule_interval(self.processjobs, 1)
+            self.log.info("Manifest Refreshed.")
         else:
             self.ShowErrorMessage("Growth Session is already running, cannot refresh!.")
 
@@ -324,26 +334,25 @@ class Ready(Screen):
         self.ElapsedTime = app.gVars.ElapsedTime
 
         if app.gVars.LastSuccessfulSequenceRunDate is None or app.gVars.LastSuccessfulSequenceRunDate != datetime.datetime.today() :
-            # if app.gVars.SequenceRunning != True: #if sequence is already not in progress then proceed otherwise skip
+           
                 oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
                 self.botThread = Thread(target=oBot.RunBot)
                 self.botThread.start()
 
-                # if app.gVars.SequenceRunning == True:
+                
                 self.hide_widget(self.pnlNotStarted)
                 self.hide_widget(self.pnlStarted,False)
+                self.hide_widget(self.pbar,False)
+                self.hide_widgetGraph(self.graphContainer,False)
                     
-                # else:
-                # self.hide_widget(self.pnlNotStarted, False)
-                # self.hide_widget(self.pnlStarted)
+              
                 
                 Clock.schedule_interval(self.updateTime, 1)
+                Clock.schedule_interval(self.updateGraph, 30)
 
                
                 
-                # Clock.schedule_interval(self.animate, 0.05)
-            # else:
-            #     self.log.info("Sequence is already running, skipping re-launch")
+               
         else:
             self.log.info("Sequence has been completed successfully for today. Next run is possible tomorrow.")
         
@@ -351,6 +360,22 @@ class Ready(Screen):
         # t = threading.Thread(target=self.my_thread, args=(log,))
         #thread.start_new(self.my_thread, (log,))
         # t.start()
+
+    def updateGraph(self,dt):
+        app = App.get_running_app()
+        #updating graph
+        if app.gVars.TotalActionsLoaded != 0 or app.gVars.RequiredActionPerformed  != 0:
+            Req = [app.gVars.ReqFollow, app.gVars.ReqUnFollow, app.gVars.ReqLikes, app.gVars.ReqStoryViews, app.gVars.ReqComments]
+            Loaded = [app.gVars.TotFollow, app.gVars.TotUnFollow , app.gVars.TotLikes, app.gVars.TotStoryViews,app.gVars.TotComments ]
+            Done = [app.gVars.CurrentFollowDone, app.gVars.CurrentUnFollowDone, app.gVars.CurrentLikeDone, app.gVars.CurrentStoryViewDone,app.gVars.CurrentCommentsDone ]
+            self.drawGraphMain(Req,Loaded,Done)
+            # LX FX CX
+            Req = [app.gVars.ReqExLikes, app.gVars.ReqExFollow, app.gVars.ReqExComments]
+            Loaded = [app.gVars.TotExLikes, app.gVars.TotExFollow , app.gVars.TotExComments ]
+            Done = [app.gVars.CurrentExLikeDone, app.gVars.CurrentExFollowDone, app.gVars.CurrentExCommentsDone ]
+            self.drawGraphSecondary(Req,Loaded,Done)
+        
+
 
     def updateTime(self,dt):
         app = App.get_running_app()
@@ -402,6 +427,8 @@ class Ready(Screen):
     def stop(self):
         app = App.get_running_app()
         Clock.unschedule(self.updateTime)
+        Clock.unschedule(self.updateGraph)
+        
         self.botStop_event.set()
 
         app.gVars.SequenceRunning = False
@@ -409,10 +436,14 @@ class Ready(Screen):
         if app.gVars.SequenceRunning == True:
             self.hide_widget(self.pnlNotStarted)
             self.hide_widget(self.pnlStarted,False)
+            self.hide_widget(self.pbar,False)
+            self.hide_widgetGraph(self.graphContainer,False)
             
         else:
             self.hide_widget(self.pnlNotStarted, False)
             self.hide_widget(self.pnlStarted)
+            self.hide_widget(self.pbar)
+            self.hide_widgetGraph(self.graphContainer)
         
 
     def ShowErrorMessage(self, ErrorMsg):
@@ -473,6 +504,7 @@ class Ready(Screen):
         app = App.get_running_app()
         #self.botThread.join()
         Clock.unschedule(self.updateTime)
+        Clock.unschedule(self.updateGraph)
         self.botStop_event.set()
         # self.ids['btnStart'].text = "Start Sequence"
         # self.ids['btnStart'].disabled = False
