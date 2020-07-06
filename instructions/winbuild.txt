@@ -32,7 +32,7 @@ SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr h
 #install the api from the following location
 pip install git+https://github.com/muzamilw/instagram_private_api.git --upgrade --force-reinstall
 
-
+#### must like this ---- install garden install matplotlib --kivy
 ###############################################
 pyinstaller mac.spec --onefile --windowed
 pyinstaller main.py --onedir --windowed --log-level=debug --debug -n mzapp --hiddenimport=requests --hiddenimport=kivy --hiddenimport=pandas --hiddenimport=pkg_resources.py2_warn
