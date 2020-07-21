@@ -179,14 +179,18 @@ def LoadManifest(manifest):
 
     manifestObj.GenderEngagmentPref = manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"]
     manifestObj.IncludeBusinessAccounts = manifest["MobileJsonRootObject"]["TargetInformation"]["IncludeBusinessAccounts"]
+    
+    hashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["HashTagsToEngage"].translate({ord(c): None for c in "!@#$'"})
 
-    manifestObj.hashtags = [x.strip() for x in manifest["MobileJsonRootObject"]["TargetInformation"]["HashTagsToEngage"].strip().split(",")]
+    manifestObj.hashtags = [x.strip() for x in hashtags.strip().split(",")]
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["LocationsToEngage"] is not None:
-        manifestObj.locations = manifest["MobileJsonRootObject"]["TargetInformation"]["LocationsToEngage"].strip().split(",")
+        locations = manifest["MobileJsonRootObject"]["TargetInformation"]["LocationsToEngage"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.locations = locations.strip().split(",")
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["DirectCompetitors"] is not None:
-        manifestObj.DirectCompetitors = manifest["MobileJsonRootObject"]["TargetInformation"]["DirectCompetitors"].strip().split(",")
+        competitors = manifest["MobileJsonRootObject"]["TargetInformation"]["DirectCompetitors"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.DirectCompetitors = competitors.strip().split(",")
 
     intervals = json.loads(manifest["MobileJsonRootObject"]["TargetInformation"]["ExecutionIntervals"])
     
@@ -199,24 +203,29 @@ def LoadManifest(manifest):
     manifestObj.AllFollowedAccounts = manifest["MobileJsonRootObject"]["AllFollowedAccounts"]
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["WhistListManualUsers"] is not None:
-        manifestObj.WhistListUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["WhistListManualUsers"].strip().split(",")
+        WhistListManualUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["WhistListManualUsers"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.WhistListUsers = WhistListManualUsers.strip().split(",")
     
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListUsers"] is not None:
-        manifestObj.BlackListUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListUsers"].strip().split(",")
+        BlackListUsers = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListUsers"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.BlackListUsers = BlackListUsers.strip().split(",")
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"] is not None:
-        manifestObj.BlackListLocations = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"].strip().split(",")
+        BlackListLocations = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListLocations"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.BlackListLocations = BlackListLocations.strip().split(",")
     else:
         manifestObj.BlackListLocations = [""]
         
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"] is not None:
-        manifestObj.BlackListHashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"].strip().split(",")
+        BlackListHashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListHashtags"].translate({ord(c): None for c in "!@#$'"})
+        manifestObj.BlackListHashtags = BlackListHashtags.strip().split(",")
     else:
         manifestObj.BlackListHashtags = [""]
 
 
     if manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"] is not None:
-        manifestObj.BlackListWordsManual = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"].strip().split(",")
+        BlackListWordsManual = manifest["MobileJsonRootObject"]["TargetInformation"]["BlackListWordsManual"].translate({ord(c): None for c in "!#'"})
+        manifestObj.BlackListWordsManual = BlackListWordsManual.strip().split(",")
     else:
         manifestObj.BlackListWordsManual = [""]
             

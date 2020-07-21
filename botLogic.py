@@ -375,7 +375,7 @@ class Bot():
 
                                 if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])) and str(row['MediaId']) != 'nan':
                                     
-                                    waitTime = randrange(20,30)
+                                    waitTime = randrange(40,60)
                                     
                                     
                                     if row['Action'] == 'Like' and gVars.manifestObj.AfterFollLikeuserPosts == 1 and ( gVars.CurrentLikeDone < gVars.manifestObj.LikeFollowingPosts or gVars.CurrentExLikeDone < gVars.ReqExLikes):
