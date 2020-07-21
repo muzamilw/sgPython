@@ -13,7 +13,7 @@ mac_icon = 'ml.icns'
 
 kivy_deps_all = hooks.get_deps_all()
 kivy_factory_modules = hooks.get_factory_modules()
-hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_resources.py2_warn']
+hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_resources.py2_warn'] + ['backend_kivy']
 
 # assets
 kivy_assets_toc = Tree(kivy_data_dir, prefix=join('kivy_install', 'data'))
@@ -30,11 +30,12 @@ a = Analysis(['main.py'],
              hiddenimports=hiddenimports,
              hookspath=[kivymd_hooks_path],
              runtime_hooks=[],
-             excludes=['_tkinter', 'Tkinter', 'enchant', 'twisted','pygments'],
+             excludes=[ 'Tkinter', 'enchant', 'twisted','pygments'],   #'_tkinter',
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
+#a.binaries = a.binaries - TOC([('libpng16.16.dylib',None,None)])
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
