@@ -56,10 +56,10 @@ exe1 = EXE(pyz,
           name='SocialPlannerPro',
           exclude_binaries=True,
           icon=join('data', 'ml.ico'),
-          debug=False,
+          debug=True,
           strip=False,
           upx=True,
-          console=False)
+          console=True)
 
 
 coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\'),
