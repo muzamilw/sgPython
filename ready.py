@@ -151,48 +151,51 @@ class Ready(Screen):
 
     def drawGraphSecondary(self,Req = None,Loaded = None,Done = None):
 
-        if (self.figRenSec is not None):
-            plt.close(self.figRenSec)
+        try:
+            if (self.figRenSec is not None):
+                plt.close(self.figRenSec)
+                
+            plt.rcParams.update({
+                        "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                        })
+
+            x = ['LX', 'FX', 'CX']
+            if Req is None:
+                Req = [15, 15, 15 ]
+            if Loaded is None:
+                Loaded = [13, 12, 10 ]
+            if Done is None:
+                Done = [1, 1, 1 ]
+
+            self.fig2 , self.ax2 = plt.subplots()
             
-        plt.rcParams.update({
-                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
-                    })
+            plt.fill_between(x, Req, color="#a5a5a5",
+                            alpha=1, label='Done')
+            
+            plt.fill_between(x, Loaded, color="#7edcad",
+                            alpha=1, label='Loaded')
 
-        x = ['LX', 'FX', 'CX']
-        if Req is None:
-            Req = [15, 15, 15 ]
-        if Loaded is None:
-            Loaded = [13, 12, 10 ]
-        if Done is None:
-            Done = [1, 1, 1 ]
-
-        self.fig2 , self.ax2 = plt.subplots()
+            plt.fill_between(x, Done, color="#009856",
+                            alpha=1, label='Required')
         
-        plt.fill_between(x, Req, color="#a5a5a5",
-                        alpha=1, label='Done')
+            self.ax2.spines['top'].set_visible(False)
+            self.ax2.spines['right'].set_visible(False)
+            self.ax2.spines['bottom'].set_visible(False)
+            self.ax2.spines['left'].set_visible(False)
+            self.ax2.patch.set_alpha(0)
+
+            if ( self.graph2 is None):
+                self.figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                self.graphContainerSecondary.add_widget(self.graph2)
+            else:
+                self.graphContainerSecondary.remove_widget(self.graph2)
+                self.figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                self.graphContainerSecondary.add_widget(self.graph2)
+        except Exception as e:
+            pass
         
-        plt.fill_between(x, Loaded, color="#7edcad",
-                        alpha=1, label='Loaded')
-
-        plt.fill_between(x, Done, color="#009856",
-                        alpha=1, label='Required')
-    
-        self.ax2.spines['top'].set_visible(False)
-        self.ax2.spines['right'].set_visible(False)
-        self.ax2.spines['bottom'].set_visible(False)
-        self.ax2.spines['left'].set_visible(False)
-        self.ax2.patch.set_alpha(0)
-
-        if ( self.graph2 is None):
-            self.figRenSec = plt.gcf()
-            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
-            self.graphContainerSecondary.add_widget(self.graph2)
-        else:
-            self.graphContainerSecondary.remove_widget(self.graph2)
-            self.figRenSec = plt.gcf()
-            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
-            self.graphContainerSecondary.add_widget(self.graph2)
-    
     def processjobs(self,dt):
         schedule.run_pending()
 

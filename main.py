@@ -201,6 +201,7 @@ class LoginApp(MDApp):
     password = StringProperty(None)
     icon = 'data//ml.ico'
     ManifestRefreshed = False
+    Login_alert_dialog = None
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -267,12 +268,26 @@ class LoginApp(MDApp):
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
-            
-            with open(file_to_open, 'rb') as gVarFile:
-                print('Loading Existing Global Defaults')
-                globvars = pickle.load(gVarFile)
-                self.gVars = globvars
-                
+            try:
+                with open(file_to_open, 'rb') as gVarFile:
+                    print('Loading Existing Global Defaults')
+                    globvars = pickle.load(gVarFile)
+                    self.gVars = globvars
+            except Exception as e:
+                #show error that admin access is required
+                if not self.alert_dialog:
+                    self.alert_dialog = MDDialog(
+                        title="Error!",
+                        text="Please re-launch the application with administrative rights.",
+                        buttons=[
+                            MDFlatButton(
+                                text="Ok",
+                                text_color=app.theme_cls.primary_color,
+                            ),
+                        ],
+                    )
+                    self.alert_dialog.open()
+                    
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
@@ -349,8 +364,23 @@ class LoginApp(MDApp):
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
-            with open(file_to_open, 'wb') as gVarFile:
-                pickle.dump(gVars, gVarFile)
+            try:
+                with open(file_to_open, 'wb') as gVarFile:
+                    pickle.dump(gVars, gVarFile)
+            except Exception as e:
+                #show error that admin access is required
+                if not self.alert_dialog:
+                    self.alert_dialog = MDDialog(
+                        title="Error!",
+                        text="Please re-launch the application with administrative rights.",
+                        buttons=[
+                            MDFlatButton(
+                                text="Ok",
+                                text_color=app.theme_cls.primary_color,
+                            ),
+                        ],
+                    )
+                    self.alert_dialog.open()
         
     def to_json(self,python_object):
         if isinstance(python_object, bytes):
