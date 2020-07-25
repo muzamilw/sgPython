@@ -294,7 +294,7 @@ class LoginApp(MDApp):
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
-            gVars.BotVer = 'py.1.6'
+            gVars.BotVer = '2.0.4'
             gVars.RunStartTime = None
             gVars.RunEndTime = None
             gVars.TotalSessionTime = 0
