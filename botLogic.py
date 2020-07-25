@@ -32,6 +32,7 @@ from kivy.app import App
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
+import kivy.utils as kutil
 
 class Actions(Enum):
     Follow = 60
@@ -539,20 +540,30 @@ class Bot():
 
                         except (ClientLoginError, ClientLoginRequiredError, ClientCookieExpiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Fatal Error : Instagram Login occurred, Please sign off and relogin to continue")
+                            log.info("Fatal Error : Instagram Login error occurred, Please sign off and relogin to continue")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
-                            self.ShowErrorMessage("Instagram Login occurred,Stopping Sequence. Please sign off and relogin to continue")
+                            self.ShowErrorMessage("Instagram Login error occurred,Stopping Sequence. Please sign off and relogin to continue")
                             IsApiClientError = True
+
+                            self.ui.showErrorLabel()
+                            self.ui.bLabel.md_bg_color = kutil.get_color_from_hex("#FF0000")
+                            self.ui.bLabelHead.text = "Fatal Error"
+                            self.ui.bLabelText.text = "Instagram Login error occurred, Please logoff and relogin to continue"
                             return
 
                         except (ClientSentryBlockError, ClientChallengeRequiredError, ClientCheckpointRequiredError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
+                            log.info("Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Also open terminal to solve IG challenge ")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
-                            self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
+                            self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Also open terminal to solve IG challenge")
                             IsApiClientError = True
+
+                            self.ui.showErrorLabel()
+                            self.ui.bLabel.md_bg_color = kutil.get_color_from_hex("#FF0000")
+                            self.ui.bLabelHead.text = "Fatal Error"
+                            self.ui.bLabelText.text = "Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Restart and open terminal to solve IG challenge"
                             return
 
                         except (ClientError,ClientConnectionError) as e:

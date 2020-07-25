@@ -44,7 +44,9 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.config import Config
-
+from kivymd.app import MDApp
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 import os
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
@@ -201,7 +203,7 @@ class LoginApp(MDApp):
     password = StringProperty(None)
     icon = 'data//ml.ico'
     ManifestRefreshed = False
-    Login_alert_dialog = None
+    alert_dialog = None
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -268,25 +270,26 @@ class LoginApp(MDApp):
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
-            try:
+            # try:
                 with open(file_to_open, 'rb') as gVarFile:
                     print('Loading Existing Global Defaults')
                     globvars = pickle.load(gVarFile)
                     self.gVars = globvars
-            except Exception as e:
-                #show error that admin access is required
-                if not self.alert_dialog:
-                    self.alert_dialog = MDDialog(
-                        title="Error!",
-                        text="Please re-launch the application with administrative rights.",
-                        buttons=[
-                            MDFlatButton(
-                                text="Ok",
-                                text_color=app.theme_cls.primary_color,
-                            ),
-                        ],
-                    )
-                    self.alert_dialog.open()
+            # except Exception as e:
+               
+            #     app = App.get_running_app()
+            #     if not self.alert_dialog:
+            #         self.alert_dialog = MDDialog(
+            #             title="Error!",
+            #             text="Please re-launch the application with administrative rights.",
+            #             buttons=[
+            #                 MDFlatButton(
+            #                     text="Ok",
+            #                     text_color=app.theme_cls.primary_color,
+            #                 ),
+            #             ],
+            #         )
+            #         self.alert_dialog.open()
                     
         except IOError:
             print('Vars file does not exist, InitBlank')

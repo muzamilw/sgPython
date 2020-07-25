@@ -269,17 +269,26 @@ def LoadManifest(manifest):
     return manifestObj
 
 def checkUsernameinFollowedList(json_object, name):
-    result = [obj for obj in json_object if name in obj['FollowedSocialUsername'] ]
+    if len(json_object) > 0 :
+        result = [obj for obj in json_object if name in obj['FollowedSocialUsername'] ]
 
-    if len(result) == 0:
-        return True
+        if len(result) == 0:
+            return True
+        else:
+            return False
     else:
-        return False
+        return True
 
 def checkInList(json_object,blacklist, name):
-    result = [obj for obj in json_object if name in obj]
+    if len(json_object) > 0:
+        result = [obj for obj in json_object if name in obj]
+    else:
+        result = []
 
-    result2 = [obj for obj in blacklist if name in obj]
+    if len(blacklist) > 0:
+        result2 = [obj for obj in blacklist if name in str(obj)]
+    else:
+        result2= []
 
     if len(result) == 0 and len(result2) == 0:
         return True
@@ -499,7 +508,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
             if manifestObj.FollowOn == 1:
                 suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
                 if suggUsers is not None and len(suggUsers) > 0:
-                            for user in suggUsers:
+                            for user in islice(suggUsers, 0, int(math.ceil(manifestObj.totalActionsIGUsers/2))):
                                 if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
                                     ufeed = api.user_feed(user['pk'])
                                     if ufeed is not None and len(ufeed['items']) > 0 :
@@ -513,15 +522,15 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                                     gVars.ActionLoaded += 1
                             
                             
-        except:
-            print('exception in chaining i.e suggested users')
-            raise
+        except Exception as e:
+            print('exception in chaining i.e suggested users  {0!s}'.format(e))
+            
 
         folluser = ''
         try:
             if manifestObj.FollowOn == 1:
                 #server follow list
-                for foll in manifestObj.FollowList:
+                for foll in  islice(manifestObj.FollowList, 0, int(math.ceil(manifestObj.totalActionsIGUsers/2))):
                     folluser = foll['FollowedSocialUsername'].strip()
                     try:
                         user = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)

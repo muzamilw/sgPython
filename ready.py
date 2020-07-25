@@ -104,50 +104,66 @@ class Ready(Screen):
             self.hide_widget(label)
             self.hide_widget(bLabel,False)
 
+    def showErrorLabel(self):
+        label = self.ids['logLabel']
+        bLabel = self.ids['bLabel']
+        
+        # if label.opacity == 0 :
+        #     label.opacity = 1
+            
+        # else:
+        #     label.opacity = 0
+       
+        self.hide_widget(label)
+        self.hide_widget(bLabel,False)
+
     def drawGraphMain(self,Req = None,Loaded = None,Done = None):
 
-        if (self.figRen is not None):
-            plt.close(self.figRen)
-            
-        plt.rcParams.update({
-                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
-                    })
+        try:
+            if (self.figRen is not None):
+                plt.close(self.figRen)
+                
+            plt.rcParams.update({
+                        "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                        })
 
-        x = ['F', 'U', 'L', 'S','C']
-        if Req is None:
-            Req = [300, 330, 150, 100, 100]
-        if Loaded is None:
-            Loaded = [290, 310, 140, 90,80 ]
-        if Done is None:
-            Done = [1, 1, 1, 1,1 ]
+            x = ['F', 'U', 'L', 'S','C']
+            if Req is None:
+                Req = [300, 330, 150, 100, 100]
+            if Loaded is None:
+                Loaded = [290, 310, 140, 90,80 ]
+            if Done is None:
+                Done = [1, 1, 1, 1,1 ]
 
-        self.fig1 , self.ax1 = plt.subplots()
+            self.fig1 , self.ax1 = plt.subplots()
 
-        plt.fill_between(x, Req, color="#a5a5a5",
-                        alpha=1, label='Done')
-      
-        plt.fill_between(x, Loaded, color="#55cadd",
-                        alpha=1, label='Loaded')
+            plt.fill_between(x, Req, color="#a5a5a5",
+                            alpha=1, label='Done')
+        
+            plt.fill_between(x, Loaded, color="#55cadd",
+                            alpha=1, label='Loaded')
 
-        plt.fill_between(x, Done, color="#006ad8",
-                        alpha=1, label='Required')
-       
-       
-        self.ax1.spines['top'].set_visible(False)
-        self.ax1.spines['right'].set_visible(False)
-        self.ax1.spines['bottom'].set_visible(False)
-        self.ax1.spines['left'].set_visible(False)
-        self.ax1.patch.set_alpha(0)
+            plt.fill_between(x, Done, color="#006ad8",
+                            alpha=1, label='Required')
+        
+        
+            self.ax1.spines['top'].set_visible(False)
+            self.ax1.spines['right'].set_visible(False)
+            self.ax1.spines['bottom'].set_visible(False)
+            self.ax1.spines['left'].set_visible(False)
+            self.ax1.patch.set_alpha(0)
 
-        if ( self.graph is None):
-            self.figRen = plt.gcf()
-            self.graph = FigureCanvasKivyAgg(self.figRen)
-            self.graphContainerMain.add_widget(self.graph)
-        else:
-            self.graphContainerMain.remove_widget(self.graph)
-            self.figRen = plt.gcf()
-            self.graph = FigureCanvasKivyAgg(self.figRen)
-            self.graphContainerMain.add_widget(self.graph)
+            if ( self.graph is None):
+                self.figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(self.figRen)
+                self.graphContainerMain.add_widget(self.graph)
+            else:
+                self.graphContainerMain.remove_widget(self.graph)
+                self.figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(self.figRen)
+                self.graphContainerMain.add_widget(self.graph)
+        except Exception as e:
+            pass
 
     def drawGraphSecondary(self,Req = None,Loaded = None,Done = None):
 
@@ -220,8 +236,8 @@ class Ready(Screen):
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
             
-            self.drawGraphMain()
-            self.drawGraphSecondary()
+            # self.drawGraphMain()
+            # self.drawGraphSecondary()
 
             # Clock.schedule_interval(self.animate, 1)
             bar = self.ids['pbar']
@@ -241,7 +257,10 @@ class Ready(Screen):
             self.lblStartTime =  self.ids['lblStartTime']
             self.pbar = self.ids['pbar']
             self.graphContainer = self.ids['graphContainer']
-            
+            self.bLabel = self.ids['bLabel']
+            self.bLabelHead = self.ids['bLabelHead']
+            self.bLabelText = self.ids['bLabelText']
+
             
 
             if app.gVars.SequenceRunning == True:
