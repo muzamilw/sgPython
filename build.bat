@@ -32,3 +32,8 @@ compil32 /cc "C:\Development\IGBot\instructions\InnoSetupScript.iss"
 
 SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com C:\Development\IGBot\instructions\Output\SocialPlannerProSetup.exe
 REM xcopy /i  C:\Development\IGBot\dist\pytransform\_pytransform.dll C:\Development\IGBot\dist\dist\SocialPlannerPro\pytransform\platforms\windows\x86_64\
+
+
+
+
+pyarmor obfuscate --with-license licenses\30aug2020\license.lic --advanced 2 main.py

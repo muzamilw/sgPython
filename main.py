@@ -52,10 +52,9 @@ os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
 from iglogin import IGLogin
 from login import Login
-from alert import Alert
+
 from instagram_private_api import Client
 from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
-import SPButton
 from home import Home
 from kivymd.app import MDApp
 

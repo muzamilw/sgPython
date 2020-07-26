@@ -22,13 +22,13 @@ import threading
 import schedule
 import time
 import datetime
-from alert import Alert
+
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
         __version__ as client_version)
 from botLogic import Bot
-import SPButton 
+ 
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
@@ -310,13 +310,13 @@ class Ready(Screen):
             
         
         except ClientLoginError as e:
-            Alert(title='Error', text='IG Login Error, full error : ' + str(e))
+            self.ShowErrorMessage('IG Login Error, full error : ' + str(e))
         except ClientCookieExpiredError as e:
-            Alert(title='Error', text='Client cookie has been expired, relogin to IG needed , full error : ' + str(e))
+            self.ShowErrorMessage('Client cookie has been expired, relogin to IG needed , full error : ' + str(e))
         except ClientLoginRequiredError as e:
-             Alert(title='Error', text='Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
+            self.ShowErrorMessage('Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
         except ClientError as e:
-            Alert(title='Error', text='General  error. , full error : ' + str(e))
+            self.ShowErrorMessage('General  error. , full error : ' + str(e))
 
     def RefreshManifest(self):
         
