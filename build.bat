@@ -13,21 +13,21 @@ xcopy /s  C:\Development\IGBot\userdata C:\Development\IGBot\dist\userdata /I
 cd dist
 pyinstaller win.spec -i data\ml.ico -w --noconsole --clean -y --paths DIR
 
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\dist"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\env"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.vscode"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.git"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.build"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\instructions"
-REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\dist"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\env"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.vscode"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.git"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.build"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\instructions"
+@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
 
 cd dist
 cd SocialPlannerPro
-REM DEL /S /Q *.py
-REM DEL /S /Q *.spec
-REM DEL /S /Q *.bat
-REM DEL /S /Q *.sh
-REM SIGNTOOL.EXE sign /F C:\Development\IGBot\instructions\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerPro.exe
+DEL /S /Q *.py
+DEL /S /Q *.spec
+DEL /S /Q *.bat
+DEL /S /Q *.sh
+SIGNTOOL.EXE sign /F C:\Development\IGBot\instructions\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerPro.exe
 
 REM cd C:\Users\muzam\AppData\Local\Programs\Inno Setup 6
 

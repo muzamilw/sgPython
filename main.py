@@ -371,18 +371,20 @@ class LoginApp(MDApp):
                     pickle.dump(gVars, gVarFile)
             except Exception as e:
                 #show error that admin access is required
-                if not self.alert_dialog:
-                    self.alert_dialog = MDDialog(
-                        title="Error!",
-                        text="Please re-launch the application with administrative rights.",
-                        buttons=[
-                            MDFlatButton(
-                                text="Ok",
-                                text_color=app.theme_cls.primary_color,
-                            ),
-                        ],
-                    )
-                    self.alert_dialog.open()
+                # app = App.get_running_app()
+                # if not self.alert_dialog:
+                #     self.alert_dialog = MDDialog(
+                #         title="Error!",
+                #         text="Please re-launch the application with administrative rights.",
+                #         buttons=[
+                #             MDFlatButton(
+                #                 text="Ok",
+                #                 text_color=app.theme_cls.primary_color,
+                #             ),
+                #         ],
+                #     )
+                #     self.alert_dialog.open()
+                print('Administrative rights are needed as app is not able to create userdata')
         
     def to_json(self,python_object):
         if isinstance(python_object, bytes):
