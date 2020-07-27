@@ -21,7 +21,7 @@ datas = [
 excludes_a = ['Tkinter', 'twisted', 'pygments']    #'_tkinter'
 
 # list of hiddenimports
-hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn'] + ['pandas._libs.tslibs.timedelta'] + ['backend_kivy']
+hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules  + ['win32timezone'] + ['pkg_resources.py2_warn'] + ['pandas._libs.tslibs.timedelta'] + ['backend_kivy'] + ["requests"] + ["numpy"] + ["pandas"] + ["email.mime"] + ["email.mime.multipart"] + ["email.mime.text"] + ["instagram_private_api"] + ["kivymd"] + ["kivymd.app"] + ["kivymd.uix.button"] + ["schedule"]+ ["kivy.garden"] + ["matplotlib"] + ["customFunctions"] +  ["apiWrappers"] + ["botLogic"] + ["ready"] + ["home"] + ["kivy.garden.matplotlib.backend_kivyagg"]
 
 # binary data
 sdl2_bin_tocs = [Tree(p) for p in sdl2.dep_bins]
@@ -62,7 +62,7 @@ exe1 = EXE(pyz,
           console=True)
 
 
-coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\'),
+coll = COLLECT(exe1,Tree('C:\\Development\\IGBot\\dist\\'),
                a.binaries,
                a.zipfiles,
                a.datas,
