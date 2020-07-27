@@ -35,7 +35,7 @@ a = Analysis(['main.py'],
              win_private_assemblies=False,
              cipher=block_cipher,
              noarchive=False)
-#a.binaries = a.binaries - TOC([('libpng16.16.dylib',None,None)])
+a.binaries = a.binaries - TOC([('libpng16.16.dylib',None,None)])
 
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
