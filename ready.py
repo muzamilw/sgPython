@@ -22,13 +22,13 @@ import threading
 import schedule
 import time
 import datetime
-from alert import Alert
+
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
         __version__ as client_version)
 from botLogic import Bot
-import SPButton 
+ 
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
@@ -104,95 +104,114 @@ class Ready(Screen):
             self.hide_widget(label)
             self.hide_widget(bLabel,False)
 
+    def showErrorLabel(self):
+        label = self.ids['logLabel']
+        bLabel = self.ids['bLabel']
+        
+        # if label.opacity == 0 :
+        #     label.opacity = 1
+            
+        # else:
+        #     label.opacity = 0
+       
+        self.hide_widget(label)
+        self.hide_widget(bLabel,False)
+
     def drawGraphMain(self,Req = None,Loaded = None,Done = None):
 
-        if (self.figRen is not None):
-            plt.close(self.figRen)
-            
-        plt.rcParams.update({
-                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
-                    })
+        try:
+            if (self.figRen is not None):
+                plt.close(self.figRen)
+                
+            plt.rcParams.update({
+                        "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                        })
 
-        x = ['F', 'U', 'L', 'S','C']
-        if Req is None:
-            Req = [300, 330, 150, 100, 100]
-        if Loaded is None:
-            Loaded = [290, 310, 140, 90,80 ]
-        if Done is None:
-            Done = [1, 1, 1, 1,1 ]
+            x = ['F', 'U', 'L', 'S','C']
+            if Req is None:
+                Req = [300, 330, 150, 100, 100]
+            if Loaded is None:
+                Loaded = [290, 310, 140, 90,80 ]
+            if Done is None:
+                Done = [1, 1, 1, 1,1 ]
 
-        self.fig1 , self.ax1 = plt.subplots()
+            self.fig1 , self.ax1 = plt.subplots()
 
-        plt.fill_between(x, Req, color="#a5a5a5",
-                        alpha=1, label='Done')
-      
-        plt.fill_between(x, Loaded, color="#55cadd",
-                        alpha=1, label='Loaded')
+            plt.fill_between(x, Req, color="#a5a5a5",
+                            alpha=1, label='Done')
+        
+            plt.fill_between(x, Loaded, color="#55cadd",
+                            alpha=1, label='Loaded')
 
-        plt.fill_between(x, Done, color="#006ad8",
-                        alpha=1, label='Required')
-       
-       
-        self.ax1.spines['top'].set_visible(False)
-        self.ax1.spines['right'].set_visible(False)
-        self.ax1.spines['bottom'].set_visible(False)
-        self.ax1.spines['left'].set_visible(False)
-        self.ax1.patch.set_alpha(0)
+            plt.fill_between(x, Done, color="#006ad8",
+                            alpha=1, label='Required')
+        
+        
+            self.ax1.spines['top'].set_visible(False)
+            self.ax1.spines['right'].set_visible(False)
+            self.ax1.spines['bottom'].set_visible(False)
+            self.ax1.spines['left'].set_visible(False)
+            self.ax1.patch.set_alpha(0)
 
-        if ( self.graph is None):
-            self.figRen = plt.gcf()
-            self.graph = FigureCanvasKivyAgg(self.figRen)
-            self.graphContainerMain.add_widget(self.graph)
-        else:
-            self.graphContainerMain.remove_widget(self.graph)
-            self.figRen = plt.gcf()
-            self.graph = FigureCanvasKivyAgg(self.figRen)
-            self.graphContainerMain.add_widget(self.graph)
+            if ( self.graph is None):
+                self.figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(self.figRen)
+                self.graphContainerMain.add_widget(self.graph)
+            else:
+                self.graphContainerMain.remove_widget(self.graph)
+                self.figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(self.figRen)
+                self.graphContainerMain.add_widget(self.graph)
+        except Exception as e:
+            pass
 
     def drawGraphSecondary(self,Req = None,Loaded = None,Done = None):
 
-        if (self.figRenSec is not None):
-            plt.close(self.figRenSec)
+        try:
+            if (self.figRenSec is not None):
+                plt.close(self.figRenSec)
+                
+            plt.rcParams.update({
+                        "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
+                        })
+
+            x = ['LX', 'FX', 'CX']
+            if Req is None:
+                Req = [15, 15, 15 ]
+            if Loaded is None:
+                Loaded = [13, 12, 10 ]
+            if Done is None:
+                Done = [1, 1, 1 ]
+
+            self.fig2 , self.ax2 = plt.subplots()
             
-        plt.rcParams.update({
-                    "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
-                    })
+            plt.fill_between(x, Req, color="#a5a5a5",
+                            alpha=1, label='Done')
+            
+            plt.fill_between(x, Loaded, color="#7edcad",
+                            alpha=1, label='Loaded')
 
-        x = ['LX', 'FX', 'CX']
-        if Req is None:
-            Req = [15, 15, 15 ]
-        if Loaded is None:
-            Loaded = [13, 12, 10 ]
-        if Done is None:
-            Done = [1, 1, 1 ]
-
-        self.fig2 , self.ax2 = plt.subplots()
+            plt.fill_between(x, Done, color="#009856",
+                            alpha=1, label='Required')
         
-        plt.fill_between(x, Req, color="#a5a5a5",
-                        alpha=1, label='Done')
+            self.ax2.spines['top'].set_visible(False)
+            self.ax2.spines['right'].set_visible(False)
+            self.ax2.spines['bottom'].set_visible(False)
+            self.ax2.spines['left'].set_visible(False)
+            self.ax2.patch.set_alpha(0)
+
+            if ( self.graph2 is None):
+                self.figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                self.graphContainerSecondary.add_widget(self.graph2)
+            else:
+                self.graphContainerSecondary.remove_widget(self.graph2)
+                self.figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                self.graphContainerSecondary.add_widget(self.graph2)
+        except Exception as e:
+            pass
         
-        plt.fill_between(x, Loaded, color="#7edcad",
-                        alpha=1, label='Loaded')
-
-        plt.fill_between(x, Done, color="#009856",
-                        alpha=1, label='Required')
-    
-        self.ax2.spines['top'].set_visible(False)
-        self.ax2.spines['right'].set_visible(False)
-        self.ax2.spines['bottom'].set_visible(False)
-        self.ax2.spines['left'].set_visible(False)
-        self.ax2.patch.set_alpha(0)
-
-        if ( self.graph2 is None):
-            self.figRenSec = plt.gcf()
-            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
-            self.graphContainerSecondary.add_widget(self.graph2)
-        else:
-            self.graphContainerSecondary.remove_widget(self.graph2)
-            self.figRenSec = plt.gcf()
-            self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
-            self.graphContainerSecondary.add_widget(self.graph2)
-    
     def processjobs(self,dt):
         schedule.run_pending()
 
@@ -217,8 +236,8 @@ class Ready(Screen):
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
             
-            self.drawGraphMain()
-            self.drawGraphSecondary()
+            # self.drawGraphMain()
+            # self.drawGraphSecondary()
 
             # Clock.schedule_interval(self.animate, 1)
             bar = self.ids['pbar']
@@ -238,7 +257,10 @@ class Ready(Screen):
             self.lblStartTime =  self.ids['lblStartTime']
             self.pbar = self.ids['pbar']
             self.graphContainer = self.ids['graphContainer']
-            
+            self.bLabel = self.ids['bLabel']
+            self.bLabelHead = self.ids['bLabelHead']
+            self.bLabelText = self.ids['bLabelText']
+
             
 
             if app.gVars.SequenceRunning == True:
@@ -288,13 +310,13 @@ class Ready(Screen):
             
         
         except ClientLoginError as e:
-            Alert(title='Error', text='IG Login Error, full error : ' + str(e))
+            self.ShowErrorMessage('IG Login Error, full error : ' + str(e))
         except ClientCookieExpiredError as e:
-            Alert(title='Error', text='Client cookie has been expired, relogin to IG needed , full error : ' + str(e))
+            self.ShowErrorMessage('Client cookie has been expired, relogin to IG needed , full error : ' + str(e))
         except ClientLoginRequiredError as e:
-             Alert(title='Error', text='Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
+            self.ShowErrorMessage('Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
         except ClientError as e:
-            Alert(title='Error', text='General  error. , full error : ' + str(e))
+            self.ShowErrorMessage('General  error. , full error : ' + str(e))
 
     def RefreshManifest(self):
         

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SocialPlannerPro"
-#define MyAppVersion "2.0"
+#define MyAppVersion "2.0.5"
 #define MyAppPublisher "SocialPlannerPro"
 #define MyAppURL "http://www.socialplannerpro.com/"
 #define MyAppExeName "SocialPlannerPro.exe"
@@ -40,8 +40,8 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "C:\Development\IGBot\dist\SocialPlannerPro\SocialPlannerPro.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Development\IGBot\dist\SocialPlannerPro\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "C:\Development\IGBot\dist\dist\SocialPlannerPro\SocialPlannerPro.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Development\IGBot\dist\dist\SocialPlannerPro\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

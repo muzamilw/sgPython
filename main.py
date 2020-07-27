@@ -44,16 +44,17 @@ from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.core.window import Window
 from kivy.config import Config
-
+from kivymd.app import MDApp
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 import os
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
 from iglogin import IGLogin
 from login import Login
-from alert import Alert
+
 from instagram_private_api import Client
 from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
-import SPButton
 from home import Home
 from kivymd.app import MDApp
 
@@ -201,6 +202,7 @@ class LoginApp(MDApp):
     password = StringProperty(None)
     icon = 'data//ml.ico'
     ManifestRefreshed = False
+    alert_dialog = None
     
     def __init__(self, **kwargs):
         self.title = "Machine Learning Growth API v1.9"
@@ -267,16 +269,31 @@ class LoginApp(MDApp):
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
-            
-            with open(file_to_open, 'rb') as gVarFile:
-                print('Loading Existing Global Defaults')
-                globvars = pickle.load(gVarFile)
-                self.gVars = globvars
-                
+            # try:
+                with open(file_to_open, 'rb') as gVarFile:
+                    print('Loading Existing Global Defaults')
+                    globvars = pickle.load(gVarFile)
+                    self.gVars = globvars
+            # except Exception as e:
+               
+            #     app = App.get_running_app()
+            #     if not self.alert_dialog:
+            #         self.alert_dialog = MDDialog(
+            #             title="Error!",
+            #             text="Please re-launch the application with administrative rights.",
+            #             buttons=[
+            #                 MDFlatButton(
+            #                     text="Ok",
+            #                     text_color=app.theme_cls.primary_color,
+            #                 ),
+            #             ],
+            #         )
+            #         self.alert_dialog.open()
+                    
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
-            gVars.BotVer = 'py.1.6'
+            gVars.BotVer = '2.0.4'
             gVars.RunStartTime = None
             gVars.RunEndTime = None
             gVars.TotalSessionTime = 0
@@ -349,8 +366,25 @@ class LoginApp(MDApp):
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
-            with open(file_to_open, 'wb') as gVarFile:
-                pickle.dump(gVars, gVarFile)
+            try:
+                with open(file_to_open, 'wb') as gVarFile:
+                    pickle.dump(gVars, gVarFile)
+            except Exception as e:
+                #show error that admin access is required
+                # app = App.get_running_app()
+                # if not self.alert_dialog:
+                #     self.alert_dialog = MDDialog(
+                #         title="Error!",
+                #         text="Please re-launch the application with administrative rights.",
+                #         buttons=[
+                #             MDFlatButton(
+                #                 text="Ok",
+                #                 text_color=app.theme_cls.primary_color,
+                #             ),
+                #         ],
+                #     )
+                #     self.alert_dialog.open()
+                print('Administrative rights are needed as app is not able to create userdata')
         
     def to_json(self,python_object):
         if isinstance(python_object, bytes):

@@ -96,6 +96,20 @@ def checkInList(json_object,blacklist, name):
     else:
         return False
 
+
+def checkFriendshipStatus(user):
+    if 'friendship_status' in user:
+        if user["friendship_status"]["following"] == False:
+            return True
+        else:
+            return False
+    else:
+        return True
+
+
+
+
+
 def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist):   #feed_tag(tag, rank_token, **kwargs)
     
     rank_token = Client.generate_uuid()
@@ -120,8 +134,8 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist
         prev = len(tag_results) 
         #tag_results.extend(results.get('ranked_items', []))
         #tag_results.extend(results.get('items', []))
-        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ]   )
-        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ] )
+        tag_results.extend([x for x in results.get('ranked_items', []) if x["user"]["is_private"] == False if checkFriendshipStatus(x["user"]) if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ]   )
+        tag_results.extend([x for x in results.get('items', []) if x["user"]["is_private"] == False if checkFriendshipStatus(x["user"]) if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"])) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ] )
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
@@ -158,7 +172,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             prev = len(location_results)
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]) ) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"]))  ])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if checkFriendshipStatus(x["user"]) if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]) ) if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"]))  ])
             
             # if maxCountToGet > len(location_results):
             #     gVars.ActionLoaded +=  (len(location_results) - prev)
@@ -182,7 +196,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             results = api.location_section(locastionSearchResult['items'][0]['location']['pk'], rank_token,tab='ranked', max_id=next_max_id)
             prev = len(location_results)
             res = [val['media'] for sublist in [x['layout_content']['medias'] for x in results.get('sections', [])]  for val in sublist] 
-            location_results.extend( [x for x in res if x["user"]["is_private"] == False if x["user"]["friendship_status"]["following"] == False if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))  if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ])
+            location_results.extend( [x for x in res if x["user"]["is_private"] == False if checkFriendshipStatus(x["user"]) if checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(x["user"]["username"]))  if checkInList(manifestObj.BlackListUsers,blacklist, str(x["user"]["username"])) ])
             
 
             # if maxCountToGet > len(location_results):
