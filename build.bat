@@ -19,19 +19,24 @@ pyinstaller win.spec -i data\ml.ico -w --noconsole --clean -y --paths DIR
 @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.git"
 @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.build"
 @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\instructions"
-@RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
 
-cd dist
-cd SocialPlannerPro
+set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
+cd /d %folder%
+for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
+
+
+set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro"
+cd /d %folder%
 DEL /S /Q *.py
 DEL /S /Q *.spec
 DEL /S /Q *.bat
 DEL /S /Q *.sh
 SIGNTOOL.EXE sign /F C:\Development\IGBot\instructions\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialPlannerPro.exe
 
-REM cd C:\Users\muzam\AppData\Local\Programs\Inno Setup 6
+cd C:\Users\muzam\AppData\Local\Programs\Inno Setup 6
 
-REM compil32 /cc "C:\Development\IGBot\instructions\InnoSetupScript.iss"
+compil32 /cc "C:\Development\IGBot\instructions\InnoSetupScript.iss"
 
 REM SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com C:\Development\IGBot\instructions\Output\SocialPlannerProSetup.exe
 REM xcopy /i  C:\Development\IGBot\dist\pytransform\_pytransform.dll C:\Development\IGBot\dist\dist\SocialPlannerPro\pytransform\platforms\windows\x86_64\
