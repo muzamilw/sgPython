@@ -270,10 +270,10 @@ class LoginApp(MDApp):
                 file_to_open = Path("userdata") / "glob.vars"
 
             # try:
-                with open(file_to_open, 'rb') as gVarFile:
-                    print('Loading Existing Global Defaults')
-                    globvars = pickle.load(gVarFile)
-                    self.gVars = globvars
+            with open(file_to_open, 'rb') as gVarFile:
+                print('Loading Existing Global Defaults')
+                globvars = pickle.load(gVarFile)
+                self.gVars = globvars
             # except Exception as e:
                
             #     app = App.get_running_app()

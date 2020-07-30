@@ -13,7 +13,6 @@ mac_icon = 'ml.icns'
 
 kivy_deps_all = hooks.get_deps_all()
 kivy_factory_modules = hooks.get_factory_modules()
-hiddenimports = kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_resources.py2_warn'] + ['backend_kivy']
 
 # assets
 kivy_assets_toc = Tree(kivy_data_dir, prefix=join('kivy_install', 'data'))
@@ -27,7 +26,7 @@ a = Analysis(['main.py'],
              pathex=[spec_root],
              binaries=[],
              datas=[('*.kv','.')],
-             hiddenimports=hiddenimports,
+             hiddenimports= kivy_deps_all['hiddenimports'] + kivy_factory_modules + ['pkg_resources.py2_warn'] + ['backend_kivy'] + ["requests"] + ["numpy"] + ["pandas"] + ["email.mime"] + ["email.mime.multipart"] + ["email.mime.text"] + ["instagram_private_api"] + ["kivymd"] + ["kivymd.app"] + ["kivymd.uix.button"] + ["schedule"]+ ["kivy.garden"] + ["matplotlib"] + ["customFunctions"] +  ["apiWrappers"] + ["botLogic"] + ["ready"] + ["home"] + ["kivy.garden.matplotlib.backend_kivyagg"] + ["progressbar"] + ["iglogin"] + ["login"] ,
              hookspath=[kivymd_hooks_path],
              runtime_hooks=[],
              excludes=[ 'Tkinter', 'enchant', 'twisted','pygments'],   #'_tkinter',
