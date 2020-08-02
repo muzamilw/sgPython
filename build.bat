@@ -38,10 +38,10 @@ cd C:\Users\muzam\AppData\Local\Programs\Inno Setup 6
 
 compil32 /cc "C:\Development\IGBot\instructions\InnoSetupScript.iss"
 
-REM SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com C:\Development\IGBot\instructions\Output\SocialPlannerProSetup.exe
+SIGNTOOL.EXE sign /F C:\Development\IGBot\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com C:\Development\IGBot\instructions\Output\SocialPlannerProSetup.exe
 REM xcopy /i  C:\Development\IGBot\dist\pytransform\_pytransform.dll C:\Development\IGBot\dist\dist\SocialPlannerPro\pytransform\platforms\windows\x86_64\
 
-SocialPlannerPro.exe
+REM SocialPlannerPro.exe
 
 
 
