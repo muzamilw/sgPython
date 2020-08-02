@@ -295,6 +295,15 @@ def checkInList(json_object,blacklist, name):
     else:
         return False
 
+def checkFriendshipStatus(user):
+    if 'friendship_status' in user:
+        if user["friendship_status"]["following"] == False:
+            return True
+        else:
+            return False
+    else:
+        return True
+
     
 def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
     
@@ -305,8 +314,8 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
-                if photo["user"]["is_private"] == False and photo["user"]["friendship_status"]["following"] == False:                
-                    tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
+                if photo["user"]["is_private"] == False and checkFriendshipStatus(photo["user"]) :                
+                    tagMediaUsers.append([tag,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(checkFriendshipStatus(photo["user"])) ])
 
          
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
@@ -367,7 +376,7 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
-                locMediaUsers.append([loc,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(photo["user"]["friendship_status"]["following"]) ])
+                locMediaUsers.append([loc,str(photo["pk"]),str(photo["user"]["pk"]),str(photo["user"]["username"]),str(photo["user"]["full_name"]), str(checkFriendshipStatus(photo["user"])) ])
   
     hcols = ["Tag", "MediaId","UserId","Username","FullName","FriendShipStatus"]
    
