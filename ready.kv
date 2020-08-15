@@ -224,9 +224,8 @@
                 font_size: "20dp"
                 markup:True
                 size_hint: 1, 0.4
-                on_ref_press:
-                    import webbrowser
-                    webbrowser.open("https://socialplannerpro.com/account/login/")
+                on_ref_press: root.onpressLink()
+                   
             MDLabel:
                 text : " "
                 font_style: 'H4'

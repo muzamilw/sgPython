@@ -30,14 +30,22 @@ class Login(Screen):
 
         self.ids['login'].text = app.gVars.SGusername
         self.ids['password'].text = app.gVars.SGPin
-
-        
             
     def show_keyboard(self,args):
         self.ids['login'].focus = True
 
     def on_enter(self):
+        app = App.get_running_app()
         Clock.schedule_once(self.show_keyboard)
+        if app.client == 1:
+            self.ids['applogo'].source = "data//ml.png"
+
+            self.ids['lbltitle'].text  = "Enter Instagram username and SPPro PIN code"
+            self.ids['password'].hint_text  = "SPPro PIN code" 
+        else:
+            self.ids['applogo'].source = "data//sg.png"
+            self.ids['lbltitle'].text  = "Enter Instagram username and SG PIN code"
+            self.ids['password'].hint_text  = "SG PIN code" 
 
     def do_login(self, loginText, passwordText):
         app = App.get_running_app()

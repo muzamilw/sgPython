@@ -22,6 +22,7 @@ import threading
 import schedule
 import time
 import datetime
+import webbrowser
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -215,6 +216,13 @@ class Ready(Screen):
     def processjobs(self,dt):
         schedule.run_pending()
 
+    def onpressLink(self):
+        app = App.get_running_app()
+        if app.client == 1:
+            webbrowser.open("https://socialplannerpro.com/account/login/")
+        else:
+            webbrowser.open("https://app.socialgrowthlabs.com/account/login/")
+
     def animate(self, dt):
         # bar = self.ids['pbar']
         # if bar.value < bar.max:
@@ -260,6 +268,13 @@ class Ready(Screen):
             self.bLabel = self.ids['bLabel']
             self.bLabelHead = self.ids['bLabelHead']
             self.bLabelText = self.ids['bLabelText']
+
+            if app.client == 1:
+                self.bLabelText.text = "Your target filters, growth charts, and much more available \nat [u][ref=google.com]socialplannerpro.com[/ref][/u]"
+            else:
+                self.bLabelText.text = "Your target filters, growth charts, and much more available \nat [u][ref=google.com]socialgrowthlabs.com[/ref][/u]"
+
+
 
             
 
