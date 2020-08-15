@@ -1,4 +1,4 @@
-pyarmor obfuscate --with-license licenses\30aug2020\license.lic --advanced 2 main.py
+pyarmor obfuscate --with-license licenses\2020\license.lic --advanced 2 main.py
 
 SET COPYCMD=/Y
 REM copy  C:\Development\IGBot\dist\*.* C:\Development\IGBot\
