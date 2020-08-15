@@ -68,6 +68,21 @@ class Home(Screen):
                 
         else:
             self.manager.current = 'login'
+
+
+    def btnLIN_released(self):
+        pass
+        # if self.app.gVars.linloginResult is not None:
+            
+        #     self.app.linapi = self.app.checkLINLogin(self.app.gVars.SGusername)
+        #     if self.app.linapi is None:
+        #         self.manager.current = 'linlogin'
+                
+        #     else:
+        #         self.manager.current = 'ready'
+                
+        # else:
+        #     self.manager.current = 'login'
             
 
 

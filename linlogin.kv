@@ -1,10 +1,5 @@
-#:include ready.kv
-#:include iglogin.kv
-#:include home.kv
-
-<Login>: 
-
-    name: "screen_login"
+<IGLogin>:
+    name: "ig_screen_login"
     email: login
     password: password
 
@@ -17,13 +12,12 @@
     
     BoxLayout:
         orientation:'horizontal'
-
         StackLayout:
             orientation: "lr-tb"
 
             BoxLayout:
                 orientation: "vertical"
-                size_hint_y: 0.8
+                size_hint_y: .8
                 spacing: 20
 
                 Label:
@@ -31,37 +25,32 @@
                     pos_hint: {"center_x": .5}
                     size_hint: 0.5, 0.1
 
-
                 Image:
-                    id:applogo
-                    source: "data//ml.png"
+                    source: "data//iglogo.png"
                     size_hint: None, None
                     size: dp(100), dp(100)
                     pos_hint: {"center_x": .5}
 
+                
                 MDLabel:
-                    id:lbltitle
-                    text: 'Enter Instagram username and SPPro PIN code'
+                    text: 'Enter your Instsagram password for :'
                     pos_hint: {"center_x": .5}
-                    size_hint: 0.8, 0.1
-                    font_size : "30dp"
+                    size_hint: 0.5, 0.1
+                    font_style: 'H5'
                     halign : 'center'
 
-                MDTextFieldRound:
+                MDLabel:
                     id: login
-                    normal_color: [1, 1, 1, 0]
-                    color_active: [0.8, 0.8, 0.8, 0]
+                   
                     icon_type: "left"
-                    size_hint: .5, 0.2
+                    size_hint: .5, None
                     pos_hint: {"center_x": .5}
                     hint_text: "Instagram Username"
-                    max_text_length: 60
-                    required: True
-                    write_tab: False
-                    font_size:"28dp"
-                    # color_mode: 'accent'
-
+                    halign : 'center'
+                    font_style: 'H4'
+                   
                     
+                
 
                 MDTextFieldRound:
                     id: password
@@ -72,7 +61,7 @@
                     icon_left: "lock"
                     size_hint: .5, 0.2
                     pos_hint: {"center_x": .5}
-                    hint_text: "SPPro PIN code"
+                    hint_text: "Password"
                     max_text_length: 60
                     required: True
                     write_tab: False
@@ -80,20 +69,16 @@
                     
 
                 MDRaisedButton:
-                    text: "Login"
+                    text: "Instagram Login"
                     size_hint: .3, 0.2
                     pos_hint: {"center_x": .5}
                     on_release: root.do_login(login.text, password.text)
-
+                
                 MDLabel:
-                    text: 'Usage instructions'
+                    text: ' '
                     font_style: 'H5'
                     pos_hint: {"center_x": .5}
                     size_hint: 0.5, 0.1
                     theme_text_color: 'Primary'
-                MDLabel:
-                    text: '1 - Open Instagram website on this pc before logging in. \n2 - You can minimise this application after starting \n3 - To close the app press close button after stopping the run.'
-                    font_style: 'Body1'
-                    pos_hint: {"center_x": .5}
-                    size_hint: 0.5, 0.1
-                    theme_text_color: 'Primary'
+
+        

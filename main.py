@@ -128,69 +128,6 @@ class Client(Client):
             print('unhandled exception', e)
 
 
-#reading api file if already exists.
-# try:
-#     with open('api.login', 'rb') as api_login_file:
-#         print('api login found, loading')
-#         api = pickle.load(api_login_file)
-# except IOError:
-#     print('api file does not exist, performing login')
-#     api = IGLogin()
-#     with open('api.login', 'wb') as api_login_file:
-#         pickle.dump(api, api_login_file)
-
-
-
-
-
-
-
-#botLogic.RunBot(gVars,api,Client)
-
-
-########################################################
-
-#cf.LoadStoryTodo(api,gVars.manifestObj,[1])
-# rank_token = Client.generate_uuid()
-
-#follfeed = apiW.GetUserFollowingFeed(api, 'muzamilw',10,Client)
-#print(len(follfeed))
-#print(follfeed)
-
-# location_results = apiW.GetLocationFeed(api, 'london',300,Client)
-
-# print(len(location_results))
-
-# with open("loc.json", "w") as outfile: 
-#     outfile.write(json.dumps(location_results))
-# #results = apiW.GetTagFeed(api, 'musically',300,Client)
-# tag_results = []
-# results = api.feed_tag(
-#             'musically', rank_token)
-
-
-# print(len(tag_results))
-
-# print(len(results['items']))
-
-# print(tag_results)
-
-#user_dtail_info = api.user_detail_info(api.authenticated_user_id)
-#user_info = api.user_info(api.authenticated_user_id)
-#username_info = api.username_info(api.authenticated_user_id)
-#print(json.dumps(user, indent=2))
-# print(json.dumps(results, indent=2))
-
-#print(user_info['user']['media_count'])
-########################################################
-
-
-
-
-
-
-
-
 class LoginApp(MDApp):
     Config.set('graphics', 'resizable', '0')
     Config.set('graphics', 'width', '700')
@@ -200,14 +137,30 @@ class LoginApp(MDApp):
     api = None
     username = StringProperty(None)
     password = StringProperty(None)
-    icon = 'data//ml.ico'
+    
     ManifestRefreshed = False
     alert_dialog = None
     
+    client = 2
+    ver = "2.0.5"
+    appName = "SocialPlannerPro"
+    apiBasePath = ""
+    
     def __init__(self, **kwargs):
-        self.title = "Machine Learning Growth API v1.9"
+        if self.client == 1:
+            self.apiBasePath = "https://socialplannerpro.com/API"
+            self.title = "Machine Learning Growth API " + self.ver
+            self.theme_cls.primary_palette = "DeepPurple"
+            self.appName = "SocialPlannerPro"
+            self.icon = 'data//ml.ico'
+        else:
+            self.title = "Social Growth Labs API " + self.ver
+            self.apiBasePath = "https://app.socialgrowthlabs.com/API"
+            self.theme_cls.primary_palette = "Green" #"DeepPurple"
+            self.appName = "SocialGrowthLabs"
+            self.icon = 'data//sg.ico'
+
         self.theme_cls.theme_style = "Light"
-        self.theme_cls.primary_palette = "DeepPurple"
         self.theme_cls.primary_hue = "500"
         super().__init__(**kwargs)
 
@@ -226,8 +179,8 @@ class LoginApp(MDApp):
 
     def on_stop(self):
         if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
         else:
                 file_to_open = Path("userdata") / "glob.vars"
 
@@ -238,8 +191,8 @@ class LoginApp(MDApp):
 
     def on_pause(self):
         if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
         else:
                 file_to_open = Path("userdata") / "glob.vars"
 
@@ -264,8 +217,8 @@ class LoginApp(MDApp):
     def loadGlobalConfig(self):
         try:
             if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
@@ -274,6 +227,8 @@ class LoginApp(MDApp):
                 print('Loading Existing Global Defaults')
                 globvars = pickle.load(gVarFile)
                 self.gVars = globvars
+                self.gVars.BotVer = self.ver
+                self.gVars.API_BaseURL = self.apiBasePath
             # except Exception as e:
                
             #     app = App.get_running_app()
@@ -293,7 +248,7 @@ class LoginApp(MDApp):
         except IOError:
             print('Vars file does not exist, InitBlank')
             gVars = GlobalVars()
-            gVars.BotVer = '2.0.4'
+            gVars.BotVer = self.ver
             gVars.RunStartTime = None
             gVars.RunEndTime = None
             gVars.TotalSessionTime = 0
@@ -356,13 +311,13 @@ class LoginApp(MDApp):
             gVars.LastSuccessfulSequenceRunDate = None
 
 
-            gVars.API_BaseURL = "https://socialplannerpro.com/API"
+            gVars.API_BaseURL = self.apiBasePath # "https://socialplannerpro.com/API"
 
             self.gVars = gVars
             print('Loading New Defaults')
             if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
+                file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
             else:
                 file_to_open = Path("userdata") / "glob.vars"
 
@@ -404,12 +359,13 @@ class LoginApp(MDApp):
             print('SAVED: {0!s}'.format(new_settings_file))
 
     def checkIGLogin(self,username):
+        app = App.get_running_app()
         device_id = None
         try:
 
             if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", username + '_login.json')
+                Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+                settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, username + '_login.json')
             else:
                 settings_file = Path("userdata") / str(username + '_login.json')
 
@@ -425,7 +381,7 @@ class LoginApp(MDApp):
             else:
                 with open(settings_file) as file_data:
                     cached_settings = json.load(file_data, object_hook=self.from_json)
-                    print('Reusing settings: {0!s}'.format(settings_file))
+                    #print('Reusing settings: {0!s}'.format(settings_file))
 
                 device_id = cached_settings.get('device_id')
                 # reuse auth settings
@@ -451,7 +407,7 @@ class LoginApp(MDApp):
         if api is not None:
         # Show when login expires
             cookie_expiry = api.cookie_jar.auth_expires
-            print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+            print('Instagram Login Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
         return api
 
@@ -531,8 +487,8 @@ class LoginApp(MDApp):
         app.api = None
 
         if (platform.system() == "Darwin"):
-            Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-            settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", igusername+'_login.json')
+            Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+            settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, igusername+'_login.json')
         else:
             settings_file = Path("userdata") / str(igusername + '_login.json')
 
@@ -543,8 +499,8 @@ class LoginApp(MDApp):
 
 
         if (platform.system() == "Darwin"):
-            Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-            file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+            Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+            file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
         else:
             file_to_open = Path("userdata") / "glob.vars"
 
