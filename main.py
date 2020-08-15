@@ -142,7 +142,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 2
-    ver = "2.0.5"
+    ver = "2.0.6"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     
