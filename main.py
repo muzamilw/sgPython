@@ -47,6 +47,7 @@ from kivy.config import Config
 from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
+from kivy.lang import Builder
 import os
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
@@ -141,7 +142,7 @@ class LoginApp(MDApp):
     ManifestRefreshed = False
     alert_dialog = None
     
-    client = 2
+    client = 1
     ver = "2.0.6"
     appName = "SocialPlannerPro"
     apiBasePath = ""
@@ -174,6 +175,8 @@ class LoginApp(MDApp):
         manager.add_widget(Home(name='home'))
 
         manager.current = 'home'
+
+        Builder.load_string(KV)
 
         return manager
 
@@ -508,8 +511,23 @@ class LoginApp(MDApp):
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
-    
+KV = '''
+<IgLoginValidationDlgContent>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDLabel:
+        text : "Instagram has sent a validation code to your account's associated email address. Please enter it below to continue the login into Instagram."
+
+    MDTextField:
+        id:igvalidationcode
+        hint_text: "Instagram validation code"
+'''  
 
 if __name__ == '__main__':
     
     LoginApp().run()
+
+
