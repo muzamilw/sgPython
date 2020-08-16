@@ -320,6 +320,9 @@ class IGLogin(Screen):
             else:
                 cookie_expiry = api.cookie_jar.auth_expires
                 print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+        else:
+            #no api
+            return (None,None)    
 
         return (api,None)
 

@@ -13,6 +13,9 @@ from socket import timeout, error as SocketError
 from ssl import SSLError
 
 
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
@@ -24,6 +27,8 @@ except NameError:  # Python 2:
     class ConnectionError(Exception):
         pass
 
+class IgLoginValidationDlgContent(BoxLayout):
+    pass
 
 class AccountsEndpointsMixin(object):
     """For endpoints in ``/accounts/``."""
@@ -79,11 +84,15 @@ class AccountsEndpointsMixin(object):
             data = compat_urllib_parse.urlencode(post_params).encode('ascii')
             req = compat_urllib_request.Request(url, data, headers=headers)
 
+            self.IsChallenged = False
             try:
                 response = self.opener.open(req, timeout=self.timeout)
             except compat_urllib_error.HTTPError as e:
+                
                 response_text = json.loads(e.read().decode('utf8'))
                 checkpoint_url = response_text.get('challenge').get('url')
+                print('login failed, challenge received')
+                self.IsChallenged = True
                 self.login_challenge(checkpoint_url, headers)
             if self.on_login:
                 on_login_callback = self.on_login

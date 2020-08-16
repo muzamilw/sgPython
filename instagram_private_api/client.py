@@ -68,8 +68,7 @@ warnings.simplefilter('default', ClientExperimentalWarning)
 
 
 
-class IgLoginValidationDlgContent(BoxLayout):
-    pass
+
 
 class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
              FriendshipsEndpointsMixin, LiveEndpointsMixin, MediaEndpointsMixin,
@@ -118,7 +117,7 @@ class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
         self.timeout = kwargs.pop('timeout', 15)
         self.on_login = kwargs.pop('on_login', None)
         self.logger = logger
-        self.login_challenge_Phase1 = kwargs.pop('login_challenge_Phase1', None)
+        
         
 
         user_settings = kwargs.pop('settings', None) or {}
