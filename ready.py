@@ -243,6 +243,8 @@ class Ready(Screen):
 
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
+
+            app.api.feed_timeline()
             
             # self.drawGraphMain()
             # self.drawGraphSecondary()

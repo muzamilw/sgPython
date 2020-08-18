@@ -22,6 +22,7 @@ import schedule
 import time
 
 
+
 class Home(Screen):
     
     app = None
@@ -70,8 +71,13 @@ class Home(Screen):
             self.manager.current = 'login'
 
 
+    
+
     def btnLIN_released(self):
         pass
+
+        
+
         # if self.app.gVars.linloginResult is not None:
             
         #     self.app.linapi = self.app.checkLINLogin(self.app.gVars.SGusername)

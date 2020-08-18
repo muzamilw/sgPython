@@ -15,7 +15,7 @@ from ssl import SSLError
 
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
-
+from kivy.core.window import Window
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import OneLineAvatarIconListItem
@@ -37,10 +37,13 @@ class AccountsEndpointsMixin(object):
     Login_alert_dialog = None
     dlgContent = None
     checkpoint_url = None
+    IsChallenged = False
+    IsChallengedResolved = False
     
     
 
     def login(self):
+       
         """Login."""
 
         print('overrided login()')
@@ -94,7 +97,7 @@ class AccountsEndpointsMixin(object):
                 print('login failed, challenge received')
                 self.IsChallenged = True
                 self.login_challenge(checkpoint_url, headers)
-            if self.on_login:
+            if self.on_login and self.IsChallenged == False:
                 on_login_callback = self.on_login
                 on_login_callback(self)
         except Exception as e:
@@ -102,13 +105,15 @@ class AccountsEndpointsMixin(object):
 
     
 
-    def continue_ig_validation(self, *args):
+    def continue_ig_validation(self, code):
+        print('clicked')
         app = App.get_running_app()
         #self.Logout_alert_dialog.dismiss()
-        code = self.dlgContent.ids['igvalidationcode'].text
+        
         if code != "":
             try:
                 
+                print('processing code')
                 code_data = {'security_code': code}
                 data = compat_urllib_parse.urlencode(code_data).encode('ascii')
 
@@ -121,6 +126,8 @@ class AccountsEndpointsMixin(object):
                 else:
                     res = response.read().decode('utf8')
 
+                print(res)
+                self.IsChallengedResolved = True
                 if self.on_login:
                     on_login_callback = self.on_login
                     on_login_callback(self)
@@ -135,7 +142,7 @@ class AccountsEndpointsMixin(object):
         print('canceling')
 
     def login_challenge(self, checkpoint_url, headers):
-
+        
         try:
             print('redirecting to ..', checkpoint_url)
             headers['X-CSRFToken'] = self.csrftoken
@@ -151,41 +158,9 @@ class AccountsEndpointsMixin(object):
             self.checkpoint_url = checkpoint_url
             self.headers = headers
 
-            app = App.get_running_app()
-            self.dlgContent = IgLoginValidationDlgContent()
-            self.Login_alert_dialog = MDDialog(
-                    title="Instagram Login Validation!",
-                    type="custom",
-                    content_cls=self.dlgContent,
-                    buttons=[
-                        MDFlatButton(
-                            text="CANCEL",
-                            text_color=app.theme_cls.primary_color,
-                            on_release=self.dismiss_callback
-                        ),
-                        MDFlatButton(
-                            text="ACCEPT",
-                            text_color=app.theme_cls.primary_color,
-                            on_release=self.continue_ig_validation
-                        ),
-                    ],
-                )
-            self.Login_alert_dialog.set_normal_height()
-            self.Login_alert_dialog.open()
+            on_validation_required_callback = self.on_validation_required
+            on_validation_required_callback(self)
 
-            # code = input('Enter code received: ')
-            # code_data = {'security_code': code}
-            # data = compat_urllib_parse.urlencode(code_data).encode('ascii')
-
-            # req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
-            # response = self.opener.open(req, timeout=self.timeout)
-
-            # if response.info().get('Content-Encoding') == 'gzip':
-            #     buf = BytesIO(response.read())
-            #     res = gzip.GzipFile(fileobj=buf).read().decode('utf8')
-            # else:
-            #     res = response.read().decode('utf8')
-    
         except compat_urllib_error.HTTPError as e:
             print('unhandled exception', e)
 

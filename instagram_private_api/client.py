@@ -116,6 +116,7 @@ class Client(AccountsEndpointsMixin, DiscoverEndpointsMixin, FeedEndpointsMixin,
         self.api_url = kwargs.pop('api_url', None) or self.API_URL
         self.timeout = kwargs.pop('timeout', 15)
         self.on_login = kwargs.pop('on_login', None)
+        self.on_validation_required = kwargs.pop('on_validation_required', None)
         self.logger = logger
         
         
