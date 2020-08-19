@@ -1,14 +1,14 @@
 pyarmor obfuscate --with-license licenses\2020\license.lic --advanced 2 main.py
 
 SET COPYCMD=/Y
-REM copy  C:\Development\IGBot\dist\*.* C:\Development\IGBot\
 
 copy  C:\Development\IGBot\winsg.spec C:\Development\IGBot\dist\
 copy  C:\Development\IGBot\*.kv C:\Development\IGBot\dist\
 copy  C:\Development\IGBot\_pytransform.dll C:\Development\IGBot\dist\
-REM copy  C:\Development\IGBot\pytransform.pyd C:\Development\IGBot\dist\
 xcopy /s  C:\Development\IGBot\data C:\Development\IGBot\dist\data /I
 xcopy /s  C:\Development\IGBot\userdata C:\Development\IGBot\dist\userdata /I
+xcopy /s  C:\Development\IGBot\instagram_private_api C:\Development\IGBot\dist\instagram_private_api /I
+xcopy /s  C:\Development\IGBot\instagram_web_api C:\Development\IGBot\dist\instagram_web_api /I
 
 cd dist
 pyinstaller winsg.spec -i data\sg.ico -w --noconsole --clean -y --paths DIR
@@ -26,13 +26,16 @@ for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialGrowthApi\userdata"
 
 
+
 set folder="C:\Development\IGBot\dist\dist\SocialGrowthApi"
 cd /d %folder%
-DEL /S /Q *.py
+
+DEL /Q *.py
 DEL /S /Q *.spec
 DEL /S /Q *.bat
 DEL /S /Q *.sh
 SIGNTOOL.EXE sign /F C:\Development\IGBot\instructions\socialplannerpro.pfx /P p@ssw0rd /tr http://timestamp.digicert.com SocialGrowthApi.exe
+
 
 cd C:\Users\muzam\AppData\Local\Programs\Inno Setup 6
 

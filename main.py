@@ -56,6 +56,10 @@ from login import Login
 
 from instagram_private_api import Client
 from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
+from instagram_private_api import (
+        Client, ClientError, ClientLoginError,
+        ClientCookieExpiredError, ClientLoginRequiredError,
+        __version__ as client_version)
 from home import Home
 from kivymd.app import MDApp
 
@@ -92,8 +96,8 @@ class LoginApp(MDApp):
     ManifestRefreshed = False
     alert_dialog = None
     
-    client = 1
-    ver = "2.0.6"
+    client = 2
+    ver = "2.0.7"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     
