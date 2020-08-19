@@ -43,94 +43,8 @@ from kivymd.uix.list import OneLineAvatarIconListItem
 from kivy.app import App
 # from instagram_web_api import Client as WebClient
 
-class MyAppClient(Client):
-    
-    def login(self):
-        """Login."""
-
-        print('overrided login()')
-
-        prelogin_params = self._call_api(
-            'si/fetch_headers/',
-            params='',
-            query={'challenge_type': 'signup', 'guid': self.generate_uuid(True)},
-            return_response=True)
-
-        login_params = {
-            'device_id': self.device_id,
-            'guid': self.uuid,
-            'adid': self.ad_id,
-            'phone_id': self.phone_id,
-            '_csrftoken': self.csrftoken,
-            'username': self.username,
-            'password': self.password,
-            'login_attempt_count': '0',
-        }
-
-        try:
-            """
-            login_response = self._call_api(
-            'accounts/login/', params=login_params, return_response=True)
-            """
-
-            url = 'https://i.instagram.com/api/v1/accounts/login/'
-            params = login_params
-
-            headers = self.default_headers
-            headers['Content-type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-            
-            json_params = json.dumps(params, separators=(',', ':'))
-            hash_sig = self._generate_signature(json_params)
-            post_params = {
-                'ig_sig_key_version': self.key_version,
-                'signed_body': hash_sig + '.' + json_params
-            }
-
-            data = compat_urllib_parse.urlencode(post_params).encode('ascii')
-            req = compat_urllib_request.Request(url, data, headers=headers)
-
-            try:
-                response = self.opener.open(req, timeout=self.timeout)
-            except compat_urllib_error.HTTPError as e:
-                response_text = json.loads(e.read().decode('utf8'))
-                checkpoint_url = response_text.get('challenge').get('url')
-                self.login_challenge(checkpoint_url, headers)
-                
-        except Exception as e:
-            print('unhandled exception', e)
-
-    def login_challenge(self, checkpoint_url, headers):
-
-        try:
-            print('redirecting to ..', checkpoint_url)
-            headers['X-CSRFToken'] = self.csrftoken
-            headers['Referer'] = checkpoint_url
-            
-            mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
-            challenge_data = {'choice': mode}
-            data = compat_urllib_parse.urlencode(challenge_data).encode('ascii')
-            
-            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
-            response = self.opener.open(req, timeout=self.timeout)
-
-            code = input('Enter code received: ')
-            code_data = {'security_code': code}
-            data = compat_urllib_parse.urlencode(code_data).encode('ascii')
-
-            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
-            response = self.opener.open(req, timeout=self.timeout)
-
-            if response.info().get('Content-Encoding') == 'gzip':
-                buf = BytesIO(response.read())
-                res = gzip.GzipFile(fileobj=buf).read().decode('utf8')
-            else:
-                res = response.read().decode('utf8')
-    
-        except compat_urllib_error.HTTPError as e:
-            print('unhandled exception', e)
-
-  
-
+class IgLoginValidationDlgContent(BoxLayout):
+    pass
 
 class IGLogin(Screen):
 
@@ -150,15 +64,61 @@ class IGLogin(Screen):
         return json_object
 
     def onlogin_callback(self,api, new_settings_file):
+        print('iglogin login call back received')
         cache_settings = api.settings
         with open(new_settings_file, 'w') as outfile:
             json.dump(cache_settings, outfile, default=self.to_json)
             print('SAVED: {0!s}'.format(new_settings_file))
+        if api.IsChallengedResolved ==True: 
+            app = App.get_running_app()
+            app.api = api
+            self.manager.transition = SlideTransition(direction="left")
+            self.manager.current = 'ready'
+
+    def onvalidation_required_callback(self,api):
+        print('validation call back received')
+        self.ShowValidationDialog()
     
     def show_keyboard(self,args):
         self.ids['password'].focus = True
 
-    
+    def ShowValidationDialog(self):
+        app = App.get_running_app()
+        self.dlgContent = IgLoginValidationDlgContent()
+        self.Login_alert_dialog = MDDialog(
+                # auto_dismiss=False,
+                title="Instagram Login Validation!",
+                type="custom",
+                content_cls=self.dlgContent,
+                buttons=[
+                    MDFlatButton(
+                        text="CANCEL",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=self.dismiss_callback
+                    ),
+                    MDFlatButton(
+                        text="ACCEPT",
+                        text_color=app.theme_cls.primary_color,
+                        on_release=self.continue_ig_validation
+                    ),
+                ],
+            )
+        # self.Login_alert_dialog.size_hint_y = 1
+        self.Login_alert_dialog.set_normal_height()
+        self.Login_alert_dialog.open()
+
+
+    def continue_ig_validation(self, *args):
+        app = App.get_running_app()
+        code = self.dlgContent.ids['igvalidationcode'].text
+        if code != "":
+            app.api.continue_ig_validation(code)
+            self.Login_alert_dialog.dismiss(force=True)
+        
+
+    def dismiss_callback(self, *args):
+        self.Login_alert_dialog.dismiss(force=True)
+        
         
     def on_enter(self):
         app = App.get_running_app()
@@ -197,21 +157,13 @@ class IGLogin(Screen):
             self.alert_dialog.open()
             return
 
-        loginRes = self.apilogin(loginText,passwordText)
-        api = loginRes[0]
-
-        app.gVars.IGusername = loginText
-        app.gVars.IGpassword = passwordText
-
-        if api is None or api.authenticated_user_id is None:
-
-            # if ( loginRes[1]) != "":
-            #     Client.login_challenge(loginRes[1])
-            # return
+        api = self.apilogin(loginText,passwordText)
+        
+        if api is None:
 
             self.Login_alert_dialog = MDDialog(
                 title="Instagram Login Error!",
-                text="There was error in performing login on Instagram, please try again",
+                text="There was error in performing login on Instagram, please enter the correct password and try again.",
                 buttons=[
                     MDFlatButton(
                         text="Ok",
@@ -221,10 +173,27 @@ class IGLogin(Screen):
             )
             self.Login_alert_dialog.open()
         else:
-            app.api = api
 
-            self.manager.transition = SlideTransition(direction="left")
-            self.manager.current = 'ready'
+            if api.IsChallenged == False and api.cookie_jar.auth_expires is None:
+                self.Login_alert_dialog = MDDialog(
+                    title="Instagram Login Error!",
+                    text="There was error in performing login on Instagram, please enter the correct password and try again.",
+                    buttons=[
+                        MDFlatButton(
+                            text="Ok",
+                            text_color=app.theme_cls.primary_color,
+                        ),
+                    ],
+                )
+                self.Login_alert_dialog.open()
+
+            else:
+                app.gVars.IGusername = loginText
+                app.gVars.IGpassword = passwordText
+                app.api = api
+                if api.IsChallenged == False:
+                    self.manager.transition = SlideTransition(direction="left")
+                    self.manager.current = 'ready'
     
 
     def apilogin(self,loginText,passwordText):
@@ -269,7 +238,8 @@ class IGLogin(Screen):
                     # resolution= '720x1280',
                     # chipset= 'qcom',
                     # version_code= '',
-                    on_login=lambda x: self.onlogin_callback(x, settings_file))
+                    on_login=lambda x: self.onlogin_callback(x, settings_file),
+                    on_validation_required=lambda x: self.onvalidation_required_callback(x))
             else:
                 with open(settings_file) as file_data:
                     cached_settings = json.load(file_data, object_hook=self.from_json)
@@ -297,7 +267,7 @@ class IGLogin(Screen):
             print('Unexpected ClientCheckpointRequiredError: {0!s}'.format(e))
             print('Challenge url = ' + e.challenge_url)
             
-            return (None, e.challenge_url)
+            return None
 
 
         # except ClientChallengeRequiredError as e:
@@ -321,5 +291,9 @@ class IGLogin(Screen):
                 cookie_expiry = api.cookie_jar.auth_expires
                 print('Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
-        return (api,None)
+            if api.IsChallenged == True:
+                print('Challenge Received')
+         
+
+        return api
 

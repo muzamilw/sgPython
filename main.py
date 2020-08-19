@@ -47,6 +47,7 @@ from kivy.config import Config
 from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
+from kivy.lang import Builder
 import os
 os.environ['KIVY_IMAGE'] = 'sdl2,gif'
 from ready import Ready
@@ -55,6 +56,10 @@ from login import Login
 
 from instagram_private_api import Client
 from instagram_private_api.client import compat_urllib_parse, compat_urllib_request, compat_urllib_error, ErrorHandler
+from instagram_private_api import (
+        Client, ClientError, ClientLoginError,
+        ClientCookieExpiredError, ClientLoginRequiredError,
+        __version__ as client_version)
 from home import Home
 from kivymd.app import MDApp
 
@@ -78,56 +83,6 @@ except ImportError:
         __version__ as client_version)
 
 
-class Client(Client):
-    def mute_unmute(self, user_id, option = 'mute', media = 'both'):
-        endpoint = 'friendships/{}_posts_or_story_from_follow/'.format(option.lower())
-        data = {
-                '_uuid': self.uuid,
-                '_uid': self.authenticated_user_id,
-                '_csrftoken': self.csrftoken,
-                }
-        if media.lower() == 'post':
-            data['target_posts_author_id'] = str(user_id)
-        elif media.lower() == 'story':
-            data['target_reel_author_id'] = str(user_id)
-        elif media.lower() == 'both':
-            data['target_posts_author_id'] = str(user_id)
-            data['target_reel_author_id'] = str(user_id)
-        res = self._call_api(endpoint, data)
-        return res
-
-    def login_challenge(self, checkpoint_url):
-
-        try:
-            headers = self.default_headers
-            print('redirecting to ..', checkpoint_url)
-            headers['X-CSRFToken'] = self.csrftoken
-            headers['Referer'] = checkpoint_url
-            
-            mode = int(input('Choose a challenge mode (0 - SMS, 1 - Email): '))
-            challenge_data = {'choice': mode}
-            data = compat_urllib_parse.urlencode(challenge_data).encode('ascii')
-            
-            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
-            response = self.opener.open(req, timeout=self.timeout)
-
-            code = input('Enter code received: ')
-            code_data = {'security_code': code}
-            data = compat_urllib_parse.urlencode(code_data).encode('ascii')
-
-            req = compat_urllib_request.Request(checkpoint_url, data, headers=headers)
-            response = self.opener.open(req, timeout=self.timeout)
-
-            if response.info().get('Content-Encoding') == 'gzip':
-                buf = BytesIO(response.read())
-                res = gzip.GzipFile(fileobj=buf).read().decode('utf8')
-            else:
-                res = response.read().decode('utf8')
-    
-        except compat_urllib_error.HTTPError as e:
-            print('unhandled exception', e)
-
-
 class LoginApp(MDApp):
     Config.set('graphics', 'resizable', '0')
     Config.set('graphics', 'width', '700')
@@ -142,7 +97,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 2
-    ver = "2.0.6"
+    ver = "2.0.7"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     
@@ -174,6 +129,8 @@ class LoginApp(MDApp):
         manager.add_widget(Home(name='home'))
 
         manager.current = 'home'
+
+        Builder.load_string(KV)
 
         return manager
 
@@ -353,6 +310,7 @@ class LoginApp(MDApp):
         return json_object
 
     def onlogin_callback(self,api, new_settings_file):
+        print('main login call back received')
         cache_settings = api.settings
         with open(new_settings_file, 'w') as outfile:
             json.dump(cache_settings, outfile, default=to_json)
@@ -406,8 +364,9 @@ class LoginApp(MDApp):
 
         if api is not None:
         # Show when login expires
-            cookie_expiry = api.cookie_jar.auth_expires
-            print('Instagram Login Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
+            if api.cookie_jar.auth_expires is not None:
+                cookie_expiry = api.cookie_jar.auth_expires
+                print('Instagram Login Cookie Expiry: {0!s}'.format(datetime.datetime.fromtimestamp(cookie_expiry).strftime('%Y-%m-%dT%H:%M:%SZ')))
 
         return api
 
@@ -508,8 +467,23 @@ class LoginApp(MDApp):
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
-    
+KV = '''
+<IgLoginValidationDlgContent>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: 120
+
+    MDLabel:
+        text : "Instagram has sent a validation code to your account's associated email address. Please enter it below to continue the login into Instagram."
+
+    MDTextField:
+        id:igvalidationcode
+        hint_text: "Instagram validation code"
+'''  
 
 if __name__ == '__main__':
     
     LoginApp().run()
+
+
