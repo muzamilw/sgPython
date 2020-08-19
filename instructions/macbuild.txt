@@ -19,3 +19,9 @@ popd
 
 ---------------------------------------------------------------------------------------------
 codesign -s "SocialPlannerPro" /Users/JanatFarooq/Documents/GitHub/sgPython/dist/SocialPlannerPro.app/Contents/MacOS/libsqlite3.0.dylib
+
+
+
+SG Build command
+-------
+pyarmor pack -x " --exact --exclude env --exclude .buildozer --exclude mypython --exclude build  " -e " --onefile --windowed -y --icon=sg.icns --runtime-tmpdir /var/user/"  -s macsg.spec main.py
