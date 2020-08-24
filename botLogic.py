@@ -327,8 +327,8 @@ class Bot():
                             #debugging file
                             file_to_open = ""
                             if (platform.system() == "Darwin"):
-                                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                                file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "GlobData.csv")
+                                Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+                                file_to_open = os.path.join(os.getenv("HOME"), "." + + app.appName, "GlobData.csv")
                             else:
                                 file_to_open = Path("userdata") / "GlobData.csv"
                             gVars.GlobalTodo.to_csv(file_to_open)
@@ -493,8 +493,8 @@ class Bot():
                                     gVars.ActionPerformed += 1 
 
                                     if (platform.system() == "Darwin"):
-                                        Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                                        file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "glob.vars")
+                                        Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+                                        file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
                                     else:
                                         file_to_open = Path("userdata") / "glob.vars"
 
@@ -510,8 +510,8 @@ class Bot():
                                 #writing log to file
 
                                 if (platform.system() == "Darwin"):
-                                    Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                                    file_to_open = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", "GlobalTodo.html")
+                                    Path(os.path.join(os.getenv("HOME"), "." + + app.appName)).mkdir(parents=True, exist_ok=True)
+                                    file_to_open = os.path.join(os.getenv("HOME"), "." + + app.appName, "GlobalTodo.html")
                                 else:
                                     file_to_open = Path("userdata") / "GlobalTodo.html"
                                 

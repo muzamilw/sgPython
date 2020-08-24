@@ -25,8 +25,10 @@ from instagram_private_api import (
         __version__ as client_version)
 
 import apiWrappers as apiW
+from kivy.app import App
 
 def SendEmail(you,filename,SocialProfileName, Header):
+    app = App.get_running_app()
     msg= ''
     
     with open(filename,mode="r", encoding="utf-8") as fp:
@@ -43,7 +45,7 @@ def SendEmail(you,filename,SocialProfileName, Header):
     
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'Daily Sequence Run Report for ' + SocialProfileName   #The subject line
+    message['Subject'] = app.appName +  'Daily Sequence Run Report for ' + SocialProfileName   #The subject line
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
@@ -57,6 +59,7 @@ def SendEmail(you,filename,SocialProfileName, Header):
     print('Mail Sent')
 
 def SendError(you,ErrorLog,SocialProfileName):
+    app = App.get_running_app()
     msg= ''
     
     # with open(filename,mode="r", encoding="utf-8") as fp:
@@ -73,7 +76,7 @@ def SendError(you,ErrorLog,SocialProfileName):
     
     message['From'] = sender_address
     message['To'] = receiver_address
-    message['Subject'] = 'Sequence Error : ' + SocialProfileName   #The subject line
+    message['Subject'] = app.appName + ' Sequence Error : ' + SocialProfileName   #The subject line
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail

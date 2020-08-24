@@ -199,6 +199,7 @@ class IGLogin(Screen):
     def apilogin(self,loginText,passwordText):
         api = None
         device_id = None
+        app = App.get_running_app()
 
         # useragentd = "'app_version': '10.26.0';
         # 'android_version': '18';
@@ -215,8 +216,8 @@ class IGLogin(Screen):
             # settings_file = 'userdata\\'+ loginText +'_login.json'
 
             if (platform.system() == "Darwin"):
-                Path(os.path.join(os.getenv("HOME"), ".SocialPlannerPro")).mkdir(parents=True, exist_ok=True)
-                settings_file = os.path.join(os.getenv("HOME"), ".SocialPlannerPro", loginText+'_login.json')
+                Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+                settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, loginText+'_login.json')
             else:
                 settings_file = Path("userdata") / str(loginText +'_login.json')
 
