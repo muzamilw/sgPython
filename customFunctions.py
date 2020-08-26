@@ -51,7 +51,7 @@ def SendEmail(you,filename,SocialProfileName, Header):
     #Create SMTP session for sending the mail
     session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
     session.starttls() #enable security
-    session.login('myprintcloud.com', 'p@ssw0rd') #login with mail_id and password
+    session.login('info@socialplannerpro.com', 'Sh@rp2050') #login with mail_id and password
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
@@ -82,7 +82,7 @@ def SendError(you,ErrorLog,SocialProfileName):
     #Create SMTP session for sending the mail
     session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
     session.starttls() #enable security
-    session.login('myprintcloud.com', 'p@ssw0rd') #login with mail_id and password
+    session.login('info@socialplannerpro.com', 'Sh@rp2050') #login with mail_id and password
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
