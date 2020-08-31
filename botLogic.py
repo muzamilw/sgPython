@@ -507,6 +507,7 @@ class Bot():
                                 gVars.LastSuccessfulSequenceRunDate = datetime.datetime.today() 
                                 
                                 log.info('Session completed at : ' + str(gVars.RunEndTime) )
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','Session Complete')
                                 #writing log to file
 
                                 if (platform.system() == "Darwin"):
