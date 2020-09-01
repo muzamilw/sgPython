@@ -5,7 +5,7 @@
 		}
 	],
 	"settings": {
-		"python.pythonPath": "mypython/bin/python"
+		"python.pythonPath": "env\\Scripts\\python.exe"
 	},
 	"launch": {
 		"version": "0.2.0",

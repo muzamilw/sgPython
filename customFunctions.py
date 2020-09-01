@@ -232,6 +232,14 @@ def LoadManifest(manifest):
         manifestObj.BlackListWordsManual = BlackListWordsManual.strip().split(",")
     else:
         manifestObj.BlackListWordsManual = [""]
+
+    manifestObj.ActionsDelayRange = manifest["MobileJsonRootObject"]["ActionsDelayRange"].strip().split(",")
+    manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")
+    manifestObj.LocationLoadDelayRange = manifest["MobileJsonRootObject"]["LocationLoadDelayRange"].strip().split(",")
+    manifestObj.UserFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UserFollowLoadDelayRange"].strip().split(",")
+    manifestObj.SuggestedUsersLoadDelayRange = manifest["MobileJsonRootObject"]["SuggestedUsersLoadDelayRange"].strip().split(",")
+    manifestObj.UnFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UnFollowLoadDelayRange"].strip().split(",")
+    manifestObj.StoryLoadDelayRange = manifest["MobileJsonRootObject"]["StoryLoadDelayRange"].strip().split(",")
             
     
     manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
