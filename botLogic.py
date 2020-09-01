@@ -364,14 +364,14 @@ class Bot():
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
                             raise e
                             
-                        Comments = ['😀','👍','💓','🤩','🥰']
+                        Comments = ['😀','👍','💓','🤩','🥰','💓💓','Nice!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','😀😀😀','🥰 WoW!']
                         curRow = None
 
                         try:
                             for i, row in islice(gVars.GlobalTodo.iterrows(),0,10000):
                             
                                 if (self.botStop.is_set() == True):
-                                    print('Stopping Session ')
+                                    print('Stopping Session as signal received')
                                     break
 
                                 if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])) and str(row['MediaId']) != 'nan':

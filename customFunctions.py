@@ -91,6 +91,7 @@ def SendError(you,ErrorLog,SocialProfileName):
 
 def AppLogin(socialUsername,pin,IMEI,gVars):
     API_Login = gVars.API_BaseURL + "/Mobile/Login"
+    app = App.get_running_app()
     
     localtz = dateutil.tz.tzlocal()
     localoffset = localtz.utcoffset(datetime.datetime.now(localtz))
@@ -99,7 +100,7 @@ def AppLogin(socialUsername,pin,IMEI,gVars):
             'Pin':pin,
             'IMEI':IMEI,
             'ForceSwitchDevice':'true',
-            'AppVersion':'py 1.0',
+            'AppVersion':app.ver,
             'AppTimeZoneOffSet':localoffset.total_seconds() / 3600
            } 
     r = json.loads(requests.post(url = API_Login, data = data).text) 
