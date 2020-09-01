@@ -101,7 +101,7 @@ class LoginApp(MDApp):
     ver = "2.0.7"
     appName = "SocialPlannerPro"
     apiBasePath = ""
-    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
     appLaunchTrigger = True
     
     def __init__(self, **kwargs):
