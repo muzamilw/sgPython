@@ -98,7 +98,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.0.7"
+    ver = "2.1.0"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
