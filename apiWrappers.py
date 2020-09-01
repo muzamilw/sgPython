@@ -139,7 +139,7 @@ def GetTagFeed(api, hashTag,maxCountToGet,Client,log,manifestObj,gVars,blacklist
 
         has_more = results.get('more_available')
         next_max_id = results.get('next_max_id')
-        sleepTime = randrange(5,10)
+        sleepTime = randrange(int(manifestObj.HashLoadDelayRange[0]),int(manifestObj.HashLoadDelayRange[1]))
         # if maxCountToGet > len(tag_results):
         #     gVars.ActionLoaded +=  (len(tag_results) - prev)
         # else:
@@ -182,7 +182,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
             
-            sleepTime = randrange(5,10)
+            sleepTime = randrange(int(manifestObj.LocationLoadDelayRange[0]),int(manifestObj.LocationLoadDelayRange[1]))
             log.info('Fetching location : ' + locationTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
@@ -206,7 +206,7 @@ def GetLocationFeed(api, locationTag,maxCountToGet,Client,log,manifestObj,gVars,
 
             has_more = results.get('more_available')
             next_max_id = results.get('next_max_id')
-            sleepTime = randrange(5,10)
+            sleepTime = randrange(int(manifestObj.LocationLoadDelayRange[0]),int(manifestObj.LocationLoadDelayRange[1]))
             log.info('Fetching location : ' + locationTag + ' - Wait :  ' +  str(sleepTime) + ' - Count : ' + str(len(location_results)) + ' of ' + str(maxCountToGet) )
             time.sleep(sleepTime)
 
@@ -263,7 +263,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
 
                     has_more = results.get('more_available')
                     next_max_id = results.get('next_max_id')
-                    sleepTime = randrange(5,10)
+                    sleepTime = randrange(int(manifestObj.UserFollowLoadDelayRange[0]),int(manifestObj.UserFollowLoadDelayRange[1]))
                     log.info('Fetching user : ' + userName + ' - Wait :  ' +  str(sleepTime) + ' - Count :  ' + str(len(follFeed_results)) + ' of ' + str(maxCountToGet) )
                     time.sleep(sleepTime)
 

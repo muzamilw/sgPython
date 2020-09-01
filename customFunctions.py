@@ -536,7 +536,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                                         if ufeed['items'][0]['has_liked'] == False:
                                             # follFeed_results.extend([ufeed['items'][0]])
                                             locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                                    sleepTime = randrange(5,10)
+                                    sleepTime = randrange(int(manifestObj.SuggestedUsersLoadDelayRange[0]),int(manifestObj.SuggestedUsersLoadDelayRange[1]))
                                     log.info('Fetching suggested user : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                                     time.sleep(sleepTime)
                                     iguserCount = iguserCount + 1
@@ -567,7 +567,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                                 if ufeed['items'][0]['has_liked'] == False:
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustFollow' ])
-                            sleepTime = randrange(5,10)
+                            sleepTime = randrange(int(manifestObj.SuggestedUsersLoadDelayRange[0]),int(manifestObj.SuggestedUsersLoadDelayRange[1]))
                             log.info('Fetching follow exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
@@ -593,7 +593,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                                 if ufeed['items'][0]['has_liked'] == False:
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustLike' ])
-                            sleepTime = randrange(5,10)
+                            sleepTime = randrange(int(manifestObj.SuggestedUsersLoadDelayRange[0]),int(manifestObj.SuggestedUsersLoadDelayRange[1]))
                             log.info('Fetching like exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
@@ -619,7 +619,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                                 if ufeed['items'][0]['has_liked'] == False:
                                     # follFeed_results.extend([ufeed['items'][0]])
                                     locMediaUsers.append(['suggested ' + user['username'],str(ufeed['items'][0]["pk"]),str(user["pk"]),str(user["username"]),str(user["full_name"]), 'MustComment' ])
-                            sleepTime = randrange(5,10)
+                            sleepTime = randrange(int(manifestObj.SuggestedUsersLoadDelayRange[0]),int(manifestObj.SuggestedUsersLoadDelayRange[1]))
                             log.info('Fetching comment exchange : ' + user['username'] + ' - Wait :  ' +  str(sleepTime)  )
                             time.sleep(sleepTime)
                             gVars.ActionLoaded += 1
@@ -713,7 +713,7 @@ def LoadUnFollowTodo(api, manifestObj, SubActionWeights,log,gVars):
 
             try:
                 follUserRes = api.username_info(foll['FollowedSocialUsername'].strip())   #check_username(username)
-                sleepTime = randrange(2,7)
+                sleepTime = randrange(int(manifestObj.UnFollowLoadDelayRange[0]),int(manifestObj.UnFollowLoadDelayRange[1]))
                 log.info('Fetching user to unfollow : ' + foll['FollowedSocialUsername'].strip() + ' - Wait :  ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
                 
@@ -763,7 +763,7 @@ def LoadStoryTodo(api, manifestObj, SubActionWeights,log,gVars):
                     reelMediaUsers.append(['StoryView ' + str(reel_user['user']['username']),[x['id']+'_'+str(reel_user['user']['pk']) for x in user_reel_media['items']],str(reel_user['user']['pk']),str(reel_user['user']['username']),str(reel_user["user"]["full_name"]), [str(x['taken_at'])+'_'+str(calendar.timegm(time.gmtime())) for x in user_reel_media['items']] ])
                     storyviewsCount = storyviewsCount + 1
                     gVars.ActionLoaded += 1
-                sleepTime = randrange(5,15)
+                sleepTime = randrange(int(manifestObj.StoryLoadDelayRange[0]),int(manifestObj.StoryLoadDelayRange[1]))
                 log.info('Fetching story feed : ' + str(reel_user['user']['username']) + ' - Wait :  ' +  str(sleepTime)  )
                 time.sleep(sleepTime)
         

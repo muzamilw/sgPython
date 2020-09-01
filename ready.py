@@ -311,16 +311,23 @@ class Ready(Screen):
 
             
             self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
-            self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
+            
 
-
-            if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
+            if app.appLaunchTrigger == True:
                 self.lblAutoStartLabel.text = "Next growth session will start today at : "
+                self.ids['lblAutoStart'].text = str(datetime.datetime.strptime(str(app.appStartTime),"%H:%M").time())
             else:
-                self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
+                if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
+                    self.lblAutoStartLabel.text = "Next growth session will start today at : "
+                else:
+                    self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
+                self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
 
             if self.RunScheduled == False:
-                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
+                if app.appLaunchTrigger == True:
+                    schedule.every().day.at(app.appStartTime).do(self.startBot).tag('daily-run')
+                else:
+                    schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
                 self.RunScheduled = True
                 self.processJobEvent = Clock.schedule_interval(self.processjobs, 1)
             
@@ -349,17 +356,25 @@ class Ready(Screen):
             app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
                 
             self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
-            self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
-
-            if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
-                self.lblAutoStartLabel.text = "Next growth session will start today at : "
-            else:
-                self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
-
+            
             self.processJobEvent.cancel()
             schedule.clear('daily-run')
 
-            schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
+            if app.appLaunchTrigger == True:
+                self.ids['lblAutoStart'].text = str(datetime.datetime.strptime(str(app.appStartTime),"%H:%M").time())
+                self.lblAutoStartLabel.text = "Next growth session will start today at : "
+                schedule.every().day.at(app.appStartTime).do(self.startBot).tag('daily-run')
+            else:
+                self.ids['lblAutoStart'].text = app.gVars.manifestObj.starttime
+                if (datetime.datetime.now().time()  < datetime.datetime.strptime(app.gVars.manifestObj.starttime,"%H:%M").time()) :
+                    self.lblAutoStartLabel.text = "Next growth session will start today at : "
+                else:
+                    self.lblAutoStartLabel.text = "Next growth session will start tomorrow at : "
+                schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
+
+           
+
+            
             self.RunScheduled = True
             Clock.schedule_interval(self.processjobs, 1)
             self.log.info("Manifest Refreshed.")
@@ -369,6 +384,9 @@ class Ready(Screen):
 
     def startBot(self):
         app = App.get_running_app()
+        #next time app should launch at the scheudled time instead of the app start +5 min time.
+        if app.appLaunchTrigger == True:
+            app.appLaunchTrigger = False
 
         if app.gVars.manifestObj.PaymentPlanId is None or app.gVars.manifestObj.PaymentPlanId == 1:
             self.ShowErrorMessage("Please upgrade your subscription to start the sequence")
@@ -487,6 +505,8 @@ class Ready(Screen):
             self.hide_widget(self.pnlStarted)
             self.hide_widget(self.pbar)
             self.hide_widgetGraph(self.graphContainer)
+
+        self.RefreshManifest()
         
 
     def ShowErrorMessage(self, ErrorMsg):

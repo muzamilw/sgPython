@@ -12,6 +12,7 @@ from random import randint
 import json
 import logging
 import time
+import datetime
 import random
 import codecs
 from urllib.parse import urlparse
@@ -100,6 +101,8 @@ class LoginApp(MDApp):
     ver = "2.0.7"
     appName = "SocialPlannerPro"
     apiBasePath = ""
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
+    appLaunchTrigger = True
     
     def __init__(self, **kwargs):
         if self.client == 1:
@@ -483,7 +486,9 @@ KV = '''
 '''  
 
 if __name__ == '__main__':
-    
-    LoginApp().run()
+    try:
+        LoginApp().run()
+    except Exception as e:
+        print("General Error : " + str(e))
 
 
