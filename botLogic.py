@@ -375,7 +375,7 @@ class Bot():
                                     break
 
                                 if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])) and str(row['MediaId']) != 'nan':
-                                    
+                                    manifestObj.ActionsDelayRange
                                     waitTime = randrange(40,60)
                                     
                                     
