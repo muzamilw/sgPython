@@ -1,7 +1,7 @@
 ######pyinstaller mac.spec -i FILE.exe -w --onedir --noconsole --windowed --icon data/ml.ico --osx-bundle-identifier com.socialplanner.growth.socialplannerpro
 pyinstaller mac2.spec --onefile --windowed --icon=ml.icns -y --runtime-tmpdir /var/user/
 
-pyarmor pack -x " advanced 2 --exact --exclude env --exclude .buildozer --exclude mypython --exclude build  --with-license licenses/30aug2020/license.lic" -e " --onefile --windowed --icon=ml.icns --runtime-tmpdir /var/user/"  -s mac2.spec main.py;2D
+pyarmor pack -x " advanced 2 --exact --exclude env --exclude .buildozer --exclude mypython --exclude build  --with-license licenses/30aug2020/license.lic" -e " --onefile --windowed --icon=ml.icns --runtime-tmpdir /var/user/"  -s mac2.spec main.py
 
 pyarmor pack -x " --exact --exclude env --exclude .buildozer --exclude mypython --exclude build  " -e " --onefile --windowed -y --icon=ml.icns --runtime-tmpdir /var/user/"  -s mac2.spec main.py
 codesign -s "SocialPlannerPro" start
