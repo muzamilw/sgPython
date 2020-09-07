@@ -20,6 +20,7 @@ import datetime, pytz
 import dateutil.tz
 from pathlib import Path
 import platform
+import gender
 #import sys
 
 
@@ -101,7 +102,7 @@ class LoginApp(MDApp):
     ver = "2.1.0"
     appName = "SocialPlannerPro"
     apiBasePath = ""
-    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
     appLaunchTrigger = True
     
     def __init__(self, **kwargs):
@@ -487,7 +488,11 @@ KV = '''
 
 if __name__ == '__main__':
     try:
-        LoginApp().run()
+        #LoginApp().run()
+        g = gender.GenderDetector()
+        p = g.get_gender('muzamilw')
+        print(p.gender)
+
     except Exception as e:
         print("General Error : " + str(e))
 

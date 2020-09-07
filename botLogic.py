@@ -60,13 +60,14 @@ class Actions(Enum):
 
 
 class Bot():
-    def __init__(self,  Client, log, ui,botStop, logControl):
+    def __init__(self,  Client, log, ui,botStop, logControl,genderDetector):
         self.ui = ui
         self.Client = Client
         self.log = log
         self.botStop = botStop
         self.logControl = logControl
         self.dialog = None
+        self.genderDetector = genderDetector
 
     def resource_path(self,relative_path):
         """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -119,6 +120,7 @@ class Bot():
         app = App.get_running_app()
         api = app.api
         log = self.log
+        genderDetector = self.genderDetector
         MaxRetryCount = 10
         RetryCount = 0
         RetryTimeSeconds = 30
@@ -213,9 +215,9 @@ class Bot():
                             # Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
                             # self.ui.drawGraphSecondary(Req,Loaded,Done)
                     
-                            runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments  + gVars.ReqExFollow + gVars.ReqExLikes) * 30 
+                            runTimeComputation = (gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments  + gVars.ReqExFollow + gVars.ReqExLikes) * int(gVars.manifestObj.ActionsDelayRange[1]) 
                             gVars.TotalActionsLoaded = gVars.ReqFollow + gVars.ReqUnFollow + gVars.ReqLikes + gVars.ReqStoryViews + gVars.ReqComments + gVars.ReqExFollow + gVars.ReqExLikes
-                            runTimeComputation += gVars.manifestObj.totalActions  * 10
+                            runTimeComputation += gVars.manifestObj.totalActions  * int(gVars.manifestObj.StoryLoadDelayRange[1])
                             gVars.RequiredActionPerformed = gVars.manifestObj.totalActions
 
                             self.ui.TotalTime = int(runTimeComputation)
@@ -229,66 +231,66 @@ class Bot():
                             if gVars.hashtagActions is None or app.ManifestRefreshed == True:
                                 log.info('Fetching feed for Hashtags')
                                 hashstart = datetime.datetime.now()
-                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars,blacklist)
+                                gVars.hashtagActions = cf.LoadHashtagsTodo(api,gVars.manifestObj,Client,log,gVars,blacklist,genderDetector)
                                 LoadtimeHashtagsTodo = (datetime.datetime.now()-hashstart).total_seconds()
                                 log.info('Hashtags feed done : ' + str(LoadtimeHashtagsTodo))
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
                             
                                 
-                            if gVars.locationActions is None or app.ManifestRefreshed == True:
-                                log.info('Fetching feed for Locations')
-                                locationtart = datetime.datetime.now()
-                                gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars,blacklist)
-                                LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
-                                log.info('Locations feed done : ' + str(LoadtimeLocTodo))
-                                gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
-                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
+                            # if gVars.locationActions is None or app.ManifestRefreshed == True :
+                            #     log.info('Fetching feed for Locations')
+                            #     locationtart = datetime.datetime.now()
+                            #     gVars.locationActions = cf.LoadLocationsTodo(api,gVars.manifestObj,gVars.hashtagActions.groupby(['Action'])['Seq'].count(),Client,log,gVars,blacklist,genderDetector)
+                            #     LoadtimeLocTodo = (datetime.datetime.now()-locationtart).total_seconds()
+                            #     log.info('Locations feed done : ' + str(LoadtimeLocTodo))
+                            #     gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeLocTodo
+                            #     cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             
                                 
-                            if gVars.DCActions is None or app.ManifestRefreshed == True:
-                                log.info('Fetching feed for Competitors')
-                                DCstart = datetime.datetime.now()
-                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
-                                gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
-                                LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
-                                log.info('Competitors feed done : ' + str(LoadtimeDCTodo))
-                                gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
-                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
+                            # if gVars.DCActions is None or app.ManifestRefreshed == True :
+                            #     log.info('Fetching feed for Competitors')
+                            #     DCstart = datetime.datetime.now()
+                            #     SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
+                            #     gVars.DCActions = cf.LoadCompetitorTodo(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector)
+                            #     LoadtimeDCTodo = (datetime.datetime.now()-DCstart).total_seconds()
+                            #     log.info('Competitors feed done : ' + str(LoadtimeDCTodo))
+                            #     gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeDCTodo
+                            #     cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if gVars.SuggestFollowers is None or app.ManifestRefreshed == True:
-                                log.info('Fetching Feed of Suggested Users')
-                                Suggestedstart = datetime.datetime.now()
-                                SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
-                                if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
-                                    SeqNos = SeqNos.add(gVars.DCActions.groupby(['Action'])['Seq'].count(),fill_value=0)
+                            # if gVars.SuggestFollowers is None or app.ManifestRefreshed == True :
+                            #     log.info('Fetching Feed of Suggested Users')
+                            #     Suggestedstart = datetime.datetime.now()
+                            #     SeqNos = gVars.locationActions.groupby(['Action'])['Seq'].count().add(gVars.hashtagActions.groupby(['Action'])['Seq'].count(),fill_value=0)
+                            #     if (len(gVars.DCActions.groupby(['Action'])['Seq'].count()) > 0 ):
+                            #         SeqNos = SeqNos.add(gVars.DCActions.groupby(['Action'])['Seq'].count(),fill_value=0)
                                 
 
-                                gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist)
-                                LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
-                                log.info('Suggested Users feed done : ' + str(LoadtimeSuggestedTodo))
-                                gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
-                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
+                            #     gVars.SuggestFollowers = cf.LoadSuggestedUsersForFollow(api,gVars.manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector)
+                            #     LoadtimeSuggestedTodo = (datetime.datetime.now()-Suggestedstart).total_seconds()
+                            #     log.info('Suggested Users feed done : ' + str(LoadtimeSuggestedTodo))
+                            #     gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeSuggestedTodo
+                            #     cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                                 
-                            if (gVars.UnFollowActions is None or app.ManifestRefreshed == True) and gVars.manifestObj.UnFollFollowersAfterMinDays == 1 :
-                                log.info('Fetching feed for UnFollow')
-                                UnFollstart = datetime.datetime.now()
-                                gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
-                                LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
-                                log.info('UnFollow feed fone : ' + str(LoadtimeUnFollTodo))
-                                gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
-                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
+                            # if (gVars.UnFollowActions is None or app.ManifestRefreshed == True) and gVars.manifestObj.UnFollFollowersAfterMinDays == 1 :
+                            #     log.info('Fetching feed for UnFollow')
+                            #     UnFollstart = datetime.datetime.now()
+                            #     gVars.UnFollowActions = cf.LoadUnFollowTodo(api,gVars.manifestObj,[1],log,gVars)
+                            #     LoadtimeUnFollTodo = (datetime.datetime.now()-UnFollstart).total_seconds()
+                            #     log.info('UnFollow feed fone : ' + str(LoadtimeUnFollTodo))
+                            #     gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeUnFollTodo
+                            #     cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
-                            if (gVars.StoryViewActions is None or app.ManifestRefreshed == True ) and gVars.manifestObj.AfterFollViewUserStory == 1 :
-                                log.info('Fetching feeds for StoryViews')
-                                Storystart = datetime.datetime.now()
-                                gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
-                                LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
-                                log.info('StoryViews feed done : ' + str(LoadtimeStoryTodo))
-                                gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
-                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
+                            # if (gVars.StoryViewActions is None or app.ManifestRefreshed == True ) and gVars.manifestObj.AfterFollViewUserStory == 1 :
+                            #     log.info('Fetching feeds for StoryViews')
+                            #     Storystart = datetime.datetime.now()
+                            #     gVars.StoryViewActions = cf.LoadStoryTodo(api,gVars.manifestObj,[1],log,gVars)
+                            #     LoadtimeStoryTodo = (datetime.datetime.now()-Storystart).total_seconds()
+                            #     log.info('StoryViews feed done : ' + str(LoadtimeStoryTodo))
+                            #     gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeStoryTodo
+                            #     cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
 
                             frames = [gVars.hashtagActions, gVars.locationActions, gVars.DCActions, gVars.UnFollowActions,gVars.SuggestFollowers,gVars.StoryViewActions]
                             actions = pd.concat(frames)
@@ -481,20 +483,6 @@ class Bot():
                                         gVars.CurrentStoryViewDone = gVars.CurrentStoryViewDone + 1
                                         time.sleep(waitTime)
 
-                                    #  F U L S C
-                                    # Req = [gVars.ReqFollow, gVars.ReqUnFollow, gVars.ReqLikes, gVars.ReqStoryViews, gVars.ReqComments]
-                                    # Loaded = [gVars.TotFollow, gVars.TotUnFollow , gVars.TotLikes, gVars.TotStoryViews,gVars.TotComments ]
-                                    # Done = [gVars.CurrentFollowDone, gVars.CurrentUnFollowDone, gVars.CurrentLikeDone, gVars.CurrentStoryViewDone,gVars.CurrentCommentsDone ]
-                                    # self.ui.drawGraphMain(Req,Loaded,Done)
-                                    # # LX FX CX
-                                    # Req = [gVars.ReqExLikes, gVars.ReqExFollow, gVars.ReqExComments]
-                                    # Loaded = [gVars.TotExLikes, gVars.TotExFollow , gVars.TotExComments ]
-                                    # Done = [gVars.CurrentExLikeDone, gVars.CurrentExFollowDone, gVars.CurrentExCommentsDone ]
-                                    # self.ui.drawGraphSecondary(Req,Loaded,Done)
-
-
-
-                            
                                     gVars.ActionPerformed += 1 
 
                                     # if(gVars.ActionPerformed == 3):
@@ -528,6 +516,7 @@ class Bot():
                                     file.writelines('<meta charset="UTF-8">\n')
                                     file.write(gVars.GlobalTodo.to_html())
 
+                                RetryCount = 0
                                 
                                 cf.SendEmail('info@socialplannerpro.com',file_to_open,gVars.SGusername,'')
 
@@ -535,6 +524,16 @@ class Bot():
                                 log.info('Cleanup done for Session')
                                 self.ui.stop()
 
+                                if (platform.system() == "Darwin"):
+                                    Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
+                                    file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
+                                else:
+                                    file_to_open = Path("userdata") / "glob.vars"
+
+                                with open(file_to_open, 'wb') as gVarFile:
+                                    print('Updating gVars at logout')
+                                    pickle.dump(gVars, gVarFile)
+                                log.info('Saving Session')
                             # log.info("Action sequence running")
 
                             # i = True

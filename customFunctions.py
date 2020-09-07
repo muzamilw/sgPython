@@ -181,7 +181,7 @@ def LoadManifest(manifest):
     if manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"] is not None:
         manifestObj.FollUserLangsList = manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"].strip().split(",")
 
-    manifestObj.GenderEngagmentPref = manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"]
+    manifestObj.GenderEngagmentPref = int(manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"])
     manifestObj.IncludeBusinessAccounts = manifest["MobileJsonRootObject"]["TargetInformation"]["IncludeBusinessAccounts"]
     
     hashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["HashTagsToEngage"].translate({ord(c): None for c in "!@#$'"})
@@ -316,13 +316,25 @@ def checkFriendshipStatus(user):
     else:
         return True
 
+def checkGender(user, genderDetector,manifestObj):
     
-def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
+    if manifestObj.GenderEngagmentPref == 1: #male
+        person = genderDetector.get_gender(user['username'])
+        if person.gender is None or person.gender == "m":
+            return True
+
+    if manifestObj.GenderEngagmentPref == 2: #male
+        person = genderDetector.get_gender(user['username'])
+        if person.gender is None or person.gender == "f":
+            return True
+
+    
+def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist, genderDetector):
     
     tagMediaUsers = []
 
-    for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist) #api.getHashtagFeed(tag)
+    for tag in islice(manifestObj.hashtags,0,2):
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist,genderDetector) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -379,12 +391,12 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars,blacklist)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars,blacklist,genderDetector)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -448,12 +460,12 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars,blacklist) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars,blacklist,genderDetector) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -519,7 +531,7 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     try:
         locMediaUsers = []
 

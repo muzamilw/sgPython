@@ -41,6 +41,7 @@ import customFunctions as cf
 from progressbar import CircularProgressBar
 import matplotlib.pyplot as plt
 import numpy as np
+import gender
 
 
 class Ready(Screen):
@@ -66,6 +67,7 @@ class Ready(Screen):
     fig2 = None
     ax2= None
     figRenSec = None
+    genderDetector = None
     
 
     # def __init__(self, **kwargs):
@@ -121,8 +123,8 @@ class Ready(Screen):
     def drawGraphMain(self,Req = None,Loaded = None,Done = None):
 
         try:
-            if (self.figRen is not None):
-                plt.close(self.figRen)
+            # if (self.figRen is not None):
+            #     plt.close(self.figRen)
                 
             plt.rcParams.update({
                         "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
@@ -155,22 +157,24 @@ class Ready(Screen):
             self.ax1.patch.set_alpha(0)
 
             if ( self.graph is None):
-                self.figRen = plt.gcf()
-                self.graph = FigureCanvasKivyAgg(self.figRen)
+                figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(figRen)
                 self.graphContainerMain.add_widget(self.graph)
+                plt.close(figRen)
             else:
                 self.graphContainerMain.remove_widget(self.graph)
-                self.figRen = plt.gcf()
-                self.graph = FigureCanvasKivyAgg(self.figRen)
+                figRen = plt.gcf()
+                self.graph = FigureCanvasKivyAgg(figRen)
                 self.graphContainerMain.add_widget(self.graph)
+                plt.close(figRen)
         except Exception as e:
             pass
 
     def drawGraphSecondary(self,Req = None,Loaded = None,Done = None):
 
         try:
-            if (self.figRenSec is not None):
-                plt.close(self.figRenSec)
+            # if (self.figRenSec is not None):
+            #     plt.close(self.figRenSec)
                 
             plt.rcParams.update({
                         "figure.facecolor":  (1.0, 0.0, 0.0, 0),  # red   with alpha = 30%
@@ -202,14 +206,16 @@ class Ready(Screen):
             self.ax2.patch.set_alpha(0)
 
             if ( self.graph2 is None):
-                self.figRenSec = plt.gcf()
-                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(figRenSec)
                 self.graphContainerSecondary.add_widget(self.graph2)
+                plt.close(figRen)
             else:
                 self.graphContainerSecondary.remove_widget(self.graph2)
-                self.figRenSec = plt.gcf()
-                self.graph2 = FigureCanvasKivyAgg(self.figRenSec)
+                figRenSec = plt.gcf()
+                self.graph2 = FigureCanvasKivyAgg(figRenSec)
                 self.graphContainerSecondary.add_widget(self.graph2)
+                plt.close(figRenSec)
         except Exception as e:
             pass
         
@@ -231,7 +237,7 @@ class Ready(Screen):
         #     bar.value = bar.min
         self.xval  += 5
         Done = [self.xval, 3, 5, 5,7 ]
-        self.drawGraphMain(Done = Done)
+        # self.drawGraphMain(Done = Done)
 
     
     def on_enter(self):
@@ -245,6 +251,8 @@ class Ready(Screen):
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
 
             app.api.feed_timeline()
+
+           
             
             # self.drawGraphMain()
             # self.drawGraphSecondary()
@@ -271,6 +279,15 @@ class Ready(Screen):
             self.bLabelHead = self.ids['bLabelHead']
             self.bLabelText = self.ids['bLabelText']
 
+            if self.log is None :
+                log = logging.getLogger("my.logger")
+                log.level = logging.DEBUG
+                log.addHandler(MyLabelHandler(label, logging.DEBUG))
+                self.log = log
+
+            if self.genderDetector is None:
+                self.genderDetector = gender.GenderDetector()
+
             if app.client == 1:
                 self.bLabelText.text = "Your target filters, growth charts, and much more available \nat [u][ref=google.com]socialplannerpro.com[/ref][/u]"
             else:
@@ -291,24 +308,22 @@ class Ready(Screen):
                 self.hide_widget(self.pnlStarted)
                 self.hide_widget(self.pbar)
                 self.hide_widgetGraph(self.graphContainer)
+                #if app.gVars.manifestObj is None:
+                #refresh the manifest
+                app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
+                app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
+                print('Default manifest loaded')
                 
+                    
 
             if hasattr(app.gVars, 'SequenceRunning'):
                 if app.gVars.SequenceRunning is None:
                     app.gVars.SequenceRunning = False
+                    print("Sequence is not already running.")
             else:
                 app.gVars.SequenceRunning = False
            
-            if self.log is None :
-                log = logging.getLogger("my.logger")
-                log.level = logging.DEBUG
-                log.addHandler(MyLabelHandler(label, logging.DEBUG))
-                self.log = log
-
-            if app.gVars.manifestObj is None:
-                app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
-                app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
-
+            
             
             self.tbar.title = "Instagram Status - Subscription (" + app.gVars.manifestObj.PlanName +")"
             
@@ -329,7 +344,7 @@ class Ready(Screen):
                 else:
                     schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
                 self.RunScheduled = True
-                self.processJobEvent = Clock.schedule_interval(self.processjobs, 1)
+                self.processJobEvent = Clock.schedule_interval(self.processjobs, 2)
             
             
         
@@ -376,7 +391,7 @@ class Ready(Screen):
 
             
             self.RunScheduled = True
-            Clock.schedule_interval(self.processjobs, 1)
+            Clock.schedule_interval(self.processjobs, 2)
             self.log.info("Manifest Refreshed.")
         else:
             self.ShowErrorMessage("Growth Session is already running, cannot refresh!.")
@@ -384,6 +399,7 @@ class Ready(Screen):
 
     def startBot(self):
         app = App.get_running_app()
+        self.log.info("Start.")
         #next time app should launch at the scheudled time instead of the app start +5 min time.
         if app.appLaunchTrigger == True:
             app.appLaunchTrigger = False
@@ -395,21 +411,21 @@ class Ready(Screen):
         self.ElapsedTime = app.gVars.ElapsedTime
 
         if app.gVars.LastSuccessfulSequenceRunDate is None or app.gVars.LastSuccessfulSequenceRunDate != datetime.datetime.today() :
-           
-                oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'])
-                self.botThread = Thread(target=oBot.RunBot)
-                self.botThread.start()
+            
+            oBot = Bot(Client,self.log,self,self.botStop_event,self.ids['logLabel'],self.genderDetector)
+            self.botThread = Thread(target=oBot.RunBot)
+            self.botThread.start()
 
+            
+            self.hide_widget(self.pnlNotStarted)
+            self.hide_widget(self.pnlStarted,False)
+            self.hide_widget(self.pbar,False)
+            self.hide_widgetGraph(self.graphContainer,False)
                 
-                self.hide_widget(self.pnlNotStarted)
-                self.hide_widget(self.pnlStarted,False)
-                self.hide_widget(self.pbar,False)
-                self.hide_widgetGraph(self.graphContainer,False)
-                    
-              
-                
-                Clock.schedule_interval(self.updateTime, 1)
-                Clock.schedule_interval(self.updateGraph, 30)
+            
+            
+            Clock.schedule_interval(self.updateTime, 1)
+            Clock.schedule_interval(self.updateGraph, 10)
 
                
                 
@@ -490,7 +506,7 @@ class Ready(Screen):
         Clock.unschedule(self.updateTime)
         Clock.unschedule(self.updateGraph)
         
-        self.botStop_event.set()
+        self.botStop_event.clear()
 
         app.gVars.SequenceRunning = False
 
