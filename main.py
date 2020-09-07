@@ -98,7 +98,7 @@ class LoginApp(MDApp):
     ManifestRefreshed = False
     alert_dialog = None
     
-    client = 2
+    client = 1
     ver = "2.1.1"
     appName = "SocialPlannerPro"
     apiBasePath = ""
