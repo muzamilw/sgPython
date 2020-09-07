@@ -449,7 +449,7 @@ class Bot():
                                             cf.SendAction(gVars,gVars.SocialProfileId,Actions.BotError,row['Username'],'Deleted MediaId while Commenting : ' + str(row['MediaId']))
                                             gVars.GlobalTodo.loc[i,'Data'] = 'Deleted MediaId while Commenting'
 
-                                            if "community" in e.msg:
+                                            if "limit" in e.error_response:
                                                 #do not attempt commenting in the session if community guideline error happens.
                                                 CommentLimitReachedPerSession = True
 

@@ -102,7 +102,7 @@ class LoginApp(MDApp):
     ver = "2.1.1"
     appName = "SocialPlannerPro"
     apiBasePath = ""
-    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
     appLaunchTrigger = True
     
     def __init__(self, **kwargs):
@@ -489,6 +489,8 @@ KV = '''
 if __name__ == '__main__':
     try:
         LoginApp().run()
+        # p = gender.GenderDetector()
+        # print(p.get_gender('john doe'))
     except Exception as e:
         print("General Error : " + str(e))
 
