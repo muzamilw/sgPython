@@ -20,6 +20,7 @@ import datetime, pytz
 import dateutil.tz
 from pathlib import Path
 import platform
+import gender
 #import sys
 
 
@@ -97,11 +98,11 @@ class LoginApp(MDApp):
     ManifestRefreshed = False
     alert_dialog = None
     
-    client = 1
-    ver = "2.1.0"
+    client = 2
+    ver = "2.1.1"
     appName = "SocialPlannerPro"
     apiBasePath = ""
-    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
     appLaunchTrigger = True
     
     def __init__(self, **kwargs):

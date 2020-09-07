@@ -181,7 +181,7 @@ def LoadManifest(manifest):
     if manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"] is not None:
         manifestObj.FollUserLangsList = manifest["MobileJsonRootObject"]["TargetInformation"]["FollUserLangsList"].strip().split(",")
 
-    manifestObj.GenderEngagmentPref = manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"]
+    manifestObj.GenderEngagmentPref = int(manifest["MobileJsonRootObject"]["TargetInformation"]["GenderEngagmentPref"])
     manifestObj.IncludeBusinessAccounts = manifest["MobileJsonRootObject"]["TargetInformation"]["IncludeBusinessAccounts"]
     
     hashtags = manifest["MobileJsonRootObject"]["TargetInformation"]["HashTagsToEngage"].translate({ord(c): None for c in "!@#$'"})
@@ -316,13 +316,55 @@ def checkFriendshipStatus(user):
     else:
         return True
 
+def checkGender(user, genderDetector,manifestObj):
     
-def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
+    if manifestObj.GenderEngagmentPref == 1: #male
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
+
+        if fp.gender is None and up.gender == None:
+            return True
+        else:
+
+            if fp.gender is None and up.gender == "m":
+                return True
+            
+            if up.gender is None and fp.gender == "m":
+                return True
+
+            if up.gender == "m" and fp.gender == "m":
+                return True
+
+            return False
+
+    if manifestObj.GenderEngagmentPref == 2: #female
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
+
+        if fp.gender is None and up.gender == None:
+            return True
+        else:
+
+            if fp.gender is None and up.gender == "f":
+                return True
+            
+            if up.gender is None and fp.gender == "f":
+                return True
+
+            if up.gender == "f" and fp.gender == "f":
+                return True
+
+            return False
+
+    return True ## when no gender pref always load
+
+    
+def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist, genderDetector):
     
     tagMediaUsers = []
 
     for tag in islice(manifestObj.hashtags,0,20):
-        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist) #api.getHashtagFeed(tag)
+        lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist,genderDetector) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -379,12 +421,12 @@ def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     
     locMediaUsers = []
 
     for loc in islice(manifestObj.locations,0,20):
-        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars,blacklist)
+        lItems = apiW.GetLocationFeed(api,loc,manifestObj.totalActionsPerLocation,Client,log,manifestObj,gVars,blacklist,genderDetector)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerLocation))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
             if (photo["has_liked"] == False):
@@ -448,12 +490,12 @@ def LoadLocationsTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     
     locMediaUsers = []
 
     for compe in islice(manifestObj.DirectCompetitors,0,20): #20
-        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars,blacklist) 
+        lItems = apiW.GetUserFollowingFeed(api,compe,manifestObj.totalActionsPerDirectCompetitor,Client,log,manifestObj,gVars,blacklist,genderDetector) 
 
         if lItems is not None and len(lItems) > 0:
             for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerDirectCompetitor))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -519,7 +561,7 @@ def LoadCompetitorTodo(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
             
     return usersdf
 
-def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blacklist):
+def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blacklist,genderDetector):
     try:
         locMediaUsers = []
 
@@ -530,7 +572,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                 suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
                 if suggUsers is not None and len(suggUsers) > 0:
                             for user in islice(suggUsers, 0, int(math.ceil(manifestObj.totalActionsIGUsers/2))):
-                                if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
+                                if user["is_private"] == False and checkGender(user,genderDetector,manifestObj) and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
                                     ufeed = api.user_feed(user['pk'])
                                     if ufeed is not None and len(ufeed['items']) > 0 :
                                         if ufeed['items'][0]['has_liked'] == False:
