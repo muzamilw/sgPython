@@ -99,7 +99,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.1.0"
+    ver = "2.1.1"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
@@ -488,11 +488,7 @@ KV = '''
 
 if __name__ == '__main__':
     try:
-        #LoginApp().run()
-        g = gender.GenderDetector()
-        p = g.get_gender('muzamilw')
-        print(p.gender)
-
+        LoginApp().run()
     except Exception as e:
         print("General Error : " + str(e))
 

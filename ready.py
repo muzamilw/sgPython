@@ -425,7 +425,7 @@ class Ready(Screen):
             
             
             Clock.schedule_interval(self.updateTime, 1)
-            Clock.schedule_interval(self.updateGraph, 10)
+            Clock.schedule_interval(self.updateGraph, 30)
 
                
                 

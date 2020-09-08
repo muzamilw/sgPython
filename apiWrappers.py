@@ -109,14 +109,45 @@ def checkFriendshipStatus(user):
 def checkGender(user, genderDetector,manifestObj):
     
     if manifestObj.GenderEngagmentPref == 1: #male
-        person = genderDetector.get_gender(user['username'])
-        if person.gender is None or person.gender == "m":
-            return True
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
 
-    if manifestObj.GenderEngagmentPref == 2: #male
-        person = genderDetector.get_gender(user['username'])
-        if person.gender is None or person.gender == "f":
+        if fp.gender is None and up.gender == None:
             return True
+        else:
+
+            if fp.gender is None and up.gender == "m":
+                return True
+            
+            if up.gender is None and fp.gender == "m":
+                return True
+
+            if up.gender == "m" and fp.gender == "m":
+                return True
+
+            return False
+
+    if manifestObj.GenderEngagmentPref == 2: #female
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
+
+        if fp.gender is None and up.gender == None:
+            return True
+        else:
+
+            if fp.gender is None and up.gender == "f":
+                return True
+            
+            if up.gender is None and fp.gender == "f":
+                return True
+
+            if up.gender == "f" and fp.gender == "f":
+                return True
+
+            return False
+
+    return True ## when no gender pref always load
+                
 
     
 
@@ -264,7 +295,7 @@ def GetUserFollowingFeed(api, userName,maxCountToGet,Client,log,manifestObj, gVa
                             if user["is_private"] == False and len(follFeed_results) <= maxCountToGet:
                                 ufeed = api.user_feed(user['pk'])
                                 if ufeed is not None and len(ufeed['items']) > 0 :
-                                    if ufeed['items'][0]['has_liked'] == False checkGender(x["user"],genderDetector,manifestObj) and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])) and  checkInList(manifestObj.BlackListUsers,blacklist, str(ufeed['items'][0]['user']["username"])):
+                                    if ufeed['items'][0]['has_liked'] == False and checkGender(x["user"],genderDetector,manifestObj) and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(ufeed['items'][0]['user']["username"])) and  checkInList(manifestObj.BlackListUsers,blacklist, str(ufeed['items'][0]['user']["username"])):
                                         prev = len(follFeed_results) 
                                         follFeed_results.extend([ufeed['items'][0]])
                                         # if maxCountToGet > len(follFeed_results):

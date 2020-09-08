@@ -319,21 +319,51 @@ def checkFriendshipStatus(user):
 def checkGender(user, genderDetector,manifestObj):
     
     if manifestObj.GenderEngagmentPref == 1: #male
-        person = genderDetector.get_gender(user['username'])
-        if person.gender is None or person.gender == "m":
-            return True
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
 
-    if manifestObj.GenderEngagmentPref == 2: #male
-        person = genderDetector.get_gender(user['username'])
-        if person.gender is None or person.gender == "f":
+        if fp.gender is None and up.gender == None:
             return True
+        else:
+
+            if fp.gender is None and up.gender == "m":
+                return True
+            
+            if up.gender is None and fp.gender == "m":
+                return True
+
+            if up.gender == "m" and fp.gender == "m":
+                return True
+
+            return False
+
+    if manifestObj.GenderEngagmentPref == 2: #female
+        up = genderDetector.get_gender(user['username'])
+        fp = genderDetector.get_gender(user['full_name'])
+
+        if fp.gender is None and up.gender == None:
+            return True
+        else:
+
+            if fp.gender is None and up.gender == "f":
+                return True
+            
+            if up.gender is None and fp.gender == "f":
+                return True
+
+            if up.gender == "f" and fp.gender == "f":
+                return True
+
+            return False
+
+    return True ## when no gender pref always load
 
     
 def LoadHashtagsTodo(api, manifestObj ,Client,log,gVars,blacklist, genderDetector):
     
     tagMediaUsers = []
 
-    for tag in islice(manifestObj.hashtags,0,2):
+    for tag in islice(manifestObj.hashtags,0,20):
         lItems = apiW.GetTagFeed(api,tag,manifestObj.totalActionsPerHahTag,Client,log,manifestObj,gVars,blacklist,genderDetector) #api.getHashtagFeed(tag)
 
         for photo in  islice(lItems, 0, int(math.ceil(manifestObj.totalActionsPerHahTag))): #islice(filter(lambda x: (x["media_type"] == 1),  items), 0, int(totalActionsPerHahTag)): #items::
@@ -542,7 +572,7 @@ def LoadSuggestedUsersForFollow(api, manifestObj,SeqNos,Client,log,gVars,blackli
                 suggUsers = api.discover_chaining(api.authenticated_user_id)['users']
                 if suggUsers is not None and len(suggUsers) > 0:
                             for user in islice(suggUsers, 0, int(math.ceil(manifestObj.totalActionsIGUsers/2))):
-                                if user["is_private"] == False and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
+                                if user["is_private"] == False and checkGender(user,genderDetector,manifestObj) and checkUsernameinFollowedList(manifestObj.AllFollowedAccounts, str(user["username"])) and checkInList(manifestObj.BlackListUsers,blacklist, str(user["username"])) and iguserCount <= manifestObj.totalActionsIGUsers :
                                     ufeed = api.user_feed(user['pk'])
                                     if ufeed is not None and len(ufeed['items']) > 0 :
                                         if ufeed['items'][0]['has_liked'] == False:
