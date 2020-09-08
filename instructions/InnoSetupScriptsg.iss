@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SocialGrowthAPI"
-#define MyAppVersion "2.0.7"
+#define MyAppVersion "2.1.1"
 #define MyAppPublisher "Muzammil Waheed"
 #define MyAppURL "http://www.socialgrowthlabs.com/"
 #define MyAppExeName "SocialGrowthApi.exe"
