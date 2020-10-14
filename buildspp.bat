@@ -7,7 +7,7 @@ copy  C:\Development\IGBot\*.kv C:\Development\IGBot\dist\
 copy  C:\Development\IGBot\_pytransform.dll C:\Development\IGBot\dist\
 xcopy /s  C:\Development\IGBot\data C:\Development\IGBot\dist\data /I
 
-xcopy /s  C:\Development\IGBot\userdata C:\Development\IGBot\dist\userdata /I
+REM xcopy /s  C:\Development\IGBot\userdata C:\Development\IGBot\dist\userdata /I
 xcopy /s  C:\Development\IGBot\instagram_private_api C:\Development\IGBot\dist\instagram_private_api /I
 xcopy /s  C:\Development\IGBot\instagram_web_api C:\Development\IGBot\dist\instagram_web_api /I
 
@@ -21,9 +21,9 @@ pyinstaller win.spec -i data\ml.ico -w --noconsole --clean -y --paths DIR
 @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\.build"
 @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\instructions"
 
-set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
-cd /d %folder%
-for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
+REM set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
+REM cd /d %folder%
+REM for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
 
 

@@ -13,9 +13,9 @@ block_cipher = None
 kivy_deps_all = hooks.get_deps_all()
 kivy_factory_modules = hooks.get_factory_modules()
 
-datas = [
-    (join('userdata', '*.ini'), 'userdata')
-]
+datas = []
+#    (join('userdata', '*.ini'), 'userdata')
+#]
 
 # list of modules to exclude from analysis
 excludes_a = ['Tkinter', 'twisted', 'pygments']    #'_tkinter'
