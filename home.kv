@@ -87,24 +87,54 @@
                 MDLabel:
                     id:xyz
                     pos_hint: {"center_x": .5}
-                    size_hint: 0.5, 0.2
-                    text : "Linkedin"
+                    size_hint: 0.5, 0.1
+                    text : ""
                     halign: 'center'
                     font_style: 'H5'
 
 
                 Image:
-                    source: "data//linkedinlogo.png"
+                    source: "data//warning.png"
+                    size_hint: None, 0.5
+                    size: dp(100), dp(100)
+                    pos_hint: {"center_x": .5}
+                
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.9, 0.2
+                    text : "Sign in the Instagram website as the account holder"
+                    halign: 'center'
+                    font_size: '16dp'
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.8, 0.1
+                    text : "Before"
+                    halign: 'center'
+                    font_size: '16dp'
+                    text_color: get_color_from_hex("#ff0000")
+                    theme_text_color: "Custom"
+                MDLabel:
+                    id:xyz
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.8, 0.1
+                    text : "You connect here"
+                    halign: 'center'
+                    font_size: '16dp'
+
+                Image:
+                    source: "data//arrow.png"
                     size_hint: None, 0.5
                     size: dp(140), dp(140)
-                    pos_hint: {"center_x": .5}
+                    # pos_hint: {"center_x": .5}
 
-                MDFillRoundFlatButton:
-                    text: "Connect"
-                    size_hint: 0.8, 0.1
-                    pos_hint: {"center_x": .5}
-                    enabled : False
-                    on_release: root.btnLIN_released()
+                # MDFillRoundFlatButton:
+                #     text: "Connect"
+                #     size_hint: 0.8, 0.1
+                #     pos_hint: {"center_x": .5}
+                #     enabled : False
+                #     on_release: root.btnLIN_released()
                 
                 MDLabel:
                     id:lblstatusLinkedIn
@@ -127,25 +157,31 @@
                 MDLabel:
                     id:xyz
                     pos_hint: {"center_x": .5}
-                    size_hint: 0.5, 0.2
-                    text : "TikToK"
+                    size_hint: 0.8, 0.2
+                    text : "Coming Soon - Jan '21"
                     halign: 'center'
-                    font_style: 'H5'
+                    font_style: 'H6'
 
 
                 Image:
                     source: "data//tictoclogo.png"
                     size_hint: None, 0.5
+                    size: dp(100), dp(100)
+                    pos_hint: {"center_x": .5}
+
+                Image:
+                    source: "data//linkedinlogo.png"
+                    size_hint: None, 0.5
                     size: dp(140), dp(140)
                     pos_hint: {"center_x": .5}
 
                 
-                MDFillRoundFlatButton:
-                    text: "Connect"
-                    size_hint: 0.8, 0.1
-                    pos_hint: {"center_x": .5}
-                    # on_release: root.do_login(login.text, password.text)
-                    enabled : False
+                # MDFillRoundFlatButton:
+                #     text: "Connect"
+                #     size_hint: 0.8, 0.1
+                #     pos_hint: {"center_x": .5}
+                #     # on_release: root.do_login(login.text, password.text)
+                #     enabled : False
                 
                 MDLabel:
                     id:xyz

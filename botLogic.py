@@ -344,7 +344,7 @@ class Bot():
                                 Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                                 file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "GlobData.csv")
                             else:
-                                file_to_open = Path("userdata") / "GlobData.csv"
+                                file_to_open = Path.home() / app.appName / "GlobData.csv"
                             gVars.GlobalTodo.to_csv(file_to_open)
 
                         except (ClientLoginError, ClientLoginRequiredError, ClientCookieExpiredError) as e:
@@ -503,7 +503,7 @@ class Bot():
                                         Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                                         file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
                                     else:
-                                        file_to_open = Path("userdata") / "glob.vars"
+                                        file_to_open = Path.home() / app.appName / "glob.vars"
 
                                     with open(file_to_open, 'wb') as gVarFile:
                                         pickle.dump(gVars, gVarFile)
@@ -521,7 +521,7 @@ class Bot():
                                     Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                                     file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "GlobalTodo.html")
                                 else:
-                                    file_to_open = Path("userdata") / "GlobalTodo.html"
+                                    file_to_open = Path.home() / app.appName / "GlobalTodo.html"
                                 
                                 with open(file_to_open, "w", encoding="utf-8") as file:
                                     file.writelines('<meta charset="UTF-8">\n')
@@ -540,7 +540,7 @@ class Bot():
                                     Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                                     file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
                                 else:
-                                    file_to_open = Path("userdata") / "glob.vars"
+                                    file_to_open = Path.home() / app.appName / "glob.vars"
 
                                 with open(file_to_open, 'wb') as gVarFile:
                                     print('Updating gVars at logout')

@@ -249,6 +249,7 @@ class Ready(Screen):
 
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
+            
 
             app.api.feed_timeline()
 
@@ -405,7 +406,7 @@ class Ready(Screen):
             app.appLaunchTrigger = False
 
         if app.gVars.manifestObj.PaymentPlanId is None or app.gVars.manifestObj.PaymentPlanId == 1:
-            self.ShowErrorMessage("Please upgrade your subscription to start the sequence")
+            self.ShowMessage("Upgrade to the FREE Trial on \n\n www.socialplannerpro.com \n\n to run this application")
             return
 
         self.ElapsedTime = app.gVars.ElapsedTime
@@ -530,6 +531,24 @@ class Ready(Screen):
         self.dialog = MDDialog(
                 title="Error!",
                 text=ErrorMsg,
+                
+                buttons=[
+                        MDFlatButton(
+                            text="Ok",
+                            text_color=app.theme_cls.primary_color,
+                        ),
+                    ],
+            )
+
+        # self.Logout_alert_dialog.buttons.append ("Close me!",action=lambda *x: self.dismiss_callback())
+        # self.dialog.set_normal_height()
+        self.dialog.open()
+
+    def ShowMessage(self, ErrorMsg):
+        app = App.get_running_app()
+        self.dialog = MDDialog(
+                
+                title=ErrorMsg,
                 
                 buttons=[
                         MDFlatButton(

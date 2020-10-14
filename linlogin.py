@@ -243,13 +243,13 @@ class IGLogin(Screen):
         # 'version_code': ''
         try:
 
-            # settings_file = 'userdata\\'+ loginText +'_login.json'
+            
 
             if (platform.system() == "Darwin"):
                 Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                 settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, loginText+'_login.json')
             else:
-                settings_file = Path("userdata") / str(loginText +'_login.json')
+                settings_file = Path.home() / app.appName / str(loginText +'_login.json')
 
             
             if not os.path.isfile(settings_file):

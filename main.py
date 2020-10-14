@@ -21,7 +21,7 @@ import dateutil.tz
 from pathlib import Path
 import platform
 import gender
-#import sys
+import sys
 
 
 import pickle
@@ -99,7 +99,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.1.1"
+    ver = "2.1.2"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
@@ -143,7 +143,7 @@ class LoginApp(MDApp):
                 Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
                 file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
         else:
-                file_to_open = Path("userdata") / "glob.vars"
+                file_to_open = Path.home() / self.appName / "glob.vars"
 
         self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
@@ -155,7 +155,7 @@ class LoginApp(MDApp):
                 Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
                 file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
         else:
-                file_to_open = Path("userdata") / "glob.vars"
+                file_to_open = Path.home() / self.appName / "glob.vars"
 
         self.gVars.SequenceRunning = False
         with open(file_to_open, 'wb') as gVarFile:
@@ -177,11 +177,17 @@ class LoginApp(MDApp):
 
     def loadGlobalConfig(self):
         try:
+            
             if (platform.system() == "Darwin"):
                 Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
                 file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
             else:
-                file_to_open = Path("userdata") / "glob.vars"
+
+                #Path(os.path.join(Path.home() , "." + self.appName)).mkdir(parents=True, exist_ok=True)
+                home = Path.home() / self.appName
+                if(not os.path.exists(home)):
+                    os.makedirs(home)
+                file_to_open = home / "glob.vars"
 
             # try:
             with open(file_to_open, 'rb') as gVarFile:
@@ -280,7 +286,8 @@ class LoginApp(MDApp):
                 Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
                 file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
             else:
-                file_to_open = Path("userdata") / "glob.vars"
+                
+                file_to_open = Path.home() / self.appName / "glob.vars"
 
             try:
                 with open(file_to_open, 'wb') as gVarFile:
@@ -329,7 +336,7 @@ class LoginApp(MDApp):
                 Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
                 settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, username + '_login.json')
             else:
-                settings_file = Path("userdata") / str(username + '_login.json')
+                settings_file = Path.home() / self.appName / str(username + '_login.json')
 
             
             if not os.path.isfile(settings_file):
@@ -453,7 +460,7 @@ class LoginApp(MDApp):
             Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
             settings_file = os.path.join(os.getenv("HOME"), "." + app.appName, igusername+'_login.json')
         else:
-            settings_file = Path("userdata") / str(igusername + '_login.json')
+            settings_file = Path.home() / self.appName / str(igusername + '_login.json')
 
         try:
             os.remove(settings_file)
@@ -465,7 +472,7 @@ class LoginApp(MDApp):
             Path(os.path.join(os.getenv("HOME"), "." + app.appName)).mkdir(parents=True, exist_ok=True)
             file_to_open = os.path.join(os.getenv("HOME"), "." + app.appName, "glob.vars")
         else:
-            file_to_open = Path("userdata") / "glob.vars"
+            file_to_open = Path.home() / app.appName / "glob.vars"
 
         with open(file_to_open, 'wb') as gVarFile:
             print('Updating gVars at logout')
@@ -492,6 +499,6 @@ if __name__ == '__main__':
         # p = gender.GenderDetector()
         # print(p.get_gender('john doe'))
     except Exception as e:
-        print("General Error : " + str(e))
+        print("General Error : " + str(e), sys.exc_info())
 
 

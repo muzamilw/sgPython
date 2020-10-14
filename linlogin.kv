@@ -74,11 +74,24 @@
                     pos_hint: {"center_x": .5}
                     on_release: root.do_login(login.text, password.text)
                 
+                # MDLabel:
+                #     text: ' '
+                #     font_style: 'H5'
+                #     pos_hint: {"center_x": .5}
+                #     size_hint: 0.5, 0.1
+                #     theme_text_color: 'Primary'
+
                 MDLabel:
-                    text: ' '
+                    text: 'NOTE :'
                     font_style: 'H5'
                     pos_hint: {"center_x": .5}
-                    size_hint: 0.5, 0.1
+                    size_hint: 0.6, 0.2
+                    theme_text_color: 'Primary'
+                MDLabel:
+                    text: '1 - Sign in the Instagram website as the account holder BEFORE you Login here. \n2 - Set your laptop to NEVER sleep and run this application minimized and running in background. \n3 - To close this application remember to Log Out first and then close the application.'
+                    font_style: 'Body1'
+                    pos_hint: {"center_x": .5}
+                    size_hint: 0.6, 0.1
                     theme_text_color: 'Primary'
 
         
