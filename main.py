@@ -22,7 +22,7 @@ from pathlib import Path
 import platform
 import gender
 import sys
-
+from loguru import logger
 
 import pickle
 #from v import MIMETextnpm
@@ -108,12 +108,12 @@ class LoginApp(MDApp):
     def __init__(self, **kwargs):
         if self.client == 1:
             self.apiBasePath = "https://socialplannerpro.com/API"
-            self.title = "Machine Learning Growth API " + self.ver
+            self.title = "Machine Learning Growth API - v" + self.ver
             self.theme_cls.primary_palette = "DeepPurple"
             self.appName = "SocialPlannerPro"
             self.icon = 'data//ml.ico'
         else:
-            self.title = "Social Growth Labs API " + self.ver
+            self.title = "Social Growth Labs API - v" + self.ver
             self.apiBasePath = "https://app.socialgrowthlabs.com/API"
             self.theme_cls.primary_palette = "Green" #"DeepPurple"
             self.appName = "SocialGrowthLabs"
@@ -478,6 +478,13 @@ class LoginApp(MDApp):
             print('Updating gVars at logout')
             pickle.dump(self.gVars, gVarFile)
 
+
+def exception_handler(exctype, value, tb):
+        logger.error(exctype)
+        logger.error(value)
+        logger.error(traceback.extract_tb(tb))
+
+
 KV = '''
 <IgLoginValidationDlgContent>
     orientation: "vertical"
@@ -495,10 +502,14 @@ KV = '''
 
 if __name__ == '__main__':
     try:
+        logger.add( Path.home() / "SocialPlannerPro" / "logs" / "SessionLog_{time}.log", backtrace=True, diagnose=True, enqueue=True)
+        # sys.excepthook = exception_handler
+        
         LoginApp().run()
         # p = gender.GenderDetector()
         # print(p.get_gender('john doe'))
     except Exception as e:
         print("General Error : " + str(e), sys.exc_info())
+        logger.info("General Error : " + str(e), sys.exc_info())
 
 

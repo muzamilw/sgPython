@@ -23,6 +23,7 @@ import schedule
 import time
 import datetime
 import webbrowser
+from loguru import logger
 
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
@@ -239,12 +240,13 @@ class Ready(Screen):
         Done = [self.xval, 3, 5, 5,7 ]
         # self.drawGraphMain(Done = Done)
 
-    
+    @logger.catch
     def on_enter(self):
         app = App.get_running_app()
+        
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-            
+            app.title = "Machine Learning Growth API - ( "+app.api.username+" ) - v" + app.ver
             lblusername.text = app.api.username
 
             self.graphContainerMain =  self.ids['graphContainerMain']
@@ -346,6 +348,8 @@ class Ready(Screen):
                     schedule.every().day.at(app.gVars.manifestObj.starttime).do(self.startBot).tag('daily-run')
                 self.RunScheduled = True
                 self.processJobEvent = Clock.schedule_interval(self.processjobs, 2)
+            else:
+                print("run not scheduled ??")
             
             
         
@@ -397,9 +401,10 @@ class Ready(Screen):
         else:
             self.ShowErrorMessage("Growth Session is already running, cannot refresh!.")
 
-
+    @logger.catch
     def startBot(self):
         app = App.get_running_app()
+        
         self.log.info("Start.")
         #next time app should launch at the scheudled time instead of the app start +5 min time.
         if app.appLaunchTrigger == True:

@@ -22,6 +22,7 @@ import sys
 import os
 import platform
 from pathlib import Path
+from loguru import logger
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -115,9 +116,10 @@ class Bot():
 
     
 
-
+    @logger.catch
     def RunBot(self):
         app = App.get_running_app()
+        
         api = app.api
         log = self.log
         genderDetector = self.genderDetector
