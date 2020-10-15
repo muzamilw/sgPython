@@ -25,3 +25,11 @@ codesign -s "SocialPlannerPro" /Users/JanatFarooq/Documents/GitHub/sgPython/dist
 SG Build command
 -------
 pyarmor pack -x " --exact --exclude env --exclude .buildozer --exclude mypython --exclude build  " -e " --onefile --windowed -y --icon=sg.icns --runtime-tmpdir /var/user/"  -s macsg.spec main.py
+
+
+
+
+to solve libpng error :
+run below commands in terminal
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+brew install libpng
