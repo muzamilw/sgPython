@@ -107,7 +107,7 @@ class LoginApp(MDApp):
     
     def __init__(self, **kwargs):
         if self.client == 1:
-            self.apiBasePath = "https://socialplannerpro.com/API"
+            self.apiBasePath = "http://sg2/API"
             self.title = "Machine Learning Growth API - v" + self.ver
             self.theme_cls.primary_palette = "DeepPurple"
             self.appName = "SocialPlannerPro"

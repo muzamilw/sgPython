@@ -24,7 +24,7 @@ import time
 import datetime
 import webbrowser
 from loguru import logger
-
+import apiWrappers as apiW
 from instagram_private_api import (
         Client, ClientError, ClientLoginError,
         ClientCookieExpiredError, ClientLoginRequiredError,
@@ -252,7 +252,7 @@ class Ready(Screen):
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
             
-
+            
             app.api.feed_timeline()
 
            
@@ -315,7 +315,7 @@ class Ready(Screen):
                 #refresh the manifest
                 app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
                 app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
-                print('Default manifest loaded')
+                print('Manifest Refreshed.')
                 
                     
 
@@ -360,6 +360,10 @@ class Ready(Screen):
         except ClientLoginRequiredError as e:
             self.ShowErrorMessage('Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
         except ClientError as e:
+            self.ShowErrorMessage('General  error. , full error : ' + str(e))
+        except Exception as e:
+            self.log.info("General  error.")
+            self.log.info(traceback.format_exc())
             self.ShowErrorMessage('General  error. , full error : ' + str(e))
 
     def RefreshManifest(self):

@@ -6,11 +6,12 @@ from random import choices
 from random import randrange
 import pandas as pd
 from itertools import islice
-import datetime
+from datetime import datetime
 from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import smtplib
+from time import mktime
 import time
 import calendar
 import sys
@@ -136,6 +137,22 @@ def UpdateInitialStatsToServer(SocialProfileId, InitFollowers, InitFollowing,Ini
     else:
         return False
 
+def UpdateProfileWarmupToServer(SocialProfileId, WarmupCalculated, BotRunningDays,WarmupCompleted,WarmupCompletedDateTime,IgAccountStartDate,gVars):
+    API_Login = gVars.API_BaseURL + "/Mobile/UpdateProfileWarmup"
+    data = {'SocialProfileId':SocialProfileId,    #1101
+            'WarmupCalculated':WarmupCalculated,
+            'BotRunningDays':BotRunningDays,
+            'WarmupCompleted':WarmupCompleted,
+            'WarmupCompletedDateTime':WarmupCompletedDateTime,
+            'IgAccountStartDate':IgAccountStartDate
+
+           } 
+    r = json.loads(requests.post(url = API_Login, data = data).text) 
+    if r is not None:
+        return True
+    else:
+        return False
+
 
 def GetManifest(SocialProfileId,gVars):
     API_Manifest = gVars.API_BaseURL + "/Mobile/GetManifest"
@@ -157,6 +174,7 @@ class Manifest:
     
 
 def LoadManifest(manifest):
+    app = App.get_running_app()
     hashtags = []
     locations = []
     DirectCompetitors = []
@@ -233,20 +251,87 @@ def LoadManifest(manifest):
     else:
         manifestObj.BlackListWordsManual = [""]
 
-    manifestObj.ActionsDelayRange = manifest["MobileJsonRootObject"]["ActionsDelayRange"].strip().split(",")
-    manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")
-    manifestObj.LocationLoadDelayRange = manifest["MobileJsonRootObject"]["LocationLoadDelayRange"].strip().split(",")
-    manifestObj.UserFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UserFollowLoadDelayRange"].strip().split(",")
-    manifestObj.SuggestedUsersLoadDelayRange = manifest["MobileJsonRootObject"]["SuggestedUsersLoadDelayRange"].strip().split(",")
-    manifestObj.UnFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UnFollowLoadDelayRange"].strip().split(",")
-    manifestObj.StoryLoadDelayRange = manifest["MobileJsonRootObject"]["StoryLoadDelayRange"].strip().split(",")
-            
+
+
+    ##################warming up
+    manifestObj.WarmupCalculated = manifest["MobileJsonRootObject"]["Profile"]["WarmupCalculated"]
+    manifestObj.WarmupCompleted = manifest["MobileJsonRootObject"]["Profile"]["WarmupCompleted"]
+    manifestObj.IgAccountStartDate = manifest["MobileJsonRootObject"]["Profile"]["IgAccountStartDate"]
     
-    manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
-    manifestObj.UnFoll16DaysEngage = int(intervals[0]["UnFoll16DaysEngage"])
-    manifestObj.LikeFollowingPosts = int(intervals[0]["LikeFollowingPosts"])
-    manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
-    manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
+    if manifestObj.WarmupCalculated is not True or  manifestObj.WarmupCompleted is not True:
+        print('Entering Warming up mode')
+        if manifestObj.IgAccountStartDate is None:
+            feed = apiW.getSelfFeedAll(app.api,Client,9999)
+            igage = (datetime.now() - datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"]))))).days
+        else:
+            igage = (datetime.now() - datetime.strptime(manifestObj.IgAccountStartDate)).days
+        igAgeFilter = 0
+        if igage <= 90:
+            igAgeFilter = 1
+        else:
+            igAgeFilter = 2
+        manifestObj.BotRunningDays = manifest["MobileJsonRootObject"]["Profile"]["BotRunningDays"]
+        if manifestObj.BotRunningDays is None:
+            manifestObj.BotRunningDays = 1
+        # else:
+        #     manifestObj.BotRunningDays  += 1
+
+        manifestObj.WarmupConfig = json.loads(manifest["MobileJsonRootObject"]["WarmupConfig"])
+        warmupConfigFound = False
+        for item in manifestObj.WarmupConfig:
+            if item["Day"] == manifestObj.BotRunningDays and item["IGAge"] == igAgeFilter:
+                warmupConfigFound = True
+                manifestObj.FollAccSearchTags = int(item["Following"])
+                manifestObj.UnFoll16DaysEngage = int(item["UnFollow"])
+                manifestObj.LikeFollowingPosts = int(item["Like"])
+                manifestObj.VwStoriesFollowing = int(item["Stories"])
+                manifestObj.CommFollowingPosts =int(item["Comments"])
+
+                manifestObj.ActionsDelayRange = item["ActionDelay"].strip().split(",")
+                manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")
+                manifestObj.LocationLoadDelayRange = manifest["MobileJsonRootObject"]["LocationLoadDelayRange"].strip().split(",")
+                manifestObj.UserFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UserFollowLoadDelayRange"].strip().split(",")
+                manifestObj.SuggestedUsersLoadDelayRange = manifest["MobileJsonRootObject"]["SuggestedUsersLoadDelayRange"].strip().split(",")
+                manifestObj.UnFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UnFollowLoadDelayRange"].strip().split(",")
+                manifestObj.StoryLoadDelayRange = manifest["MobileJsonRootObject"]["StoryLoadDelayRange"].strip().split(",")
+
+        if warmupConfigFound == False:
+            #warmup completed load default values from server
+            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],None,manifestObj.BotRunningDays,True,datetime.now() ,None,app.gVars)
+            
+            manifestObj.ActionsDelayRange = manifest["MobileJsonRootObject"]["ActionsDelayRange"].strip().split(",")
+            manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")
+            manifestObj.LocationLoadDelayRange = manifest["MobileJsonRootObject"]["LocationLoadDelayRange"].strip().split(",")
+            manifestObj.UserFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UserFollowLoadDelayRange"].strip().split(",")
+            manifestObj.SuggestedUsersLoadDelayRange = manifest["MobileJsonRootObject"]["SuggestedUsersLoadDelayRange"].strip().split(",")
+            manifestObj.UnFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UnFollowLoadDelayRange"].strip().split(",")
+            manifestObj.StoryLoadDelayRange = manifest["MobileJsonRootObject"]["StoryLoadDelayRange"].strip().split(",")
+                    
+            
+            manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
+            manifestObj.UnFoll16DaysEngage = int(intervals[0]["UnFoll16DaysEngage"])
+            manifestObj.LikeFollowingPosts = int(intervals[0]["LikeFollowingPosts"])
+            manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
+            manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
+        else:
+            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],True,manifestObj.BotRunningDays,False,None ,datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"])))),app.gVars)
+
+                
+    else:  #use the numbers from the user and ignore warmup since it's already done
+        manifestObj.ActionsDelayRange = manifest["MobileJsonRootObject"]["ActionsDelayRange"].strip().split(",")
+        manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")
+        manifestObj.LocationLoadDelayRange = manifest["MobileJsonRootObject"]["LocationLoadDelayRange"].strip().split(",")
+        manifestObj.UserFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UserFollowLoadDelayRange"].strip().split(",")
+        manifestObj.SuggestedUsersLoadDelayRange = manifest["MobileJsonRootObject"]["SuggestedUsersLoadDelayRange"].strip().split(",")
+        manifestObj.UnFollowLoadDelayRange = manifest["MobileJsonRootObject"]["UnFollowLoadDelayRange"].strip().split(",")
+        manifestObj.StoryLoadDelayRange = manifest["MobileJsonRootObject"]["StoryLoadDelayRange"].strip().split(",")
+                
+        
+        manifestObj.FollAccSearchTags = int(intervals[0]["FollAccSearchTags"])
+        manifestObj.UnFoll16DaysEngage = int(intervals[0]["UnFoll16DaysEngage"])
+        manifestObj.LikeFollowingPosts = int(intervals[0]["LikeFollowingPosts"])
+        manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
+        manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
 
     manifestObj.starttime = intervals[0]["starttime"]
 
@@ -277,6 +362,17 @@ def LoadManifest(manifest):
     manifestObj.totalActionsPerHahTag = math.ceil(manifestObj.totalActionsHashTag / len(manifestObj.hashtags))
     manifestObj.totalActionsPerLocation = math.ceil(manifestObj.totalActionsLocation / len(manifestObj.locations))
     manifestObj.totalActionsPerDirectCompetitor = math.ceil(manifestObj.totalActionsDirectCompetitor / len(manifestObj.DirectCompetitors))
+
+    manifestObj.winappver = manifest["MobileJsonRootObject"]["winappver"].strip()
+    manifestObj.macappver = manifest["MobileJsonRootObject"]["macappver"].strip()
+    manifestObj.winapp = manifest["MobileJsonRootObject"]["winapp"].strip()
+    manifestObj.macapp = manifest["MobileJsonRootObject"]["macapp"].strip()
+    
+
+    
+
+        
+    
     
     return manifestObj
 
