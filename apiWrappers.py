@@ -48,6 +48,24 @@ def getFollowings(api, user_id,Client, maxlen):   #user_following(user_id, rank_
         rank_token = results.get('rank_token')
     return user_results
 
+def getSelfFeedAll(api, Client, maxlen):   #user_following(user_id, rank_token, **kwargs)
+    #return api.getTotalFollowings(user_id)
+    rank_token = Client.generate_uuid()
+    has_more = True
+    user_results = []
+    next_max_id = True
+
+    while has_more and rank_token and next_max_id and len(user_results) < maxlen:
+        if next_max_id is True:
+            next_max_id = ''
+
+        results = api.self_feed(
+            max_id=next_max_id)
+        user_results.extend(results.get('items', []))
+        has_more = results.get('more_available')
+        next_max_id = results.get('next_max_id')
+    return user_results
+
 def getTotalUserFeed(api, user_id):   #user_feed(user_id, **kwargs)
     return api.getTotalUserFeed(user_id)
 
