@@ -102,18 +102,18 @@ class LoginApp(MDApp):
     ver = "2.1.2"
     appName = "SocialPlannerPro"
     apiBasePath = ""
-    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=1) ) .strftime("%H:%M")
+    appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
     appLaunchTrigger = True
     
     def __init__(self, **kwargs):
         if self.client == 1:
-            self.apiBasePath = "http://sg2/API"
-            self.title = "Machine Learning Growth API - v" + self.ver
+            self.apiBasePath = "http://socialplannerpro.com/API"
+            self.title = "[] Engaging on auto-pilot - SPPro - v" + self.ver
             self.theme_cls.primary_palette = "DeepPurple"
             self.appName = "SocialPlannerPro"
             self.icon = 'data//ml.ico'
         else:
-            self.title = "Social Growth Labs API - v" + self.ver
+            self.title = "[] Engaging on auto-pilot - SPPro - v" + self.ver
             self.apiBasePath = "https://app.socialgrowthlabs.com/API"
             self.theme_cls.primary_palette = "Green" #"DeepPurple"
             self.appName = "SocialGrowthLabs"

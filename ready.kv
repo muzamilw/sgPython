@@ -226,11 +226,30 @@
                 size_hint: 1, 0.4
                 on_ref_press: root.onpressLink()
                    
+        MDStackLayout:
+            id:pnlStatus
+            orientation:'lr-tb'
+            md_bg_color: get_color_from_hex("#ffbd08")
+            size_hint: 1, 0.2
+            # size_hint_x : 1
+        
             MDLabel:
-                text : " "
-                font_style: 'H4'
-                size_hint: 1, 0.1
-           
+                id:bLabelWarmup
+                text : ""
+                size_hint: 0.5, 1
+                font_size: "16dp"
+                # text_color: get_color_from_hex("#FFFF00")
+
+            MDLabel:
+                id:bLabelUpdate
+                text : ""
+                size_hint: 0.5, 1
+                font_size: "16dp"
+                markup:True
+                theme_text_color: "Custom"
+                on_ref_press: root.onpressDLLink()
+                # text_color: get_color_from_hex("#FFFF00")
+            
                 
                 
            

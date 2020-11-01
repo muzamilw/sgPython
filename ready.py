@@ -230,6 +230,13 @@ class Ready(Screen):
         else:
             webbrowser.open("https://app.socialgrowthlabs.com/account/login/")
 
+    def onpressDLLink(self):
+        app = App.get_running_app()
+        if app.client == 1:
+            webbrowser.open("https://socialplannerpro.com/home/download")
+        else:
+            ebbrowser.open("https://socialplannerpro.com/home/download")
+
     def animate(self, dt):
         # bar = self.ids['pbar']
         # if bar.value < bar.max:
@@ -246,16 +253,11 @@ class Ready(Screen):
         
         try:
             lblusername = self.ids['lblusername'] #Label(text="showing the log here")
-            app.title = "Machine Learning Growth API - ( "+app.api.username+" ) - v" + app.ver
+            app.title = "["+app.api.username+"] - Engaging on auto-pilot - SPPro - v" + app.ver
             lblusername.text = app.api.username
 
             self.graphContainerMain =  self.ids['graphContainerMain']
             self.graphContainerSecondary =  self.ids['graphContainerSecondary']
-            
-            
-            app.api.feed_timeline()
-
-           
             
             # self.drawGraphMain()
             # self.drawGraphSecondary()
@@ -281,6 +283,12 @@ class Ready(Screen):
             self.bLabel = self.ids['bLabel']
             self.bLabelHead = self.ids['bLabelHead']
             self.bLabelText = self.ids['bLabelText']
+            self.bLabelUpdate = self.ids['bLabelUpdate']
+            self.bLabelWarmup = self.ids['bLabelWarmup']
+            self.pnlStatus = self.ids['pnlStatus']
+            
+            
+            
 
             if self.log is None :
                 log = logging.getLogger("my.logger")
@@ -298,8 +306,9 @@ class Ready(Screen):
 
 
 
+            self.hide_widget(self.pnlStatus)
             
-
+            
             if app.gVars.SequenceRunning == True:
                 self.hide_widget(self.pnlNotStarted)
                 self.hide_widget(self.pnlStarted,False)
@@ -315,6 +324,20 @@ class Ready(Screen):
                 #refresh the manifest
                 app.gVars.manifestJson = cf.GetManifest(app.gVars.loginResult["SocialProfileId"],app.gVars)
                 app.gVars.manifestObj = cf.LoadManifest(app.gVars.manifestJson)
+
+                if app.gVars.manifestObj.winappver != app.gVars.BotVer:
+                    if (platform.system() == "Darwin"):
+                        self.bLabelUpdate.text = "New update "+ str(app.gVars.manifestObj.macappver)+ " available. [u][ref=socialplannerpro.com/downloads]Click here to download[/ref][/u] "
+                    else:
+                        self.bLabelUpdate.text = "New update "+ str(app.gVars.manifestObj.winappver)+ " available. [u][ref=socialplannerpro.com/downloads]Click here to download[/ref][/u] "
+                    self.hide_widget(self.pnlStatus, False)
+                
+                if app.gVars.manifestObj.WarmupCalculated is not True or  app.gVars.manifestObj.WarmupCompleted is not True:
+                    self.bLabelWarmup.text = " Warming up account. " + str(16-app.gVars.manifestObj.BotRunningDays) + " day(s) left"
+                    self.hide_widget(self.pnlStatus, False)
+
+                    
+                
                 print('Manifest Refreshed.')
                 
                     
@@ -350,6 +373,9 @@ class Ready(Screen):
                 self.processJobEvent = Clock.schedule_interval(self.processjobs, 2)
             else:
                 print("run not scheduled ??")
+            
+            #call to check if IG is functional.
+            app.api.feed_timeline()
             
             
         
