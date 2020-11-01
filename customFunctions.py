@@ -181,6 +181,8 @@ def LoadManifest(manifest):
     
     manifestObj = Manifest()
 
+    manifestObj.SocialProfileId = manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"]
+
     manifestObj.PaymentPlanId = manifest["MobileJsonRootObject"]["CurrentPlan"]["PaymentPlanId"]
     manifestObj.PlanName = manifest["MobileJsonRootObject"]["CurrentPlan"]["PlanName"]
 
@@ -251,20 +253,24 @@ def LoadManifest(manifest):
     else:
         manifestObj.BlackListWordsManual = [""]
 
-
+    manifestObj.BlockedStatus = manifest["MobileJsonRootObject"]["Profile"]["BlockedStatus"]
+    manifestObj.BockedSinceDateTime = manifest["MobileJsonRootObject"]["Profile"]["BockedSinceDateTime"]
 
     ##################warming up
     manifestObj.WarmupCalculated = manifest["MobileJsonRootObject"]["Profile"]["WarmupCalculated"]
     manifestObj.WarmupCompleted = manifest["MobileJsonRootObject"]["Profile"]["WarmupCompleted"]
     manifestObj.IgAccountStartDate = manifest["MobileJsonRootObject"]["Profile"]["IgAccountStartDate"]
+    igStartDate = ""
     
     if manifestObj.WarmupCalculated is not True or  manifestObj.WarmupCompleted is not True:
         print('Entering Warming up mode')
         if manifestObj.IgAccountStartDate is None:
             feed = apiW.getSelfFeedAll(app.api,Client,9999)
             igage = (datetime.now() - datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"]))))).days
+            igStartDate  = datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"])))).strftime("%Y-%m-%d %H:%M:%S")
         else:
-            igage = (datetime.now() - datetime.strptime(manifestObj.IgAccountStartDate)).days
+            igage = (datetime.now() - datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S")).days
+            igStartDate  = datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
         igAgeFilter = 0
         if igage <= 90:
             igAgeFilter = 1
@@ -314,7 +320,7 @@ def LoadManifest(manifest):
             manifestObj.VwStoriesFollowing = int(intervals[0]["VwStoriesFollowing"])
             manifestObj.CommFollowingPosts = int(intervals[0]["CommFollowingPosts"])
         else:
-            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],True,manifestObj.BotRunningDays,False,None ,datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"])))),app.gVars)
+            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],True,manifestObj.BotRunningDays,False,None ,igStartDate,app.gVars)
 
                 
     else:  #use the numbers from the user and ignore warmup since it's already done

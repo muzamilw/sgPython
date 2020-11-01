@@ -123,9 +123,9 @@ class Bot():
         api = app.api
         log = self.log
         genderDetector = self.genderDetector
-        MaxRetryCount = 20
+        MaxRetryCount = 6
         RetryCount = 0
-        RetryTimeSeconds = 30
+        RetryTimeSeconds = 45
         IsApiClientError = False
         CommentLimitReachedPerSession = False
 
@@ -250,7 +250,11 @@ class Bot():
                                 gVars.TotalSessionTime = gVars.TotalSessionTime + LoadtimeHashtagsTodo
                                 cf.SendAction(gVars,gVars.SocialProfileId,Actions.ping,'','ping')
                             
-                                
+                            #clearing action block if we have reached here
+                            if gVars.manifestObj.BlockedStatus is not None and gVars.manifestObj.BlockedStatus == 66:
+                                cf.SendAction(gVars,gVars.SocialProfileId,Actions.ClearBlock,"","Block Cleared")
+                                gVars.manifestObj.BlockedStatus = None
+
                             if gVars.locationActions is None or app.ManifestRefreshed == True :
                                 log.info('Fetching feed for Locations')
                                 locationtart = datetime.datetime.now()
@@ -367,9 +371,18 @@ class Bot():
                             IsApiClientError = True
                             return
 
-                        except (ClientError,ClientConnectionError) as e:
+                        except (ClientError) as e:
+                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            log.info("Initial feed : Action Block Received from Instagram, Stopping activity, restart the bot after 24 hours ")
+                            log.info(str(traceback.format_exc()))
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            self.ShowErrorMessage("Initial feed : Action Block Received from Instagram, Stopping activity, restart the bot after 24 hours")
+                            IsApiClientError = True
+                            return
+
+                        except (ClientConnectionError) as e:
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Initial feed : Api Client or Network Error occurred, Restarting")
+                            log.info("Initial feed : Network Error occurred, Restarting")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                            
@@ -530,6 +543,14 @@ class Bot():
                                     file.write(gVars.GlobalTodo.to_html())
 
                                 RetryCount = 0
+
+                                #warmup update
+                                if gVars.manifestObj.WarmupCalculated is not True or  gVars.manifestObj.WarmupCompleted is not True:
+                                    gVars.manifestObj.BotRunningDays += 1
+                                    if gVars.manifestObj.BotRunningDays == 16:  #warmup completes at end of day 15
+                                        cf.UpdateProfileWarmupToServer(gVars.manifestObj.SocialProfileId,True,gVars.manifestObj.BotRunningDays,True,datetime.datetime.today() ,None,gVars)
+                                    else:
+                                        cf.UpdateProfileWarmupToServer(gVars.manifestObj.SocialProfileId,True,gVars.manifestObj.BotRunningDays,False,None ,None,gVars)
                                 
                                 cf.SendEmail('info@socialplannerpro.com',file_to_open,gVars.SGusername,'')
 
@@ -590,9 +611,23 @@ class Bot():
                             self.ui.bLabelText.text = "Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Restart and open terminal to solve IG challenge"
                             return
 
-                        except (ClientError,ClientConnectionError) as e:
-                            #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
-                            log.info("Error : Api Client or Network Error occurred, Restarting")
+                        except (ClientError) as e:
+                            log.info("Instagram Block : Instagram is blocking the account. Stopping the activity and will resume after 24 hours")
+                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            log.info(str(traceback.format_exc()))
+                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            self.ShowErrorMessage("Instagram Action Block : Instagram is blocking the account. Stopping the activity and will resume after 24 hours")
+                            IsApiClientError = True
+
+                            self.ui.showErrorLabel()
+                            self.ui.bLabel.md_bg_color = kutil.get_color_from_hex("#FF0000")
+                            self.ui.bLabelHead.text = "Instagram Action Block"
+                            self.ui.bLabelText.text = "Instagram is blocking the account. Stopping the activity and will resume after 24 hours"
+                            return
+
+                        except (ClientConnectionError) as e:
+                            
+                            log.info("Error : Network Error occurred, Restarting")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                            
