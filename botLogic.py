@@ -380,7 +380,8 @@ class Bot():
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text ,gVars.SGusername)
                             raise e
                             
-                        Comments = ['😀','👍','💓','🤩','🥰','💓💓','Nice!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','😀😀😀','🥰 WoW!','Perfect','Fantastic','Keep it coming!']
+                        #Comments = ['😀','👍','💓','🤩','🥰','💓💓','Nice!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','😀😀😀','🥰 WoW!','Perfect','Fantastic','Keep it coming!']
+                        Comments = ['😀','👍','🖐','🤩','🙌','👏','Blessed!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','Perfect','On Point!!','Make this viral',' 🙌' ]
                         curRow = None
 
                         try:
