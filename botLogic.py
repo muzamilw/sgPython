@@ -394,7 +394,7 @@ class Bot():
                             raise e
                             
                         #Comments = ['😀','👍','💓','🤩','🥰','💓💓','Nice!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','😀😀😀','🥰 WoW!','Perfect','Fantastic','Keep it coming!']
-                        Comments = ['😀','👍','🖐','🤩','🙌','👏','Blessed!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','Perfect','On Point!!','Make this viral',' 🙌' ]
+                        Comments = ['😀','👍','🖐','🤩','🙌🙌','👏','Blessed!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','Perfect','On Point!!','Make this viral',' 🙌','🔥🔥🔥','This is such à POWERFULL image.💯','Great Post 😮😮' ]
                         curRow = None
 
                         try:
