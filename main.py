@@ -3,7 +3,6 @@
 
 import requests 
 import os.path
-import datetime
 import pandas
 
 #from collections import Counter
@@ -12,7 +11,6 @@ from random import randint
 import json
 import logging
 import time
-import datetime
 import random
 import codecs
 from urllib.parse import urlparse
@@ -99,7 +97,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.1.2"
+    ver = "2.1.3"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
@@ -107,7 +105,7 @@ class LoginApp(MDApp):
     
     def __init__(self, **kwargs):
         if self.client == 1:
-            self.apiBasePath = "http://socialplannerpro.com/API"
+            self.apiBasePath = "https://socialplannerpro.com/API"
             self.title = "[] Engaging on auto-pilot - SPPro - v" + self.ver
             self.theme_cls.primary_palette = "DeepPurple"
             self.appName = "SocialPlannerPro"

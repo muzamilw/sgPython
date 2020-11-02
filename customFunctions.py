@@ -6,7 +6,6 @@ from random import choices
 from random import randrange
 import pandas as pd
 from itertools import islice
-from datetime import datetime
 from email.message import EmailMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -266,11 +265,11 @@ def LoadManifest(manifest):
         print('Entering Warming up mode')
         if manifestObj.IgAccountStartDate is None:
             feed = apiW.getSelfFeedAll(app.api,Client,9999)
-            igage = (datetime.now() - datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"]))))).days
-            igStartDate  = datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"])))).strftime("%Y-%m-%d %H:%M:%S")
+            igage = (datetime.datetime.now() - datetime.datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"]))))).days
+            igStartDate  = datetime.datetime.fromtimestamp(mktime(time.localtime(int(feed[-1]["taken_at"])))).strftime("%Y-%m-%d %H:%M:%S")
         else:
-            igage = (datetime.now() - datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S")).days
-            igStartDate  = datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+            igage = (datetime.datetime.now() - datetime.datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S")).days
+            igStartDate  = datetime.datetime.strptime(manifestObj.IgAccountStartDate,"%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
         igAgeFilter = 0
         if igage <= 90:
             igAgeFilter = 1

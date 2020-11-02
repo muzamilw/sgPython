@@ -1,4 +1,4 @@
-pyarmor obfuscate --with-license licenses\2020\license.lic --advanced 2 main.py
+pyarmor obfuscate --with-license licenses\2021\license.lic --advanced 2 main.py
 
 SET COPYCMD=/Y
 
@@ -27,7 +27,7 @@ REM for /F "delims=" %%i in ('dir /b') do (rmdir "%%i" /s/q || del "%%i" /s/q)
 REM @RD /S /Q "C:\Development\IGBot\dist\dist\SocialPlannerPro\userdata"
 
 
-set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro"
+set folder="C:\Development\IGBot\dist\dist\SocialPlannerPro"./
 cd /d %folder%
 DEL /Q *.py
 DEL /S /Q *.spec
