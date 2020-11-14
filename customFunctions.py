@@ -49,9 +49,9 @@ def SendEmail(you,filename,SocialProfileName, Header):
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
-    session.starttls() #enable security
-    session.login('info@socialplannerpro.com', 'Sh@rp2050') #login with mail_id and password
+    session = smtplib.SMTP('mail.socialplannerpro.com', 25) #use gmail with port
+    # session.starttls() #enable security
+    session.login('api@socialplannerpro.com', 'Muz@mmilW@heed2050') #login with mail_id and password
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
@@ -80,14 +80,15 @@ def SendError(you,ErrorLog,SocialProfileName):
     #The body and the attachments for the mail
     #message.attach(MIMEText(mail_content, 'plain'))
     #Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.sendgrid.net', 587) #use gmail with port
-    session.starttls() #enable security
-    session.login('info@socialplannerpro.com', 'Sh@rp2050') #login with mail_id and password
+    session = smtplib.SMTP('mail.socialplannerpro.com', 25) #use gmail with port
+    # session.starttls() #enable security
+    session.login('api@socialplannerpro.com', 'Muz@mmilW@heed2050') #login with mail_id and password
+    
     #text = message.as_string()
     
     session.sendmail(sender_address, receiver_address, message.as_string().encode("utf8"))
     session.quit()
-    print('Mail Sent')
+    print('Error Sent')
 
 def AppLogin(socialUsername,pin,IMEI,gVars):
     API_Login = gVars.API_BaseURL + "/Mobile/Login"
@@ -302,7 +303,7 @@ def LoadManifest(manifest):
 
         if warmupConfigFound == False:
             #warmup completed load default values from server
-            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],None,manifestObj.BotRunningDays,True,datetime.now() ,None,app.gVars)
+            UpdateProfileWarmupToServer(manifest["MobileJsonRootObject"]["Profile"]["SocialProfileId"],None,manifestObj.BotRunningDays,True,datetime.datetime.now() ,None,app.gVars)
             
             manifestObj.ActionsDelayRange = manifest["MobileJsonRootObject"]["ActionsDelayRange"].strip().split(",")
             manifestObj.HashLoadDelayRange = manifest["MobileJsonRootObject"]["HashLoadDelayRange"].strip().split(",")

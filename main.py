@@ -3,6 +3,7 @@
 
 import requests 
 import os.path
+import os
 import pandas
 
 #from collections import Counter
@@ -97,7 +98,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.1.3"
+    ver = "2.1.4"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
@@ -502,12 +503,13 @@ if __name__ == '__main__':
     try:
         logger.add( Path.home() / "SocialPlannerPro" / "logs" / "SessionLog_{time}.log", backtrace=True, diagnose=True, enqueue=True)
         # sys.excepthook = exception_handler
-        
+       
         LoginApp().run()
-        # p = gender.GenderDetector()
-        # print(p.get_gender('john doe'))
+        # print(os.getpid())
     except Exception as e:
         print("General Error : " + str(e), sys.exc_info())
         logger.info("General Error : " + str(e), sys.exc_info())
+        app = App.get_running_app()
+        cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +sys.exc_info()  ,app.gVars.IGusername)
 
 

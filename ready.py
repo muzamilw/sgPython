@@ -263,6 +263,7 @@ class Ready(Screen):
             # self.drawGraphSecondary()
 
             # Clock.schedule_interval(self.animate, 1)
+            
             bar = self.ids['pbar']
             
             if (platform.system() == "Darwin"):
@@ -387,10 +388,14 @@ class Ready(Screen):
             self.ShowErrorMessage('Challenge received from IG,remove challenge by visiting IG manually. , full error : ' + str(e))
         except ClientError as e:
             self.ShowErrorMessage('General  error. , full error : ' + str(e))
+            app = App.get_running_app()
+            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +str(sys.exc_info())  ,app.gVars.IGusername)
         except Exception as e:
             self.log.info("General  error.")
             self.log.info(traceback.format_exc())
             self.ShowErrorMessage('General  error. , full error : ' + str(e))
+            app = App.get_running_app()
+            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " + str(sys.exc_info())  ,app.gVars.IGusername)
 
     def RefreshManifest(self):
         
