@@ -372,7 +372,7 @@ class Bot():
                             return
 
                         except (ClientError) as e:
-                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,gVars.SGusername,"b")
                             log.info("Initial feed : Action Block Received from Instagram, Stopping activity, restart the bot after 24 hours ")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
@@ -394,7 +394,8 @@ class Bot():
                             raise e
                             
                         #Comments = ['😀','👍','💓','🤩','🥰','💓💓','Nice!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','😀😀😀','🥰 WoW!','Perfect','Fantastic','Keep it coming!']
-                        Comments = ['😀','👍','🖐','🤩','🙌🙌','👏','Blessed!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','Perfect','On Point!!','Make this viral',' 🙌','🔥🔥🔥','This is such à POWERFULL image.💯','Great Post 😮😮' ]
+                        #Comments = ['😀','👍','🖐','🤩','🙌🙌','👏','Blessed!','WoW!!','👍👍👍','Keep it up!','Could not be better','Aha!!','Perfect','On Point!!','Make this viral',' 🙌','🔥🔥🔥','This is such à POWERFULL image.💯','Great Post 😮😮' ]
+                        Comments = ['😀','👍','🖐','🤩','🙌🙌','👏','👍👍👍','🙌','🔥🔥🔥','💯','😮😮','🤩🤩','😀😀','👏👏']
                         curRow = None
 
                         try:
