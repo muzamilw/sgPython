@@ -123,9 +123,9 @@ class Bot():
         api = app.api
         log = self.log
         genderDetector = self.genderDetector
-        MaxRetryCount = 6
+        MaxRetryCount = 16
         RetryCount = 0
-        RetryTimeSeconds = 45
+        RetryTimeSeconds = 145
         IsApiClientError = False
         CommentLimitReachedPerSession = False
 
@@ -363,7 +363,7 @@ class Bot():
                             return
 
                         except (ClientSentryBlockError, ClientChallengeRequiredError, ClientCheckpointRequiredError) as e:
-                            #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.HardBlock,gVars.SGusername,"b")
                             log.info("Initial feed : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
@@ -372,7 +372,7 @@ class Bot():
                             return
 
                         except (ClientError) as e:
-                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,gVars.SGusername,"b")
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.ActionBlock,gVars.SGusername,"b")
                             log.info("Initial feed : Action Block Received from Instagram, Stopping activity, restart the bot after 24 hours ")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
@@ -408,7 +408,7 @@ class Bot():
                                 if row['Status'] == 1 and not pd.isnull(str(row['MediaId'])) and str(row['MediaId']) != 'nan':
                                     
                                     waitTime = randrange(int(gVars.manifestObj.ActionsDelayRange[0]),int(gVars.manifestObj.ActionsDelayRange[1]))
-                                    
+                                    curRow = row
                                     
                                     if row['Action'] == 'Like' and gVars.manifestObj.AfterFollLikeuserPosts == 1 and ( gVars.CurrentLikeDone < gVars.manifestObj.LikeFollowingPosts or gVars.CurrentExLikeDone < gVars.ReqExLikes):
                                         try:
@@ -603,7 +603,8 @@ class Bot():
                             #cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
                             log.info("Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Also open terminal to solve IG challenge ")
                             log.info(str(traceback.format_exc()))
-                            cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.HardBlock,curRow['Username'],"Fatal Error : Instagram Error occurred, Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Also open terminal to solve IG challenge")
+                            cf.SendError(gVars,'info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Critical Instagram Error occurred, Stopping Sequence. Please open Instagram in the browser and manually clear any location Challenges or checkpoints. Also open terminal to solve IG challenge")
                             IsApiClientError = True
 
@@ -615,7 +616,7 @@ class Bot():
 
                         except (ClientError) as e:
                             log.info("Instagram Block : Instagram is blocking the account. Stopping the activity and will resume after 24 hours")
-                            cf.SendAction(gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],curRow)
+                            cf.SendAction(gVars,gVars.SocialProfileId,Actions.ActionBlock,curRow['Username'],"Instagram Block : Instagram is blocking the account. Stopping the activity and will resume after 24 hours")
                             log.info(str(traceback.format_exc()))
                             cf.SendError('info@socialplannerpro.com',traceback.format_exc() + self.logControl.text,gVars.SGusername)
                             self.ShowErrorMessage("Instagram Action Block : Instagram is blocking the account. Stopping the activity and will resume after 24 hours")

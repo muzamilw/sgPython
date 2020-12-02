@@ -5,7 +5,7 @@ import requests
 import os.path
 import os
 import pandas
-
+import traceback
 #from collections import Counter
 from time import sleep
 from random import randint
@@ -29,6 +29,7 @@ import pickle
 import customFunctions as cf
 import apiWrappers as apiW
 import botLogic
+import dbutil
 
 import kivy
 kivy.require('1.11.0')
@@ -98,7 +99,7 @@ class LoginApp(MDApp):
     alert_dialog = None
     
     client = 1
-    ver = "2.1.5"
+    ver = "2.1.6"
     appName = "SocialPlannerPro"
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
@@ -500,16 +501,17 @@ KV = '''
 '''  
 
 if __name__ == '__main__':
+    
     try:
         logger.add( Path.home() / "SocialPlannerPro" / "logs" / "SessionLog_{time}.log", backtrace=True, diagnose=True, enqueue=True)
         # sys.excepthook = exception_handler
        
         LoginApp().run()
-        # print(os.getpid())
+      
     except Exception as e:
         print("General Error : " + str(e), sys.exc_info())
         logger.info("General Error : " + str(e), sys.exc_info())
         app = App.get_running_app()
-        cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +sys.exc_info()  ,app.gVars.IGusername)
+        cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +str(sys.exc_info())  ,"gen exception")
 
 
