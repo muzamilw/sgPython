@@ -104,6 +104,7 @@ class LoginApp(MDApp):
     apiBasePath = ""
     appStartTime = (datetime.datetime.now()  + datetime.timedelta(minutes=5) ) .strftime("%H:%M")
     appLaunchTrigger = True
+    dbPath = ""
     
     def __init__(self, **kwargs):
         if self.client == 1:
@@ -126,6 +127,7 @@ class LoginApp(MDApp):
     def build(self):
         self.loadGlobalConfig()
         manager = ScreenManager()
+       
         
         manager.add_widget(Login(name='login'))
         manager.add_widget(Ready(name='ready'))
@@ -181,6 +183,7 @@ class LoginApp(MDApp):
             if (platform.system() == "Darwin"):
                 Path(os.path.join(os.getenv("HOME"), "." + self.appName)).mkdir(parents=True, exist_ok=True)
                 file_to_open = os.path.join(os.getenv("HOME"), "." + self.appName, "glob.vars")
+                self.dbPath = os.path.join(os.getenv("HOME"), "." + self.appName, "data.db")
             else:
 
                 #Path(os.path.join(Path.home() , "." + self.appName)).mkdir(parents=True, exist_ok=True)
@@ -188,6 +191,7 @@ class LoginApp(MDApp):
                 if(not os.path.exists(home)):
                     os.makedirs(home)
                 file_to_open = home / "glob.vars"
+                self.dbPath = home / "data.db"
 
             # try:
             with open(file_to_open, 'rb') as gVarFile:
@@ -512,6 +516,6 @@ if __name__ == '__main__':
         print("General Error : " + str(e), sys.exc_info())
         logger.info("General Error : " + str(e), sys.exc_info())
         app = App.get_running_app()
-        cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +str(sys.exc_info())  ,"gen exception")
+        # cf.SendError('info@socialplannerpro.com',traceback.format_exc() + str(e) + " " +str(sys.exc_info())  ,"gen exception")
 
 

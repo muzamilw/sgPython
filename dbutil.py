@@ -22,7 +22,7 @@ def create_table(conn, create_table_sql):
     """
     try:
         c = conn.cursor()
-        c.execute("DROP TABLE profiles")
+        #c.execute("DROP TABLE profiles")
         c.execute(create_table_sql)
     except Error as e:
         print(e)
@@ -75,8 +75,7 @@ def select_all_profiles(conn):
 
     rows = cur.fetchall()
 
-    for row in rows:
-        print(row)
+    return rows
 
 
 def select_profile_byname(conn,profilename):
